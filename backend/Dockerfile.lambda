@@ -1,11 +1,10 @@
 FROM public.ecr.aws/lambda/python:3.11
 
-# Install dependencies
+COPY app/ app/
+COPY main.py .
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
-# Copy function code
-COPY ./app ${LAMBDA_TASK_ROOT}
+CMD ["main.handler"]
 
-# Set the CMD to your handler
-CMD ["app.main:app"]

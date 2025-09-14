@@ -1,0 +1,6 @@
+[dev.deploy.parameters]
+stack_name = "zcout-backend-dev"
+region = "eu-central-1"
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true

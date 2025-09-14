@@ -1,0 +1,143 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Zcout backend (FastAPI on Lambda behind HttpApi) — SAM template
+
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+    AllowedPattern: '^[a-z0-9\-]+$'
+    Description: API stage name (e.g., dev, uat, prod)
+  ImageUri:
+    Type: String
+    Description: ECR image URI for the backend Lambda (e.g., 6401....dkr.ecr.eu-central-1.amazonaws.com/zcout-backend-lambda:latest)
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 512
+    Tracing: Active
+    Architectures: [ x86_64 ]
+    Environment:
+      Variables:
+        STAGE:
+          Ref: StageName
+
+Resources:
+  ApiGateway:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName:
+        Ref: StageName
+      CorsConfiguration:
+        AllowOrigins: ['*']
+        AllowMethods: ['*']
+        AllowHeaders: ['*']
+
+  BackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: zcout-backend-lambda-${StageName}
+      PackageType: Image
+      ImageUri:
+        Ref: ImageUri
+      Events:
+        Proxy:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: ApiGateway
+            Path: /{proxy+}
+            Method: ANY
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: ApiGateway
+            Path: /
+            Method: ANY
+      Environment:
+        Variables:
+          STAGE:
+            Ref: StageName
+          VOTES_TABLE_NAME:
+            Fn::Sub: zcout-votes-${StageName}
+          PLAYERS_TABLE_NAME: !Sub zcout-players-${StageName}
+
+  VotesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName:
+        Fn::Sub: zcout-votes-${StageName}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: player_id
+          AttributeType: S
+        - AttributeName: ts
+          AttributeType: N
+      KeySchema:
+        - AttributeName: player_id
+          KeyType: HASH
+        - AttributeName: ts
+          KeyType: RANGE
+
+  VotesTablePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName:
+        Fn::Sub: zcout-votes-access-${StageName}
+      Roles:
+        - Ref: BackendFunctionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:GetItem
+              - dynamodb:Query
+              - dynamodb:DescribeTable
+            Resource:
+              - Fn::GetAtt: [VotesTable, Arn]
+
+  PlayersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub zcout-players-${StageName}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: player_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: player_id
+          KeyType: HASH
+
+  PlayersTablePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub zcout-players-access-${StageName}
+      Roles:
+        - Ref: BackendFunctionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:GetItem
+              - dynamodb:Query
+              - dynamodb:BatchWriteItem
+              - dynamodb:DescribeTable
+            Resource:
+              - !GetAtt PlayersTable.Arn
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the deployed API stage
+    Value:
+      Fn::Sub: https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${StageName}
