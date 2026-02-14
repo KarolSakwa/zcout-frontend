@@ -10,11 +10,16 @@ Parameters:
     Description: API stage name (e.g., dev, uat, prod)
   ImageUri:
     Type: String
-    Description: ECR image URI for the backend Lambda (e.g., 6401....dkr.ecr.eu-central-1.amazonaws.com/zcout-backend-lambda:latest)
+    Description: ECR image URI OR local Docker tag for the backend Lambda (e.g., 6401....dkr.ecr.eu-central-1.amazonaws.com/zcout-backend-lambda:latest OR zcout-backend-lambda:dev)
+  DebugpyEnabled:
+    Type: String
+    Default: '0'
+    AllowedValues: ['0','1']
+    Description: Set to '1' for local debugging with debugpy (port 5678)
 
 Globals:
   Function:
-    Timeout: 10
+    Timeout: 50
     MemorySize: 512
     Tracing: Active
     Architectures: [ x86_64 ]
@@ -61,33 +66,58 @@ Resources:
         Variables:
           STAGE:
             Ref: StageName
-          VOTES_TABLE_NAME:
-            Fn::Sub: zcout-votes-${StageName}
+          # DynamoDB table names used by the code
+          VOTES_TABLE_NAME: !Sub zcout-votes-${StageName}
           PLAYERS_TABLE_NAME: !Sub zcout-players-${StageName}
+          ACCUMULATORS_TABLE_NAME: !Sub zcout-acc-v2-${StageName}
+          RATINGS_TABLE_NAME: !Sub zcout-ratings-${StageName}
+          # Debugger flags (picked up in main.py)
+          DEBUGPY_ENABLED:
+            Ref: DebugpyEnabled
+          DEBUGPY_WAIT: '0'
+          PYDEVD_DISABLE_FILE_VALIDATION: '1'
+
 
   VotesTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName:
-        Fn::Sub: zcout-votes-${StageName}
+      TableName: !Sub zcout-votes-${StageName}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: player_id
+        - AttributeName: vote_id
           AttributeType: S
         - AttributeName: ts
-          AttributeType: N
+          AttributeType: S
+        - AttributeName: gsiPairPK
+          AttributeType: S
+        - AttributeName: gsiPlayerPK
+          AttributeType: S
       KeySchema:
-        - AttributeName: player_id
+        - AttributeName: vote_id
           KeyType: HASH
-        - AttributeName: ts
-          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1Pair
+          KeySchema:
+            - AttributeName: gsiPairPK
+              KeyType: HASH
+            - AttributeName: ts
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: GSI2Player
+          KeySchema:
+            - AttributeName: gsiPlayerPK
+              KeyType: HASH
+            - AttributeName: ts
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   VotesTablePolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName:
-        Fn::Sub: zcout-votes-access-${StageName}
+      PolicyName: !Sub zcout-votes-access-${StageName}
       Roles:
         - Ref: BackendFunctionRole
       PolicyDocument:
@@ -101,7 +131,40 @@ Resources:
               - dynamodb:Query
               - dynamodb:DescribeTable
             Resource:
-              - Fn::GetAtt: [VotesTable, Arn]
+              - !GetAtt VotesTable.Arn
+              - !Sub '${VotesTable.Arn}/index/*'
+
+  # Pair Accumulators (preview windows)
+  PairAccumulatorsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub zcout-acc-v2-${StageName}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: acc_key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: acc_key
+          KeyType: HASH
+
+  PairAccumulatorsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub zcout-accumulators-access-${StageName}
+      Roles:
+        - Ref: BackendFunctionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DescribeTable
+            Resource:
+              - !GetAtt PairAccumulatorsTable.Arn
 
   PlayersTable:
     Type: AWS::DynamoDB::Table
@@ -135,6 +198,42 @@ Resources:
               - dynamodb:DescribeTable
             Resource:
               - !GetAtt PlayersTable.Arn
+
+  # NEW: Ratings table used by /vote
+  RatingsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub zcout-ratings-${StageName}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: player_id
+          AttributeType: S
+        - AttributeName: attr
+          AttributeType: S
+      KeySchema:
+        - AttributeName: player_id
+          KeyType: HASH
+        - AttributeName: attr
+          KeyType: RANGE
+
+  RatingsTablePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub zcout-ratings-access-${StageName}
+      Roles:
+        - Ref: BackendFunctionRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:GetItem
+              - dynamodb:DescribeTable
+            Resource:
+              - !GetAtt RatingsTable.Arn
 
 Outputs:
   ApiUrl:

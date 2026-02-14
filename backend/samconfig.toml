@@ -1,4 +1,6 @@
-[dev.deploy.parameters]
+version = 0.1
+
+[default.deploy.parameters]
 stack_name = "zcout-backend-dev"
 region = "eu-central-1"
 capabilities = "CAPABILITY_IAM"
