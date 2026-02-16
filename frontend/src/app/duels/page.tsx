@@ -4,7 +4,7 @@ import Duel from '@/components/Duel';
 
 type PairResponse = any;
 
-export default async function Home() {
+export default async function DuelsPage() {
   const res = await fetch('http://localhost:8080/api/duels/next', {
     cache: 'no-store',
     headers: { Accept: 'application/json' },

@@ -1,0 +1,453 @@
+.page {
+  min-height: calc(100vh - 64px);
+  padding: 26px 28px 44px;
+}
+
+.header {
+  display: grid;
+  justify-items: center;
+  margin: 6px 0 18px;
+}
+
+.title {
+  font-size: 46px;
+  letter-spacing: 10px;
+  font-weight: 800;
+  color: rgba(215, 177, 90, 0.95);
+  text-transform: uppercase;
+  text-shadow: 0 16px 50px rgba(0, 0, 0, 0.65);
+}
+
+.sub {
+  margin-top: 8px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.grid {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 18px;
+  align-items: start;
+}
+
+.left {
+  display: grid;
+  gap: 14px;
+}
+
+.right {
+  display: grid;
+  gap: 12px;
+}
+
+.panel {
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 12, 0.52);
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.45);
+  padding: 18px;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(700px 260px at 20% 15%, color-mix(in oklab, var(--c1), transparent 70%), transparent 60%),
+    radial-gradient(540px 220px at 85% 30%, color-mix(in oklab, var(--c3), transparent 82%), transparent 60%),
+    radial-gradient(520px 260px at 55% 110%, color-mix(in oklab, var(--c2), transparent 82%), transparent 60%);
+  opacity: 0.55;
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.panelTitle {
+  position: relative;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(215, 177, 90, 0.85);
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.clubOverallRow {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.clubOverallLabel {
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.clubOverallValue {
+  font-size: 38px;
+  letter-spacing: 1px;
+  font-weight: 950;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.statRows {
+  position: relative;
+  display: grid;
+  gap: 12px;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 92px 1fr 52px;
+  gap: 12px;
+  align-items: center;
+}
+
+.statKey {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 800;
+}
+
+.statBar {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.statFill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(215, 177, 90, 0.95), rgba(255, 225, 160, 0.9));
+  border-radius: 999px;
+}
+
+.statVal {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  opacity: 0.9;
+}
+
+.topCard {
+  position: relative;
+  display: grid;
+  gap: 14px;
+}
+
+.topHead {
+  display: grid;
+  grid-template-columns: 60px 1fr 78px;
+  gap: 14px;
+  align-items: center;
+}
+
+.topAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  border: 1px solid rgba(215, 177, 90, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+}
+
+.topAvatarInner {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 40% 30%, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.22));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.topMeta {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.topNameRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.posBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(215, 177, 90, 0.55);
+  background: rgba(10, 10, 12, 0.35);
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(255, 215, 120, 0.95);
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.topName {
+  font-weight: 950;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topOverall {
+  justify-self: end;
+  text-align: right;
+}
+
+.topOverallLabel {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.topOverallValue {
+  font-size: 38px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.topConf {
+  display: grid;
+  gap: 8px;
+}
+
+.topConfLabel {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  font-weight: 800;
+}
+
+.confGrid {
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  gap: 12px;
+  align-items: center;
+}
+
+.confBar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.confFill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(215, 177, 90, 0.95), rgba(255, 225, 160, 0.9));
+}
+
+.confPct {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+}
+
+.topActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.listHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 2px 0;
+}
+
+.listTitle {
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: rgba(215, 177, 90, 0.88);
+}
+
+.listMeta {
+  font-size: 12px;
+  opacity: 0.65;
+  letter-spacing: 1px;
+}
+
+.tableWrap {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 12, 0.52);
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.thead th {
+  padding: 14px 14px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 900;
+  color: rgba(215, 177, 90, 0.82);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sortLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: rgba(215, 177, 90, 0.82);
+}
+
+.sortLink:hover {
+  color: rgba(255, 215, 140, 0.95);
+}
+
+.sortActive {
+  color: rgba(255, 215, 140, 0.98);
+}
+
+.sortArrow {
+  font-size: 10px;
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.row td {
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.row:last-child td {
+  border-bottom: 0;
+}
+
+.rankCell {
+  width: 44px;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+.playerCell {
+  min-width: 240px;
+}
+
+.playerName {
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.posCell {
+  width: 92px;
+}
+
+.posPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(215, 177, 90, 0.35);
+  background: rgba(10, 10, 12, 0.25);
+  font-weight: 900;
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+
+.ovrCell {
+  width: 86px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+}
+
+.confCell {
+  width: 260px;
+}
+
+.profileCell {
+  width: 120px;
+  text-align: right;
+}
+
+.profileBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(215, 177, 90, 0.5);
+  background: rgba(10, 10, 12, 0.25);
+  color: rgba(255, 215, 120, 0.95);
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.profileBtn:hover {
+  border-color: rgba(215, 177, 90, 0.7);
+  background: rgba(10, 10, 12, 0.35);
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  letter-spacing: 1px;
+  font-size: 12px;
+}
+
+.backLink:hover {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.error {
+  max-width: 1240px;
+  margin: 0 auto;
+  opacity: 0.8;
+  display: grid;
+  gap: 10px;
+}
+
+.empty {
+  opacity: 0.65;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

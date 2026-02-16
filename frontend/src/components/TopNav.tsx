@@ -7,9 +7,9 @@ import React from 'react';
 import styles from './TopNav.module.css';
 
 const ITEMS = [
-  { href: '/', label: 'DUEL' },
+  { href: '/duels', label: 'DUEL' },
   { href: '/rankings', label: 'RANKINGS' },
-  { href: '/players', label: 'PLAYERS' },
+  { href: '/database', label: 'DATABASE' },
 ];
 
 export default function TopNav() {
@@ -24,7 +24,11 @@ export default function TopNav() {
 
         <nav className={styles.menu} aria-label="Main">
           {ITEMS.map((it) => {
-            const active = pathname === it.href;
+            const active =
+              it.href === '/duels'
+                ? pathname === '/' || pathname.startsWith('/duels')
+                : pathname === it.href || pathname.startsWith(`${it.href}/`);
+
             return (
               <Link
                 key={it.href}
