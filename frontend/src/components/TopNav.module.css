@@ -71,5 +71,46 @@
 }
 
 .spacer {
+  display: none;
+}
+
+.auth {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.auth a {
+  color: #d7b15a;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.auth a:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: #d7b15a;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.auth button:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

@@ -12,27 +12,23 @@ function readCookieFromReq(req: Request, name: string): string | null {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.text();
-
     const anonId = readCookieFromReq(req, "zcout_anon_id");
     const cookieHeader = req.headers.get("cookie");
-    const xsrfHeader = req.headers.get("x-xsrf-token");
+    const xsrfCookie = readCookieFromReq(req, "XSRF-TOKEN");
 
     const headers: Record<string, string> = {
       Accept: "application/json",
-      "Content-Type": "application/json",
       Origin: ORIGIN,
       Referer: `${ORIGIN}/`,
       "X-Requested-With": "XMLHttpRequest",
     };
     if (anonId) headers["X-Zcout-Anon"] = anonId;
     if (cookieHeader) headers["Cookie"] = cookieHeader;
-    if (xsrfHeader) headers["X-XSRF-TOKEN"] = xsrfHeader;
+    if (xsrfCookie) headers["X-XSRF-TOKEN"] = xsrfCookie;
 
-    const upstream = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/votes`, {
+    const upstream = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/auth/claim-anon`, {
       method: "POST",
       headers,
-      body,
       cache: "no-store",
     });
 
@@ -45,7 +41,7 @@ export async function POST(req: Request) {
     });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
-    return new Response(JSON.stringify({ error: "Proxy /api/vote failed", message }), {
+    return new Response(JSON.stringify({ error: "Proxy /api/auth/claim-anon failed", message }), {
       status: 500,
       headers: { "content-type": "application/json" },
     });

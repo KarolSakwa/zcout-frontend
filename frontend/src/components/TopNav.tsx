@@ -1,10 +1,11 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react';
 import styles from './TopNav.module.css';
+import AuthStatus from './AuthStatus';
 
 const ITEMS = [
   { href: '/duels', label: 'DUEL' },
@@ -42,6 +43,10 @@ export default function TopNav() {
         </nav>
 
         <div className={styles.spacer} />
+
+        <div className={styles.auth}>
+          <AuthStatus />
+        </div>
       </div>
     </header>
   );

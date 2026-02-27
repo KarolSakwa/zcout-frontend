@@ -100,7 +100,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     setTransition('idle');
 
     try {
-      const res = await fetch(`${API_BASE}/api/duels/next`, {
+      const res = await fetch(`/api/vote`, {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
         signal: controller.signal,
@@ -374,9 +374,22 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
       };
 
       try {
-        const res = await fetch(`${API_BASE}/api/votes`, {
+        await fetch('/api/auth/csrf', { method: 'GET' });
+
+        const xsrfCookie = document.cookie
+          .split('; ')
+          .find((c) => c.startsWith('XSRF-TOKEN='));
+        const xsrf = xsrfCookie ? decodeURIComponent(xsrfCookie.split('=')[1] ?? '') : '';
+
+        const res = await fetch(`/api/vote`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': xsrf,
+          },
           body: JSON.stringify(body),
         });
 
