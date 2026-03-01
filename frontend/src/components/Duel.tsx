@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ZLoader from './ZLoader';
 import type { PairResponse, RatingsMap, VoteApiResponse } from './duels/duelTypes';
-import { API_BASE, ATTR_MAP, SLIDE_MS, glowForAttribute, normalizePair, toPct } from './duels/duelUtils';
+import { ATTR_MAP, SLIDE_MS, glowForAttribute, normalizePair, toPct } from './duels/duelUtils';
 import DuelCountdownBar from './duels/DuelCountdownBar';
 import DuelAttributeHeader from './duels/DuelAttributeHeader';
 import DuelCardsRow from './duels/DuelCardsRow';
@@ -100,7 +100,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     setTransition('idle');
 
     try {
-      const res = await fetch(`/api/vote`, {
+      const res = await fetch(`/api/duel/next`, {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
         signal: controller.signal,
@@ -146,7 +146,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     setLoadingPair(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/duels/next`, {
+      const res = await fetch(`/api/duel/next`, {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
         signal: controller.signal,
@@ -376,9 +376,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
       try {
         await fetch('/api/auth/csrf', { method: 'GET' });
 
-        const xsrfCookie = document.cookie
-          .split('; ')
-          .find((c) => c.startsWith('XSRF-TOKEN='));
+        const xsrfCookie = document.cookie.split('; ').find((c) => c.startsWith('XSRF-TOKEN='));
         const xsrf = xsrfCookie ? decodeURIComponent(xsrfCookie.split('=')[1] ?? '') : '';
 
         const res = await fetch(`/api/vote`, {
@@ -392,6 +390,16 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
           },
           body: JSON.stringify(body),
         });
+
+        if (res.status === 409) {
+          setShowPendingUi(false);
+          if (pendingUiTimerRef.current) window.clearTimeout(pendingUiTimerRef.current);
+          pendingUiTimerRef.current = null;
+          setLastWinner(null);
+          clearAutoNext(true);
+          goNext();
+          return;
+        }
 
         if (!res.ok) {
           const text = await res.text().catch(() => '');
@@ -443,7 +451,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         setVoting(false);
       }
     },
-    [pair, voting, transition, clearAutoNext, scheduleAutoNextAfterReveal, lastWinner]
+    [pair, voting, transition, clearAutoNext, scheduleAutoNextAfterReveal, lastWinner, goNext]
   );
 
   const showImpact = impactVisible && !!postVoteRatings;
@@ -472,7 +480,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
             pointerEvents: showOverlayLoader ? 'none' : 'auto',
           }}
         >
-          <DuelAttributeHeader attribute={String(attribute)} />
+          <DuelAttributeHeader attribute={String(pair?.attributeLabel ?? attribute)} />
 
           {error && <div className="p-3 rounded bg-red-100 text-red-800 text-sm whitespace-pre-wrap">{error}</div>}
 

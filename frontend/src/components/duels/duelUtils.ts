@@ -91,16 +91,22 @@ export function normalizePair(raw: unknown): PairResponse {
   };
 
   const attrVal = o.attribute;
-  const attr =
-    typeof attrVal === 'string'
-      ? attrVal
-      : asRec(attrVal)?.key != null
-        ? str(asRec(attrVal)?.key)
-        : 'dribbling';
+
+  let attrKey = 'dribbling';
+  let attrLabel: string | undefined;
+
+  if (typeof attrVal === 'string') {
+    attrKey = attrVal;
+  } else {
+    const a = asRec(attrVal);
+    if (a?.key != null) attrKey = str(a.key);
+    if (a?.label != null) attrLabel = str(a.label);
+  }
 
   return {
     pair_id: (o.duel_id as any) ?? (o.pair_id as any) ?? 'next',
-    attribute: String(attr).toLowerCase(),
+    attribute: String(attrKey).toLowerCase(),
+    attributeLabel: attrLabel,
     left: mkPlayer(p1),
     right: mkPlayer(p2),
   };

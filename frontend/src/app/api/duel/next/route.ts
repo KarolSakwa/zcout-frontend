@@ -34,6 +34,7 @@ export async function GET(req: Request) {
       Referer: `${ORIGIN}/`,
       'X-Requested-With': 'XMLHttpRequest',
     };
+
     if (anonId) headers['X-Zcout-Anon'] = anonId;
     if (cookieHeader) headers['Cookie'] = cookieHeader;
 
@@ -42,42 +43,13 @@ export async function GET(req: Request) {
       headers,
     });
 
-    if (!res.ok) {
-      const txt = await res.text().catch(() => '');
-      return NextResponse.json({ error: `Backend error: ${res.status} ${txt.slice(0, 400)}` }, { status: 500 });
-    }
+    const text = await res.text();
 
-    const data = (await res.json()) as any;
-
-    const players = Array.isArray(data.players) ? data.players : [];
-    if (players.length < 2) {
-      return NextResponse.json({ error: 'Not enough players (need >= 2)' }, { status: 500 });
-    }
-
-    const mapPlayer = (p: any) => {
-      const nation = (p.country ?? '').toLowerCase();
-      return {
-        player_id: p.id,
-        name: p.name,
-        number: p.number ?? null,
-        avatar_url: `/players/${p.id}.png`,
-        flag_url: nation ? `/flags/${nation}.png` : undefined,
-        club: {
-          name: p.club?.name ?? null,
-          color_primary: p.club?.color_primary ?? '#1f2937',
-          color_accent: p.club?.color_secondary ?? '#111827',
-        },
-        league: { code: null, name: null },
-        nation_code: p.country ?? null,
-        position: { code: p.position ?? 'ST', name: p.position ?? 'ST' },
-      };
-    };
-
-    return NextResponse.json({
-      attr: attrRaw ?? null,
-      duel_id: data.duel_id ?? null,
-      players: players.map(mapPlayer),
-      source: 'laravel',
+    return new Response(text, {
+      status: res.status,
+      headers: {
+        'content-type': res.headers.get('content-type') ?? 'application/json',
+      },
     });
   } catch (err: any) {
     return NextResponse.json({ error: 'Proxy error', detail: String(err?.message ?? err) }, { status: 500 });

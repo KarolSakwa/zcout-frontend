@@ -17,6 +17,7 @@ export type PairResponse = {
   attribute: string;
   left: Player;
   right: Player;
+  attributeLabel?: string;
 };
 
 export type VoteApiResponse = {
