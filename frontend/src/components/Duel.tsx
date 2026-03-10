@@ -25,6 +25,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
   const [loadingPair, setLoadingPair] = useState(false);
   const [voting, setVoting] = useState(false);
+  const [skipping, setSkipping] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [showPendingUi, setShowPendingUi] = useState(false);
@@ -51,8 +52,6 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
   const fetchAbortRef = useRef<AbortController | null>(null);
   const fetchSeqRef = useRef(0);
-
-  const didAutoFetchRef = useRef(false);
 
   const attribute = pair?.attribute ?? '';
   const glow = useMemo(() => glowForAttribute(attribute), [attribute]);
@@ -195,6 +194,42 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     fetchNextPair();
   }, [fetchNextPair]);
 
+  const handleSkip = useCallback(async () => {
+    if (!pair) return;
+    if (voting || skipping) return;
+    if (transition !== 'idle' || loadingPair) return;
+    if (lastWinner !== null) return;
+
+    clearAutoNext(true);
+    setError(null);
+    setSkipping(true);
+
+    try {
+      const duelId = Number(pair.pair_id);
+      if (!Number.isFinite(duelId) || duelId <= 0) {
+        throw new Error('Invalid duel_id');
+      }
+
+      const res = await fetch('/api/duel/skip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ duel_id: duelId }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(`Skip failed: ${res.status} ${txt.slice(0, 160)}`);
+      }
+
+      goNext();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Błąd pomijania pojedynku';
+      setError(msg);
+    } finally {
+      setSkipping(false);
+    }
+  }, [pair, voting, skipping, transition, loadingPair, lastWinner, clearAutoNext, goNext]);
+
   const startAutoNextNow = useCallback(() => {
     if (autoNextIntervalRef.current) window.clearInterval(autoNextIntervalRef.current);
     autoNextIntervalRef.current = null;
@@ -315,10 +350,10 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
   useEffect(() => {
     if (pair) return;
-    if (didAutoFetchRef.current) return;
-    didAutoFetchRef.current = true;
+    if (loadingPair) return;
+    if (error) return;
     fetchInitialPair();
-  }, [pair, fetchInitialPair]);
+  }, [pair, loadingPair, error, fetchInitialPair]);
 
   useEffect(() => {
     return () => {
@@ -455,66 +490,117 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   );
 
   const showImpact = impactVisible && !!postVoteRatings;
-  const showFullLoader = loadingPair && !pair;
   const showCountdown = showImpact && autoNextRunning && transition === 'idle';
 
   const nextDisabled = transition !== 'idle' || loadingPair;
   const nextIsHover = nextHover && !nextDisabled;
 
-  const showOverlayLoader = loadingPair && !!pair;
+  const showOverlayLoader = loadingPair || skipping;
+  const overlayBlur = showOverlayLoader && !!pair;
+
+  const skipDisabled = !pair || skipping || voting || loadingPair || transition !== 'idle' || showReveal;
 
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
 
-      {showFullLoader ? (
-        <div style={{ minHeight: '62vh', display: 'grid', placeItems: 'center' }}>
-          <ZLoader />
-        </div>
-      ) : (
+      <div
+        style={{
+          filter: overlayBlur ? 'blur(4px) saturate(0.9)' : 'none',
+          opacity: overlayBlur ? 0.55 : 1,
+          transition: 'filter 180ms ease, opacity 180ms ease',
+          pointerEvents: overlayBlur ? 'none' : 'auto',
+        }}
+      >
+        <DuelAttributeHeader attribute={String(pair?.attributeLabel ?? attribute)} />
+
+        {error && <div className="p-3 rounded bg-red-100 text-red-800 text-sm whitespace-pre-wrap">{error}</div>}
+
+        {pair && (
+          <div style={{ position: 'relative' }}>
+            <DuelCardsRow
+              pair={pair}
+              cardStyle={cardStyle}
+              showPendingUi={showPendingUi}
+              showReveal={showReveal}
+              lastWinner={lastWinner}
+              glow={glow}
+              handleVote={handleVote}
+            />
+
+            {showImpact && postVoteRatings && (
+              <DuelRevealPanel
+                pair={pair}
+                showImpact={showImpact}
+                onMouseEnter={pauseAutoNext}
+                onMouseLeave={resumeAutoNext}
+                duelVotePct={duelVotePct}
+                lastWinner={lastWinner}
+                glow={glow}
+                barPct={barPct}
+                postVoteRatings={postVoteRatings}
+                nextDisabled={nextDisabled}
+                nextIsHover={nextIsHover}
+                setNextHover={setNextHover}
+                goNext={goNext}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      {!showReveal && pair && (
         <div
           style={{
-            filter: showOverlayLoader ? 'blur(4px) saturate(0.9)' : 'none',
-            opacity: showOverlayLoader ? 0.55 : 1,
-            transition: 'filter 180ms ease, opacity 180ms ease',
+            position: 'fixed',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 'clamp(120px, 14vh, 170px)',
+            zIndex: 60,
             pointerEvents: showOverlayLoader ? 'none' : 'auto',
           }}
         >
-          <DuelAttributeHeader attribute={String(pair?.attributeLabel ?? attribute)} />
-
-          {error && <div className="p-3 rounded bg-red-100 text-red-800 text-sm whitespace-pre-wrap">{error}</div>}
-
-          {pair && (
-            <div style={{ position: 'relative' }}>
-              <DuelCardsRow
-                pair={pair}
-                cardStyle={cardStyle}
-                showPendingUi={showPendingUi}
-                showReveal={showReveal}
-                lastWinner={lastWinner}
-                glow={glow}
-                handleVote={handleVote}
-              />
-
-              {showImpact && postVoteRatings && (
-                <DuelRevealPanel
-                  pair={pair}
-                  showImpact={showImpact}
-                  onMouseEnter={pauseAutoNext}
-                  onMouseLeave={resumeAutoNext}
-                  duelVotePct={duelVotePct}
-                  lastWinner={lastWinner}
-                  glow={glow}
-                  barPct={barPct}
-                  postVoteRatings={postVoteRatings}
-                  nextDisabled={nextDisabled}
-                  nextIsHover={nextIsHover}
-                  setNextHover={setNextHover}
-                  goNext={goNext}
-                />
-              )}
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={handleSkip}
+            disabled={skipDisabled}
+            style={{
+              minWidth: 190,
+              padding: '10px 22px',
+              borderRadius: 10,
+              border: '1px solid rgba(215,177,90,0.55)',
+              color: '#d7b15a',
+              background:
+                'linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))',
+              boxShadow:
+                '0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)',
+              backdropFilter: 'blur(7px)',
+              WebkitBackdropFilter: 'blur(7px)',
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              cursor: skipDisabled ? 'default' : 'pointer',
+              opacity: skipDisabled ? 0.45 : 1,
+              transition: 'transform 120ms ease, background 160ms ease, opacity 120ms ease',
+            }}
+            onMouseDown={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(1px)';
+            }}
+            onMouseUp={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
+            }}
+            onMouseEnter={(e) => {
+              if (skipDisabled) return;
+              (e.currentTarget as HTMLButtonElement).style.background =
+                'linear-gradient(180deg, rgba(34,34,34,0.78), rgba(12,12,12,0.44))';
+            }}
+          >
+            Skip
+          </button>
         </div>
       )}
 
