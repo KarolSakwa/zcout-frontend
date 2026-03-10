@@ -1,1 +1,0 @@
-{"errorType":"Runtime.InvalidEntrypoint","errorMessage":"RequestId: 5a032878-d2e3-4409-908e-e20ead52c8ec Error: exec: \"main.handler\": executable file not found in $PATH"}
