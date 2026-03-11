@@ -113,7 +113,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     setTransition('idle');
 
     try {
-      const res = await fetch(`/api/duel/next`, {
+      const res = await fetch(`/api/duels/next`, {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
         signal: controller.signal,
@@ -159,7 +159,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     setLoadingPair(true);
 
     try {
-      const res = await fetch(`/api/duel/next`, {
+      const res = await fetch(`/api/duels/next`, {
         cache: 'no-store',
         headers: { Accept: 'application/json' },
         signal: controller.signal,
@@ -224,7 +224,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         throw new Error('Invalid duel_id');
       }
 
-      const res = await fetch('/api/duel/skip', {
+      const res = await fetch('/api/duels/skip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ duel_id: duelId }),
