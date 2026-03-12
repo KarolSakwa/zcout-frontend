@@ -1,1 +1,0 @@
-{ "Version":"2012-10-17", "Statement":[ { "Effect":"Allow", "Action":[ "dynamodb:BatchWriteItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:GetItem", "dynamodb:DescribeTable" ], "Resource":"arn:aws:dynamodb:eu-central-1:640168447866:table/zcout-votes-dev" } ] }

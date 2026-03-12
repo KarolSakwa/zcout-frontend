@@ -1,5 +1,0 @@
-fastapi
-uvicorn[standard]
-boto3
-mangum
-debugpy==1.8.7
