@@ -54,7 +54,7 @@ export default function AuthSuccessClient({ next }: { next: string }) {
       <main style={{ padding: 24 }}>
         <div style={{ opacity: 0.85 }}>Auth sync failed.</div>
         <div style={{ marginTop: 10 }}>
-          <a href={next} style={{ color: '#d7b15a' }}>
+          <a href={next} style={{ color: 'var(--ui-accent-primary)' }}>
             Continue
           </a>
         </div>

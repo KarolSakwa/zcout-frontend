@@ -42,9 +42,9 @@ export default function DuelImpact({
     <div
       style={{
         width: '100%',
-        borderRadius: 14,
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.10)',
+        borderRadius: 'var(--ui-radius-lg)',
+        background: 'var(--ui-surface-soft)',
+        border: '1px solid var(--ui-border-subtle)',
         boxShadow: '0 18px 44px rgba(0,0,0,0.46)',
         padding: '14px 14px 12px',
       }}

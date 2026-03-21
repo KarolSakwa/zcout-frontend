@@ -12,13 +12,13 @@
   font-size: 44px;
   letter-spacing: 10px;
   font-weight: 700;
-  color: #d7b15a;
-  text-shadow: 0 0 24px rgba(215, 177, 90, 0.16);
+  color: var(--ui-accent-primary);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--ui-accent-primary) 16%, transparent);
 }
 
 .controlsRow {
   display: flex;
-  gap: 14px;
+  gap: var(--ui-space-lg);
   justify-content: center;
   flex-wrap: wrap;
   margin: 14px 0 10px;
@@ -27,17 +27,17 @@
 .control {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--ui-space-md);
   min-width: 220px;
   padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(215, 177, 90, 0.28);
-  background: rgba(10, 10, 12, 0.55);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03) inset, 0 10px 40px rgba(0, 0, 0, 0.35);
+  border-radius: var(--ui-radius-lg);
+  border: var(--ui-border-width-thin) solid var(--ui-border-accent);
+  background: var(--ui-surface-elevated);
+  box-shadow: var(--ui-shadow-panel-soft);
 }
 
 .controlValue {
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ui-text-primary);
   font-weight: 650;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -49,18 +49,18 @@
   margin: 8px auto 18px;
   display: flex;
   justify-content: flex-start;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--ui-text-dim);
   font-size: 14px;
 }
 
 .tableWrap {
   max-width: 1200px;
   margin: 0 auto;
-  border-radius: 14px;
+  border-radius: var(--ui-radius-lg);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 10, 12, 0.52);
-  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.45);
+  border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
+  background: var(--ui-surface-elevated);
+  box-shadow: var(--ui-shadow-panel-soft);
   position: relative;
   z-index: 1;
 }
@@ -76,24 +76,24 @@
   font-size: 12px;
   letter-spacing: 2px;
   font-weight: 700;
-  color: rgba(215, 177, 90, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--ui-accent-primary);
+  border-bottom: var(--ui-border-width-thin) solid var(--ui-border-subtle);
 }
 
 .row td {
   padding: 14px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.9);
+  border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 80%, transparent);
+  color: var(--ui-text-primary);
   font-size: 14px;
 }
 
 .row:hover td {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--ui-surface-soft);
 }
 
 .rankCell {
   width: 56px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--ui-text-secondary);
 }
 
 .playerCell {
@@ -101,12 +101,12 @@
 }
 
 .clubCell {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--ui-text-muted);
 }
 
 .posCell {
   width: 80px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ui-text-secondary);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -114,7 +114,7 @@
 .ratingCell {
   width: 120px;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ui-text-primary);
 }
 
 .confCell {
@@ -124,35 +124,39 @@
 .confGrid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 10px;
+  gap: var(--ui-space-md);
   align-items: center;
 }
 
 .confBar {
   height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-surface-soft-2);
   overflow: hidden;
 }
 
 .confFill {
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(215, 177, 90, 0.9), rgba(255, 215, 120, 0.9));
+  border-radius: var(--ui-radius-pill);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ui-accent-primary) 90%, transparent),
+    color-mix(in srgb, var(--ui-accent-primary) 72%, white)
+  );
 }
 
 .confPct {
   width: 52px;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--ui-text-secondary);
 }
 
 .votesNum {
   width: 44px;
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--ui-text-muted);
 }
 
 .profileCell {
@@ -165,25 +169,26 @@
   align-items: center;
   justify-content: center;
   padding: 9px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(215, 177, 90, 0.5);
-  color: rgba(255, 215, 120, 0.95);
+  border-radius: var(--ui-radius-lg);
+  border: var(--ui-border-width-thin) solid var(--ui-border-accent);
+  color: var(--ui-accent-primary);
   text-decoration: none;
   letter-spacing: 1px;
   font-weight: 700;
   font-size: 12px;
-  background: rgba(10, 10, 12, 0.25);
+  background: color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent);
 }
 
 .profileBtn:hover {
-  background: rgba(215, 177, 90, 0.08);
+  background: var(--ui-accent-primary-soft);
 }
+
 .select {
   width: 100%;
   background: transparent;
   border: 0;
   outline: none;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--ui-text-primary);
   font-weight: 650;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -192,8 +197,8 @@
 }
 
 .select option {
-  background: #0b0b0f;
-  color: rgba(255, 255, 255, 0.92);
+  background: var(--ui-bg-canvas-1);
+  color: var(--ui-text-primary);
 }
 
 .shell {

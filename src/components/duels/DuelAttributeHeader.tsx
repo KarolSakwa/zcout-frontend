@@ -12,19 +12,19 @@ export default function DuelAttributeHeader({ attribute }: { attribute: string }
         margin: '18px auto 26px',
         display: 'grid',
         placeItems: 'center',
-        gap: 10,
+        gap: 'var(--ui-space-md)',
       }}
     >
       <div
         style={{
           width: 46,
           height: 46,
-          borderRadius: 999,
+          borderRadius: 'var(--ui-radius-pill)',
           display: 'grid',
           placeItems: 'center',
-          background: 'rgba(255,214,102,0.16)',
-          border: '1px solid rgba(255,214,102,0.45)',
-          color: 'rgba(255,214,102,0.95)',
+          background: 'var(--ui-accent-primary-soft)',
+          border: '1px solid var(--ui-border-accent)',
+          color: 'var(--ui-accent-primary)',
           fontWeight: 900,
           boxShadow: '0 10px 24px rgba(0,0,0,0.35)',
         }}
@@ -38,7 +38,7 @@ export default function DuelAttributeHeader({ attribute }: { attribute: string }
           fontWeight: 950,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.92)',
+          color: 'var(--ui-text-primary)',
           fontSize: 18,
           textShadow: '0 6px 18px rgba(0,0,0,0.55)',
         }}
@@ -50,9 +50,9 @@ export default function DuelAttributeHeader({ attribute }: { attribute: string }
         style={{
           width: 180,
           height: 2,
-          borderRadius: 999,
-          background: 'linear-gradient(90deg, transparent, rgba(255,214,102,0.75), transparent)',
-          opacity: 0.9,
+          borderRadius: 'var(--ui-radius-pill)',
+          background: 'linear-gradient(90deg, transparent, var(--ui-accent-primary), transparent)',
+          opacity: 0.72,
         }}
         aria-hidden
       />

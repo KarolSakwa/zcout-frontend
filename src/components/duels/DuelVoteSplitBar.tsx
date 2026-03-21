@@ -14,7 +14,7 @@ type Props = {
 };
 
 const hexToRgba = (hex: string, a: number) => {
-  const h = hex.replace('#', '').trim();
+  const h = String(hex ?? '').replace('#', '').trim();
   const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
   const n = parseInt(full, 16);
   if (!Number.isFinite(n)) return `rgba(255,255,255,${a})`;
@@ -22,6 +22,26 @@ const hexToRgba = (hex: string, a: number) => {
   const g = (n >> 8) & 255;
   const b = n & 255;
   return `rgba(${r},${g},${b},${a})`;
+};
+
+const alphaColor = (color: string, a: number) => {
+  const value = String(color ?? '').trim();
+  if (!value) return `rgba(255,255,255,${a})`;
+  if (value.startsWith('var(')) {
+    return `color-mix(in srgb, ${value} ${Math.round(Math.max(0, Math.min(1, a)) * 100)}%, transparent)`;
+  }
+  if (value.startsWith('#')) {
+    return hexToRgba(value, a);
+  }
+  if (
+    value.startsWith('rgb(') ||
+    value.startsWith('rgba(') ||
+    value.startsWith('hsl(') ||
+    value.startsWith('hsla(')
+  ) {
+    return `color-mix(in srgb, ${value} ${Math.round(Math.max(0, Math.min(1, a)) * 100)}%, transparent)`;
+  }
+  return `color-mix(in srgb, ${value} ${Math.round(Math.max(0, Math.min(1, a)) * 100)}%, transparent)`;
 };
 
 export default function DuelVoteSplitBar({
@@ -51,11 +71,11 @@ export default function DuelVoteSplitBar({
   const votedLeft = votedSide === 'left';
   const votedRight = votedSide === 'right';
 
-  const leftFill = hexToRgba(leftPrimary, votedLeft ? 0.92 : 0.55);
-  const rightFill = hexToRgba(rightPrimary, votedRight ? 0.92 : 0.55);
+  const leftFill = alphaColor(leftPrimary, votedLeft ? 0.92 : 0.55);
+  const rightFill = alphaColor(rightPrimary, votedRight ? 0.92 : 0.55);
 
-  const leftEdge = hexToRgba(leftPrimary, votedLeft ? 0.70 : 0.25);
-  const rightEdge = hexToRgba(rightPrimary, votedRight ? 0.70 : 0.25);
+  const leftEdge = alphaColor(leftPrimary, votedLeft ? 0.7 : 0.25);
+  const rightEdge = alphaColor(rightPrimary, votedRight ? 0.7 : 0.25);
 
   const showVotes = Number.isFinite(votesA as number) && Number.isFinite(votesB as number);
 
@@ -74,7 +94,7 @@ export default function DuelVoteSplitBar({
             fontSize: 11,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.70)',
+            color: 'var(--ui-text-muted)',
             fontWeight: 950,
           }}
         >
@@ -85,8 +105,8 @@ export default function DuelVoteSplitBar({
           <div
             style={{
               fontSize: 11,
-              letterSpacing: '0.10em',
-              color: 'rgba(255,255,255,0.55)',
+              letterSpacing: '0.1em',
+              color: 'var(--ui-text-dim)',
               fontWeight: 900,
             }}
           >
@@ -105,14 +125,14 @@ export default function DuelVoteSplitBar({
           <div
             style={{
               padding: '6px 10px',
-              borderRadius: 999,
+              borderRadius: 'var(--ui-radius-pill)',
               border: `1px solid ${leftEdge}`,
-              background: hexToRgba(leftPrimary, 0.14),
-              color: 'rgba(255,255,255,0.92)',
+              background: alphaColor(leftPrimary, 0.14),
+              color: 'var(--ui-text-primary)',
               fontWeight: 950,
               letterSpacing: '0.08em',
               fontSize: 11,
-              boxShadow: votedLeft ? `0 0 18px ${hexToRgba(leftPrimary, 0.20)}` : 'none',
+              boxShadow: votedLeft ? `0 0 18px ${alphaColor(leftPrimary, 0.2)}` : 'none',
               minWidth: 72,
               textAlign: 'center',
             }}
@@ -123,14 +143,14 @@ export default function DuelVoteSplitBar({
           <div
             style={{
               padding: '6px 10px',
-              borderRadius: 999,
+              borderRadius: 'var(--ui-radius-pill)',
               border: `1px solid ${rightEdge}`,
-              background: hexToRgba(rightPrimary, 0.14),
-              color: 'rgba(255,255,255,0.92)',
+              background: alphaColor(rightPrimary, 0.14),
+              color: 'var(--ui-text-primary)',
               fontWeight: 950,
               letterSpacing: '0.08em',
               fontSize: 11,
-              boxShadow: votedRight ? `0 0 18px ${hexToRgba(rightPrimary, 0.20)}` : 'none',
+              boxShadow: votedRight ? `0 0 18px ${alphaColor(rightPrimary, 0.2)}` : 'none',
               minWidth: 72,
               textAlign: 'center',
             }}
@@ -143,9 +163,9 @@ export default function DuelVoteSplitBar({
       <div
         style={{
           width: '100%',
-          borderRadius: 999,
+          borderRadius: 'var(--ui-radius-pill)',
           overflow: 'hidden',
-          border: '1px solid rgba(255,255,255,0.12)',
+          border: '1px solid var(--ui-border-subtle)',
           background: 'rgba(0,0,0,0.35)',
           boxShadow: '0 10px 22px rgba(0,0,0,0.32)',
         }}

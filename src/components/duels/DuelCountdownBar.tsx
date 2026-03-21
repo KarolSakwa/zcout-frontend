@@ -25,7 +25,7 @@ export default function DuelCountdownBar({
         height,
         zIndex: 60,
         background: 'rgba(0,0,0,0.55)',
-        borderBottom: '1px solid rgba(255,214,102,0.25)',
+        borderBottom: '1px solid var(--ui-accent-primary-soft)',
         boxShadow: '0 10px 24px rgba(0,0,0,0.45)',
       }}
       aria-hidden
@@ -34,11 +34,15 @@ export default function DuelCountdownBar({
         style={{
           height: '100%',
           width: `${Math.max(0, Math.min(1, progress)) * 100}%`,
-          background:
-            'linear-gradient(90deg, rgba(255,214,102,0.15), rgba(255,214,102,0.95), rgba(255,214,102,0.65))',
+          background: `linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--ui-accent-primary) 15%, transparent),
+            var(--ui-accent-primary),
+            color-mix(in srgb, var(--ui-accent-primary) 65%, transparent)
+          )`,
           transition: 'width 50ms linear',
           opacity: paused ? 0.65 : 1,
-          boxShadow: '0 0 16px rgba(255,214,102,0.25)',
+          boxShadow: '0 0 16px var(--ui-accent-primary-soft)',
         }}
       />
     </div>

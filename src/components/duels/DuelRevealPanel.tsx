@@ -43,8 +43,8 @@ export default function DuelRevealPanel({
   const votedLeft = lastWinner === leftId;
   const votedRight = lastWinner === rightId;
 
-  const leftPrimary = pair.left.color ?? '#1f2937';
-  const rightPrimary = pair.right.color ?? '#1f2937';
+  const leftPrimary = pair.left.color ?? 'var(--ui-surface-panel-solid)';
+  const rightPrimary = pair.right.color ?? 'var(--ui-surface-panel-solid)';
 
   const pctLeft = duelVotePct?.left ?? 50;
   const pctRight = duelVotePct?.right ?? 50;
@@ -82,7 +82,7 @@ export default function DuelRevealPanel({
           fontSize: 11,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: verdictReady ? 'rgba(255,255,255,0.62)' : 'rgba(255,255,255,0.45)',
+          color: verdictReady ? 'var(--ui-text-muted)' : 'var(--ui-text-dim)',
           fontWeight: 900,
         }}
       >
@@ -149,16 +149,16 @@ export default function DuelRevealPanel({
           style={{
             height: 34,
             padding: '0 16px',
-            borderRadius: 999,
-            border: `1px solid ${nextIsHover ? 'rgba(255,214,102,0.75)' : 'rgba(255,214,102,0.55)'}`,
-            background: nextIsHover ? 'rgba(255,214,102,0.16)' : 'rgba(255,214,102,0.10)',
-            color: 'rgba(255,214,102,0.95)',
+            borderRadius: 'var(--ui-radius-pill)',
+            border: `1px solid ${nextIsHover ? 'var(--ui-accent-primary)' : 'var(--ui-border-accent)'}`,
+            background: nextIsHover ? 'var(--ui-accent-primary-soft)' : 'color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
+            color: 'var(--ui-accent-primary)',
             fontWeight: 950,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             boxShadow: nextIsHover
-              ? '0 14px 30px rgba(0,0,0,0.40), 0 0 22px rgba(255,214,102,0.14)'
-              : '0 12px 28px rgba(0,0,0,0.35), 0 0 18px rgba(255,214,102,0.10)',
+              ? '0 14px 30px rgba(0,0,0,0.40), 0 0 22px var(--ui-accent-primary-soft)'
+              : '0 12px 28px rgba(0,0,0,0.35), 0 0 18px color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
             opacity: nextDisabled ? 0.55 : 1,
             cursor: nextDisabled ? 'not-allowed' : 'pointer',
             userSelect: 'none',

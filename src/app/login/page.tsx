@@ -137,68 +137,120 @@ export default function LoginPage() {
     router.push('/duels');
   };
 
+  const shellStyle: React.CSSProperties = {
+    maxWidth: 420,
+    margin: '40px auto',
+    padding: 16,
+  };
+
+  const cardStyle: React.CSSProperties = {
+    borderRadius: 'var(--ui-radius-lg)',
+    border: '1px solid var(--ui-border-subtle)',
+    background: 'var(--ui-surface-elevated)',
+    boxShadow: 'var(--ui-shadow-panel-soft)',
+    padding: 18,
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: 22,
+    margin: '0 0 16px',
+    color: 'var(--ui-text-primary)',
+    fontWeight: 800,
+    letterSpacing: '0.02em',
+  };
+
   const inputStyle: React.CSSProperties = {
     padding: 10,
-    borderRadius: 8,
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(0,0,0,0.25)',
-    color: 'rgba(255,255,255,0.9)',
+    borderRadius: 'var(--ui-radius-md)',
+    border: '1px solid var(--ui-border-subtle)',
+    background: 'color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent)',
+    color: 'var(--ui-text-primary)',
     outline: 'none',
     width: '100%',
   };
 
+  const primaryButtonStyle: React.CSSProperties = {
+    minHeight: 'var(--ui-action-height)',
+    padding: '0 var(--ui-action-pad-x)',
+    borderRadius: 'var(--ui-radius-md)',
+    border: '1px solid var(--ui-action-primary-border)',
+    background: 'linear-gradient(180deg, var(--ui-action-primary-bg-1) 0%, var(--ui-action-primary-bg-2) 100%)',
+    color: 'var(--ui-action-primary-text)',
+    cursor: loading ? 'default' : 'pointer',
+    width: '100%',
+    fontWeight: 800,
+    boxShadow: 'var(--ui-shadow-button)',
+  };
+
+  const secondaryButtonStyle: React.CSSProperties = {
+    minHeight: 'var(--ui-action-height)',
+    padding: '0 var(--ui-action-pad-x)',
+    borderRadius: 'var(--ui-radius-md)',
+    border: '1px solid var(--ui-action-secondary-border)',
+    background: 'linear-gradient(180deg, var(--ui-action-secondary-bg-1) 0%, var(--ui-action-secondary-bg-2) 100%)',
+    color: 'var(--ui-action-secondary-text)',
+    cursor: loading ? 'default' : 'pointer',
+    width: '100%',
+    fontWeight: 800,
+    boxShadow: 'var(--ui-shadow-button)',
+    marginBottom: 12,
+  };
+
   const errorStyle: React.CSSProperties = {
     marginTop: 6,
-    color: '#ff6b6b',
+    color: 'var(--ui-danger)',
     fontSize: 12,
     lineHeight: 1.2,
   };
 
+  const formErrorStyle: React.CSSProperties = {
+    color: 'var(--ui-danger)',
+    fontSize: 13,
+    lineHeight: 1.3,
+  };
+
   return (
-    <div style={{ maxWidth: 420, margin: '40px auto', padding: 16 }}>
-      <h1 style={{ fontSize: 22, marginBottom: 16 }}>Log in</h1>
+    <div style={shellStyle}>
+      <div style={cardStyle}>
+        <h1 style={titleStyle}>Log in</h1>
 
-      <button
-        type="button"
-        onClick={onGoogle}
-        disabled={loading}
-        style={{ padding: 10, cursor: loading ? 'default' : 'pointer', width: '100%', marginBottom: 12 }}
-      >
-        Zaloguj się przez Google
-      </button>
-
-      <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12 }}>
-        <div>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="email"
-            autoComplete="email"
-            style={inputStyle}
-            disabled={loading}
-          />
-          {fieldMsg('email') && <div style={errorStyle}>{fieldMsg('email')}</div>}
-        </div>
-
-        <div>
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="password"
-            type="password"
-            autoComplete="current-password"
-            style={inputStyle}
-            disabled={loading}
-          />
-          {fieldMsg('password') && <div style={errorStyle}>{fieldMsg('password')}</div>}
-        </div>
-
-        <button disabled={loading} style={{ padding: 10, cursor: loading ? 'default' : 'pointer' }}>
-          Log in
+        <button type="button" onClick={onGoogle} disabled={loading} style={secondaryButtonStyle}>
+          Zaloguj się przez Google
         </button>
 
-        {formError && <div style={{ color: '#ff6b6b' }}>{formError}</div>}
-      </form>
+        <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12 }}>
+          <div>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email"
+              autoComplete="email"
+              style={inputStyle}
+              disabled={loading}
+            />
+            {fieldMsg('email') && <div style={errorStyle}>{fieldMsg('email')}</div>}
+          </div>
+
+          <div>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="password"
+              type="password"
+              autoComplete="current-password"
+              style={inputStyle}
+              disabled={loading}
+            />
+            {fieldMsg('password') && <div style={errorStyle}>{fieldMsg('password')}</div>}
+          </div>
+
+          <button disabled={loading} style={primaryButtonStyle}>
+            Log in
+          </button>
+
+          {formError && <div style={formErrorStyle}>{formError}</div>}
+        </form>
+      </div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export default function DuelCardsRow({
           name={pair.left.name}
           position={pair.left.position}
           club={pair.left.club ?? '—'}
-          color={pair.left.color ?? '#1f2937'}
+          color={pair.left.color ?? 'var(--ui-surface-panel-solid)'}
           secondaryColor={pair.left.secondaryColor}
           avatarSrc={pair.left.avatarSrc ?? `/players/${pair.left.id}.png`}
           countryIso2={pair.left.countryIso2}
@@ -66,7 +66,7 @@ export default function DuelCardsRow({
           name={pair.right.name}
           position={pair.right.position}
           club={pair.right.club ?? '—'}
-          color={pair.right.color ?? '#1f2937'}
+          color={pair.right.color ?? 'var(--ui-surface-panel-solid)'}
           secondaryColor={pair.right.secondaryColor}
           avatarSrc={pair.right.avatarSrc ?? `/players/${pair.right.id}.png`}
           countryIso2={pair.right.countryIso2}

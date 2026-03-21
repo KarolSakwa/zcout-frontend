@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import styles from './database.module.css';
 
 type ClubItem = {
   club: string;
@@ -25,6 +27,22 @@ function slugifyClubName(name: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+function hexToRgba(hex: string, alpha: number) {
+  const h = String(hex ?? '').replace('#', '').trim();
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const n = parseInt(full, 16);
+
+  if (!Number.isFinite(n)) {
+    return `rgba(255,255,255,${alpha})`;
+  }
+
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 export default async function DatabasePage() {
   const limit = '24';
 
@@ -33,9 +51,11 @@ export default async function DatabasePage() {
 
   if (!res.ok) {
     return (
-      <main style={{ padding: 28 }}>
-        <div style={{ fontSize: 40, letterSpacing: 10, color: '#d7b15a', fontWeight: 700 }}>DATABASE</div>
-        <div style={{ marginTop: 14, opacity: 0.7 }}>Failed to load: {res.status}</div>
+      <main className={styles.page}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>DATABASE</h1>
+        </div>
+        <div className={styles.errorText}>Failed to load: {res.status}</div>
       </main>
     );
   }
@@ -43,74 +63,44 @@ export default async function DatabasePage() {
   const data = (await res.json()) as ClubsResponse;
 
   return (
-    <main style={{ padding: '28px 28px 40px' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px 0 18px' }}>
-        <h1 style={{ fontSize: 44, letterSpacing: 10, fontWeight: 700, color: '#d7b15a' }}>DATABASE</h1>
+    <main className={styles.page}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>DATABASE</h1>
       </div>
 
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-          gap: 14,
-        }}
-      >
+      <div className={styles.grid}>
         {data.items.map((c) => {
-          const primary = c.colors?.primary ?? '#d7b15a';
-          const secondary = c.colors?.secondary ?? '#000000';
+          const primary = c.colors?.primary ?? 'var(--ui-accent-primary)';
+          const secondary = c.colors?.secondary ?? 'var(--ui-surface-panel-solid)';
           const slug = slugifyClubName(c.club);
+
+          const cardVars: CSSProperties & Record<'--club-primary' | '--club-secondary' | '--club-accent', string> = {
+            '--club-primary': hexToRgba(primary, 0.12),
+            '--club-secondary': hexToRgba(secondary, 0.12),
+            '--club-accent': primary,
+          };
 
           return (
             <Link
               key={c.club}
               href={`/database/clubs/${slug}`}
-              style={{
-                borderRadius: 14,
-                border: '1px solid rgba(255,255,255,0.08)',
-                background: `linear-gradient(135deg, ${primary}1a 0%, rgba(10,10,12,0.55) 55%, ${secondary}12 100%)`,
-                boxShadow: '0 12px 60px rgba(0, 0, 0, 0.45)',
-                padding: 16,
-                position: 'relative',
-                overflow: 'hidden',
-                textDecoration: 'none',
-                color: 'inherit',
-                display: 'block',
-                cursor: 'pointer',
-              }}
+              className={styles.card}
+              style={cardVars}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 2,
-                  background: primary,
-                  opacity: 0.9,
-                }}
-              />
+              <div className={styles.cardAccent} />
 
-              <div style={{ fontWeight: 750, letterSpacing: 1, marginBottom: 12 }}>{c.club}</div>
+              <div className={styles.cardTitle}>{c.club}</div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 70px', gap: 10, alignItems: 'center' }}>
+              <div className={styles.statsGrid}>
                 {[
                   { k: 'OVERALL', v: c.overall },
                   { k: 'ATTACK', v: c.attack },
                   { k: 'MIDFIELD', v: c.midfield },
                   { k: 'DEFENCE', v: c.defence },
                 ].map((row) => (
-                  <div key={row.k} style={{ display: 'contents' }}>
-                    <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, letterSpacing: 2 }}>{row.k}</div>
-                    <div
-                      style={{
-                        textAlign: 'right',
-                        fontVariantNumeric: 'tabular-nums',
-                        color: row.v == null ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.9)',
-                        fontWeight: 700,
-                      }}
-                    >
+                  <div key={row.k} className={styles.statRow}>
+                    <div className={styles.statKey}>{row.k}</div>
+                    <div className={`${styles.statValue} ${row.v == null ? styles.statValueEmpty : ''}`}>
                       {row.v == null ? '—' : row.v}
                     </div>
                   </div>

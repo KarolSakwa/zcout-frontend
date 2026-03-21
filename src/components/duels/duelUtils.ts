@@ -18,15 +18,6 @@ export function toPct(rating: number) {
   return (v / 99) * 100;
 }
 
-export function glowForAttribute(attr: string) {
-  const key = String(attr).toLowerCase();
-  if (key.includes('drib')) return '#22c55e';
-  if (key.includes('pass')) return '#60a5fa';
-  if (key.includes('fin') || key.includes('shot')) return '#f97316';
-  if (key.includes('tack') || key.includes('def')) return '#ef4444';
-  return '#ffd666';
-}
-
 function asRec(v: unknown): Record<string, unknown> | null {
   return typeof v === 'object' && v !== null ? (v as Record<string, unknown>) : null;
 }

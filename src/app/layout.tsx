@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="cool-slate">
       <body className={inter.className}>
         <TopNav />
         <Suspense fallback={null}>

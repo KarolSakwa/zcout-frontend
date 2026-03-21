@@ -122,9 +122,9 @@ export default async function ClubPage({
 
   const data = (await res.json()) as ClubResponse;
 
-  const c1 = data.club.colors.primary ?? '#d7b15a';
-  const c2 = data.club.colors.secondary ?? '#0b0b0f';
-  const c3 = data.club.colors.tertiary ?? '#ffffff';
+  const c1 = data.club.colors.primary ?? 'var(--ui-accent-primary)';
+  const c2 = data.club.colors.secondary ?? 'var(--ui-surface-panel-solid)';
+  const c3 = data.club.colors.tertiary ?? 'var(--ui-text-primary)';
 
   const top = data.club.top_player;
   const topPct = clampPct(top?.confidence ?? 0);
@@ -140,7 +140,7 @@ export default async function ClubPage({
       if (pa !== pb) return (pa - pb) * mul;
       const na = a.name ?? '';
       const nb = b.name ?? '';
-      return na.localeCompare(nb) * 1;
+      return na.localeCompare(nb);
     }
 
     if (sortKey === 'name') {
@@ -165,8 +165,7 @@ export default async function ClubPage({
   const basePath = `/database/clubs/${encodeURIComponent(slug)}`;
 
   function hrefFor(key: SortKey) {
-    const nextDir =
-      key === sortKey ? (dir === 'asc' ? 'desc' : 'asc') : defaultDirForKey(key);
+    const nextDir = key === sortKey ? (dir === 'asc' ? 'desc' : 'asc') : defaultDirForKey(key);
 
     const sp = new URLSearchParams();
     sp.set('sort', key);
@@ -183,6 +182,7 @@ export default async function ClubPage({
   function thLabel(key: SortKey, label: string) {
     const active = key === sortKey;
     const arrow = arrowFor(key);
+
     return (
       <Link className={`${styles.sortLink} ${active ? styles.sortActive : ''}`} href={hrefFor(key)}>
         <span>{label}</span>
@@ -192,16 +192,13 @@ export default async function ClubPage({
   }
 
   const themeVars: CSSProperties & Record<'--c1' | '--c2' | '--c3', string> = {
-  '--c1': c1,
-  '--c2': c2,
-  '--c3': c3,
-};
+    '--c1': c1,
+    '--c2': c2,
+    '--c3': c3,
+  };
 
   return (
-    <main
-      className={styles.page}
-      style={themeVars}
-    >
+    <main className={styles.page} style={themeVars}>
       <div className={styles.header}>
         <h1 className={styles.title}>{data.club.name}</h1>
         <div className={styles.sub}>Premier League Database</div>
@@ -311,6 +308,7 @@ export default async function ClubPage({
               <tbody>
                 {items.map((p, idx) => {
                   const pct = clampPct(p.confidence ?? 0);
+
                   return (
                     <tr key={p.id} className={styles.row}>
                       <td className={styles.rankCell}>{idx + 1}</td>

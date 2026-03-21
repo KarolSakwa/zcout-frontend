@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ZLoader from './ZLoader';
 import type { PairResponse, RatingsMap, VoteApiResponse } from './duels/duelTypes';
-import { ATTR_MAP, SLIDE_MS, glowForAttribute, normalizePair, toPct } from './duels/duelUtils';
+import { ATTR_MAP, SLIDE_MS, normalizePair, toPct } from './duels/duelUtils';
 import DuelCountdownBar from './duels/DuelCountdownBar';
 import DuelAttributeHeader from './duels/DuelAttributeHeader';
 import DuelCardsRow from './duels/DuelCardsRow';
@@ -68,7 +68,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const fetchSeqRef = useRef(0);
 
   const attribute = pair?.attribute ?? '';
-  const glow = useMemo(() => glowForAttribute(attribute), [attribute]);
+  const glow = 'var(--ui-accent-success)';
 
   const clearAutoNext = useCallback((resetProgress: boolean) => {
     if (autoNextStartTimerRef.current) window.clearTimeout(autoNextStartTimerRef.current);
@@ -530,7 +530,23 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
       >
         <DuelAttributeHeader attribute={String(pair?.attributeLabel ?? attribute)} />
 
-        {error && <div className="p-3 rounded bg-red-100 text-red-800 text-sm whitespace-pre-wrap">{error}</div>}
+        {error && (
+          <div
+            style={{
+              maxWidth: 996,
+              margin: '0 auto 12px',
+              padding: '12px 14px',
+              borderRadius: 'var(--ui-radius-md)',
+              border: '1px solid var(--ui-border-subtle)',
+              background: 'var(--ui-surface-soft)',
+              color: 'var(--ui-text-primary)',
+              whiteSpace: 'pre-wrap',
+              boxShadow: 'var(--ui-shadow-panel-soft)',
+            }}
+          >
+            {error}
+          </div>
+        )}
 
         {pair && (
           <div style={{ position: 'relative' }}>
@@ -583,11 +599,10 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
             style={{
               minWidth: 190,
               padding: '10px 22px',
-              borderRadius: 10,
-              border: '1px solid rgba(215,177,90,0.55)',
-              color: '#d7b15a',
-              background:
-                'linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))',
+              borderRadius: 'var(--ui-radius-md)',
+              border: '1px solid var(--ui-border-accent)',
+              color: 'var(--ui-accent-primary)',
+              background: 'linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))',
               boxShadow:
                 '0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)',
               backdropFilter: 'blur(7px)',

@@ -13,11 +13,26 @@ const hexToRgba = (hex: string, a: number) => {
   return `rgba(${r},${g},${b},${a})`;
 };
 
+const alphaColor = (color: string, a: number) => {
+  const value = String(color ?? '').trim();
+  if (!value) return `rgba(255,255,255,${a})`;
+  if (value.startsWith('var(')) {
+    return `color-mix(in srgb, ${value} ${Math.round(clamp(a, 0, 1) * 100)}%, transparent)`;
+  }
+  if (value.startsWith('#')) {
+    return hexToRgba(value, a);
+  }
+  if (value.startsWith('rgb(') || value.startsWith('rgba(') || value.startsWith('hsl(') || value.startsWith('hsla(')) {
+    return `color-mix(in srgb, ${value} ${Math.round(clamp(a, 0, 1) * 100)}%, transparent)`;
+  }
+  return `color-mix(in srgb, ${value} ${Math.round(clamp(a, 0, 1) * 100)}%, transparent)`;
+};
+
 const intensityForAbsDelta = (absDelta: number) => {
   const d = Math.abs(absDelta);
-  if (d < 0.01) return { a: 0.20, glow: 0.06 };
+  if (d < 0.01) return { a: 0.2, glow: 0.06 };
   if (d < 0.02) return { a: 0.28, glow: 0.08 };
-  if (d < 0.03) return { a: 0.36, glow: 0.10 };
+  if (d < 0.03) return { a: 0.36, glow: 0.1 };
   if (d < 0.05) return { a: 0.48, glow: 0.14 };
   if (d < 0.08) return { a: 0.62, glow: 0.18 };
   if (d < 0.12) return { a: 0.74, glow: 0.22 };
@@ -34,10 +49,10 @@ const formatDelta = (d: number) => {
 
 const baseAlphaForScore = (before: number) => {
   const v = clamp(before, 0, 100);
-  if (v <= 0) return 0.10;
+  if (v <= 0) return 0.1;
   if (v >= 100) return 0.28;
   const bucket = clamp(Math.floor(clamp(v, 1, 99) / 10), 0, 9);
-  return 0.10 + bucket * 0.02;
+  return 0.1 + bucket * 0.02;
 };
 
 export default function ImpactDeltaBar({
@@ -46,9 +61,9 @@ export default function ImpactDeltaBar({
   delta,
   min = 0,
   max = 100,
-  goldHex = '#FFD666',
-  positiveHex = '#35f28b',
-  negativeHex = '#ff4d6d',
+  goldHex = 'var(--ui-accent-primary)',
+  positiveHex = 'var(--ui-accent-success)',
+  negativeHex = 'var(--ui-danger)',
   height = 14,
   animMs = 1300,
   delayMs = 333,
@@ -79,13 +94,13 @@ export default function ImpactDeltaBar({
   const deltaHex = isPos ? positiveHex : negativeHex;
   const { a, glow } = intensityForAbsDelta(delta);
 
-  const deltaFill = useMemo(() => hexToRgba(deltaHex, a), [deltaHex, a]);
-  const deltaGlow = useMemo(() => hexToRgba(deltaHex, glow), [deltaHex, glow]);
-  const deltaTextColor = useMemo(() => hexToRgba(deltaHex, Math.min(0.98, a + 0.28)), [deltaHex, a]);
+  const deltaFill = useMemo(() => alphaColor(deltaHex, a), [deltaHex, a]);
+  const deltaGlow = useMemo(() => alphaColor(deltaHex, glow), [deltaHex, glow]);
+  const deltaTextColor = useMemo(() => alphaColor(deltaHex, Math.min(0.98, a + 0.28)), [deltaHex, a]);
 
   const baseA = useMemo(() => baseAlphaForScore(beforeClamped), [beforeClamped]);
-  const baseFill = useMemo(() => hexToRgba(goldHex, baseA), [goldHex, baseA]);
-  const baseStroke = useMemo(() => hexToRgba(goldHex, Math.min(0.55, baseA + 0.20)), [goldHex, baseA]);
+  const baseFill = useMemo(() => alphaColor(goldHex, baseA), [goldHex, baseA]);
+  const baseStroke = useMemo(() => alphaColor(goldHex, Math.min(0.55, baseA + 0.2)), [goldHex, baseA]);
 
   const deltaStart = Math.min(pBefore, pAfter);
   const deltaTargetWidth = Math.abs(pAfter - pBefore);
@@ -112,9 +127,9 @@ export default function ImpactDeltaBar({
           position: 'relative',
           width: '100%',
           height,
-          borderRadius: 999,
+          borderRadius: 'var(--ui-radius-pill)',
           background: 'rgba(0,0,0,0.28)',
-          border: '1px solid rgba(255,255,255,0.10)',
+          border: '1px solid var(--ui-border-subtle)',
           overflow: 'hidden',
           boxShadow: '0 12px 26px rgba(0,0,0,0.36)',
         }}
@@ -164,7 +179,7 @@ export default function ImpactDeltaBar({
           style={{
             position: 'absolute',
             inset: 0,
-            borderRadius: 999,
+            borderRadius: 'var(--ui-radius-pill)',
             boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
             pointerEvents: 'none',
           }}
@@ -189,20 +204,20 @@ export default function ImpactDeltaBar({
           fontSize: 14,
           fontWeight: 950,
           letterSpacing: '0.02em',
-          color: 'rgba(255,255,255,0.92)',
+          color: 'var(--ui-text-primary)',
         }}
       >
-        <span style={{ color: 'rgba(255,255,255,0.72)' }}>{beforeClamped.toFixed(2)}</span>
-        <span style={{ color: 'rgba(255,255,255,0.38)' }}>→</span>
-        <span style={{ color: 'rgba(255,255,255,0.96)' }}>{afterClamped.toFixed(2)}</span>
+        <span style={{ color: 'var(--ui-text-muted)' }}>{beforeClamped.toFixed(2)}</span>
+        <span style={{ color: 'var(--ui-text-dim)' }}>→</span>
+        <span style={{ color: 'var(--ui-text-primary)' }}>{afterClamped.toFixed(2)}</span>
 
         <span
           style={{
             marginLeft: 6,
             padding: '2px 10px',
-            borderRadius: 999,
-            border: `1px solid ${hexToRgba(deltaHex, 0.38)}`,
-            background: hexToRgba(deltaHex, 0.12),
+            borderRadius: 'var(--ui-radius-pill)',
+            border: `1px solid ${alphaColor(deltaHex, 0.38)}`,
+            background: alphaColor(deltaHex, 0.12),
             color: deltaTextColor,
             fontSize: 13,
             letterSpacing: '0.06em',

@@ -25,6 +25,26 @@ const hexToRgba = (hex: string, a: number) => {
   return `rgba(${r},${g},${b},${a})`;
 };
 
+const alphaColor = (color: string, a: number) => {
+  const value = String(color ?? '').trim();
+  if (!value) return `rgba(255,255,255,${a})`;
+  if (value.startsWith('var(')) {
+    return `color-mix(in srgb, ${value} ${Math.round(Math.max(0, Math.min(1, a)) * 100)}%, transparent)`;
+  }
+  if (value.startsWith('#')) {
+    return hexToRgba(value, a);
+  }
+  if (
+    value.startsWith('rgb(') ||
+    value.startsWith('rgba(') ||
+    value.startsWith('hsl(') ||
+    value.startsWith('hsla(')
+  ) {
+    return `color-mix(in srgb, ${value} ${Math.round(Math.max(0, Math.min(1, a)) * 100)}%, transparent)`;
+  }
+  return `color-mix(in srgb, ${value} ${Math.round(Math.max(0, Math.min(1, a)) * 100)}%, transparent)`;
+};
+
 export default function CrowdVerdictBar({
   ready,
   leftName,
@@ -123,11 +143,11 @@ export default function CrowdVerdictBar({
             zIndex: 20,
             pointerEvents: 'none',
             padding: '8px 10px',
-            borderRadius: 10,
+            borderRadius: 'var(--ui-radius-md)',
             background: 'rgba(0,0,0,0.86)',
-            border: '1px solid rgba(255,214,102,0.35)',
+            border: '1px solid var(--ui-border-accent)',
             boxShadow: '0 14px 28px rgba(0,0,0,0.55)',
-            color: 'rgba(255,255,255,0.92)',
+            color: 'var(--ui-text-primary)',
             fontSize: 12,
             fontWeight: 800,
             letterSpacing: '0.02em',
@@ -142,13 +162,13 @@ export default function CrowdVerdictBar({
         onMouseMove={onMoveBar}
         style={{
           width: '100%',
-          borderRadius: 999,
+          borderRadius: 'var(--ui-radius-pill)',
           overflow: 'hidden',
-          border: '1px solid rgba(255,255,255,0.12)',
+          border: '1px solid var(--ui-border-subtle)',
           background: 'rgba(0,0,0,0.35)',
           boxShadow: '0 10px 22px rgba(0,0,0,0.32)',
           position: 'relative',
-          cursor: ready ? 'default' : 'default',
+          cursor: 'default',
         }}
         aria-hidden
       >
@@ -156,8 +176,8 @@ export default function CrowdVerdictBar({
           <div
             style={{
               width: `${displayLeft}%`,
-              background: hexToRgba(leftColor, votedLeft ? 0.82 : 0.42),
-              boxShadow: `inset 0 0 0 1px ${hexToRgba(leftColor, votedLeft ? 0.55 : 0.22)}`,
+              background: alphaColor(leftColor, votedLeft ? 0.82 : 0.42),
+              boxShadow: `inset 0 0 0 1px ${alphaColor(leftColor, votedLeft ? 0.55 : 0.22)}`,
               transitionProperty: 'width, background',
               transitionDuration: `${ANIMATE_WIDTH ? ANIM_MS : 0}ms, 160ms`,
               transitionTimingFunction: `${timing}, ${timing}`,
@@ -166,8 +186,8 @@ export default function CrowdVerdictBar({
           <div
             style={{
               width: `${displayRight}%`,
-              background: hexToRgba(rightColor, votedRight ? 0.82 : 0.42),
-              boxShadow: `inset 0 0 0 1px ${hexToRgba(rightColor, votedRight ? 0.55 : 0.22)}`,
+              background: alphaColor(rightColor, votedRight ? 0.82 : 0.42),
+              boxShadow: `inset 0 0 0 1px ${alphaColor(rightColor, votedRight ? 0.55 : 0.22)}`,
               transitionProperty: 'width, background',
               transitionDuration: `${ANIMATE_WIDTH ? ANIM_MS : 0}ms, 160ms`,
               transitionTimingFunction: `${timing}, ${timing}`,
