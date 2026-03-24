@@ -1,11 +1,18 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Inter } from 'next/font/google';
+import { Inter, IBM_Plex_Sans_Condensed } from 'next/font/google';
 import './globals.css';
 import TopNav from '../components/TopNav';
 import RouteOverlayLoader from '@/components/RouteOverlayLoader';
 
 const inter = Inter({ subsets: ['latin'] });
+
+const ratingFont = IBM_Plex_Sans_Condensed({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  variable: '--font-rating',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -19,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="cool-slate">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${ratingFont.variable}`}>
         <TopNav />
         <Suspense fallback={null}>
           <RouteOverlayLoader />

@@ -318,7 +318,6 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
             </div>
           );
         })}
-
         {hoveredAxis ? (
           <div
             style={{
@@ -339,7 +338,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
             }}
           >
-            {hoveredAxis.label}: {hoveredAxis.value.toFixed(1)}
+            {hoveredAxis.label}: <span className="ratingValue">{hoveredAxis.value.toFixed(1)}</span>
           </div>
         ) : null}
       </div>

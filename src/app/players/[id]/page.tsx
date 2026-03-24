@@ -381,7 +381,10 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
               <div className={styles.attributeYouSlot}>
                 {userRating != null ? (
                   <>
-                    <div className={styles.attributeYouValue}>you: {userRating}</div>
+                    <span className={styles.attributeYouValue}>
+                      <span className={styles.attributeYouLabel}>you:</span>{' '}
+                      <span className={styles.attributeYouRating}>{userRating}</span>
+                    </span>
                     <div className={styles.attributeYouDivider} aria-hidden="true" />
                   </>
                 ) : null}
@@ -391,7 +394,7 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
                 <div className={styles.attributeDeltaSlot}>
                   {hasDelta ? (
                     <Tooltip
-                      content={`Weekly change: ${formatSignedTwoDecimals(delta7d)}`}
+                      content={<>Last 7 days: <span className="ratingValue">{formatSignedTwoDecimals(delta7d)}</span></>}
                       side="top"
                       align="end"
                     >
@@ -404,7 +407,7 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
                             : styles.attributeDeltaDown,
                           getDeltaToneClass(delta7d),
                         ].join(' ')}
-                        aria-label={`Weekly change ${formatSignedTwoDecimals(delta7d)}`}
+                        aria-label={`Last 7 days ${formatSignedTwoDecimals(delta7d)}`}
                       >
                         {delta7d > 0 ? '↑' : '↓'}
                       </span>
@@ -413,7 +416,7 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
                 </div>
 
                 <Tooltip
-                  content={`Crowd rating: ${formatTwoDecimals(attr.rating)}`}
+                  content={<>Crowd rating: <span className="ratingValue">{formatTwoDecimals(attr.rating)}</span></>}
                   side="top"
                   align="end"
                 >
@@ -521,151 +524,155 @@ export default async function PlayerPage({
   return (
     <main className={styles.pageShell}>
       <div className={styles.pageInner}>
-        <section className={styles.topCard}>
-          <div className={styles.topCardHeader}>
-            <Link href="/database" className={styles.topCardBack}>
-              ← Back
-            </Link>
+        <div className={styles.profileFrame}>
+          <button
+            type="button"
+            className={`${styles.profileNav} ${styles.profileNavLeft}`}
+            aria-label="Previous player"
+          >
+            ‹
+          </button>
 
-            <button type="button" className={styles.topCardReport}>
-              Scout Report
-            </button>
-          </div>
+          <div className={styles.profileContent}>
+            <section className={styles.topCard}>
+              <div className={styles.topCardHeader}>
+                <Link href="/database" className={styles.topCardBack}>
+                  ← Back
+                </Link>
 
-          <div className={styles.topCardMain}>
-            <button
-              type="button"
-              className={`${styles.switchRail} ${styles.switchRailLeft}`}
-              aria-label="Previous player"
-            >
-              ‹
-            </button>
-
-            <div className={styles.topCardGrid}>
-              <div className={styles.topCardLeft}>
-                <div className={styles.topCardIdentity}>
-                  <h1 className={styles.playerName}>
-                    {data.number != null ? (
-                      <span className={styles.playerNumberInline}>#{data.number}</span>
-                    ) : null}
-                    <span>{data.name}</span>
-                  </h1>
-
-                  <div className={styles.playerMeta}>
-                    <span>{data.club?.name ?? 'No club'}</span>
-                    <span className={styles.metaDot}>•</span>
-                    <span>{data.position ?? 'Unknown position'}</span>
-                    <span className={styles.metaDot}>•</span>
-                    <span>{data.country?.name ?? 'Unknown nationality'}</span>
-                    {age != null ? (
-                      <>
-                        <span className={styles.metaDot}>•</span>
-                        <span>{age}</span>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
+                <button type="button" className={styles.topCardReport}>
+                  Scout Report
+                </button>
               </div>
 
-              <div className={styles.topCardCenter}>
-                <div className={styles.overallBlock}>
-                  <div className={styles.overallLabel}>OVERALL</div>
+              <div className={styles.topCardMain}>
+                <div className={styles.topCardGrid}>
+                  <div className={styles.topCardLeft}>
+                    <div className={styles.topCardIdentity}>
+                      <h1 className={styles.playerName}>
+                        {data.number != null ? (
+                          <span className={styles.playerNumberInline}>#{data.number}</span>
+                        ) : null}
+                        <span>{data.name}</span>
+                      </h1>
 
-                  <div className={styles.overallRow}>
-                    <div className={styles.overallMetricCluster}>
-                      <div className={styles.overallDeltaSlot}>
-                        {hasOverallDelta ? (
+                      <div className={styles.playerMeta}>
+                        <span>{data.club?.name ?? 'No club'}</span>
+                        <span className={styles.metaDot}>•</span>
+                        <span>{data.position ?? 'Unknown position'}</span>
+                        <span className={styles.metaDot}>•</span>
+                        <span>{data.country?.name ?? 'Unknown nationality'}</span>
+                        {age != null ? (
+                          <>
+                            <span className={styles.metaDot}>•</span>
+                            <span>{age}</span>
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.topCardCenter}>
+                    <div className={styles.overallBlock}>
+                      <div className={styles.overallLabel}>OVERALL</div>
+
+                      <div className={styles.overallRow}>
+                        <div className={styles.overallMetricCluster}>
+                          <div className={styles.overallDeltaSlot}>
+                            {hasOverallDelta ? (
+                              <Tooltip
+                                content={<>Last 7 days: <span className="ratingValue">{formatSignedTwoDecimals(overallDelta7d)}</span></>}
+                                side="top"
+                                align="end"
+                              >
+                                <span
+                                  className={[
+                                    styles.attributeDelta,
+                                    styles.infoHover,
+                                    overallDelta7d > 0
+                                      ? styles.attributeDeltaUp
+                                      : styles.attributeDeltaDown,
+                                    getDeltaToneClass(overallDelta7d),
+                                  ].join(' ')}
+                                  aria-label={`Last 7 days ${formatSignedTwoDecimals(overallDelta7d)}`}
+                                >
+                                  {overallDelta7d > 0 ? '↑' : '↓'}
+                                </span>
+                              </Tooltip>
+                            ) : null}
+                          </div>
+
                           <Tooltip
-                            content={`Weekly change: ${formatSignedTwoDecimals(overallDelta7d)}`}
+                            content={<>Crowd rating: <span className="ratingValue">{formatTwoDecimals(overallExact)}</span></>}
                             side="top"
                             align="end"
                           >
                             <span
-                              className={[
-                                styles.attributeDelta,
-                                styles.infoHover,
-                                overallDelta7d > 0
-                                  ? styles.attributeDeltaUp
-                                  : styles.attributeDeltaDown,
-                                getDeltaToneClass(overallDelta7d),
-                              ].join(' ')}
-                              aria-label={`Weekly change ${formatSignedTwoDecimals(overallDelta7d)}`}
+                              className={`${styles.overallValue} ${styles.metricHover}`}
+                              style={metricStyle(overall)}
+                              aria-label={`Crowd rating ${formatTwoDecimals(overallExact)}`}
                             >
-                              {overallDelta7d > 0 ? '↑' : '↓'}
+                              {overall}
                             </span>
                           </Tooltip>
-                        ) : null}
-                      </div>
 
-                      <Tooltip
-                        content={`Crowd rating: ${formatTwoDecimals(overallExact)}`}
-                        side="top"
-                        align="end"
-                      >
-                        <span
-                          className={`${styles.overallValue} ${styles.metricHover}`}
-                          style={metricStyle(overall)}
-                          aria-label={`Crowd rating ${formatTwoDecimals(overallExact)}`}
-                        >
-                          {overall}
-                        </span>
-                      </Tooltip>
-
-                      <Tooltip
-                        content={`Confidence: ${overallConfidencePct}%`}
-                        side="top"
-                        align="end"
-                      >
-                        <span className={styles.infoHover}>
-                          <div
-                            className={styles.overallConfidence}
-                            aria-label="Overall confidence"
+                          <Tooltip
+                            content={`Confidence: ${overallConfidencePct}%`}
+                            side="top"
+                            align="end"
                           >
-                            <div
-                              className={styles.overallConfidenceFill}
-                              style={{
-                                height: `${overallConfidencePct}%`,
-                              }}
-                            />
-                          </div>
-                        </span>
-                      </Tooltip>
+                            <span className={styles.infoHover}>
+                              <div
+                                className={styles.overallConfidence}
+                                aria-label="Overall confidence"
+                              >
+                                <div
+                                  className={styles.overallConfidenceFill}
+                                  style={{
+                                    height: `${overallConfidencePct}%`,
+                                  }}
+                                />
+                              </div>
+                            </span>
+                          </Tooltip>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.topCardRight}>
+                    <div className={styles.radarPlaceholder} aria-label="Player radar chart">
+                      <PlayerRadarChart data={radarData} />
                     </div>
                   </div>
                 </div>
               </div>
+            </section>
 
-              <div className={styles.topCardRight}>
-                <div className={styles.radarPlaceholder} aria-label="Player radar chart">
-                  <PlayerRadarChart data={radarData} />
-                </div>
+            <section className={styles.attributesCard}>
+              <div
+                className={styles.attributesColumns}
+                style={
+                  isGoalkeeper
+                    ? { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }
+                    : undefined
+                }
+              >
+                {attributeColumns.map((columnItems, index) => (
+                  <AttributeColumn key={`column-${index}`} items={columnItems} />
+                ))}
               </div>
-            </div>
-
-            <button
-              type="button"
-              className={`${styles.switchRail} ${styles.switchRailRight}`}
-              aria-label="Next player"
-            >
-              ›
-            </button>
+            </section>
           </div>
-        </section>
 
-        <section className={styles.attributesCard}>
-          <div
-            className={styles.attributesColumns}
-            style={
-              isGoalkeeper
-                ? { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }
-                : undefined
-            }
+          <button
+            type="button"
+            className={`${styles.profileNav} ${styles.profileNavRight}`}
+            aria-label="Next player"
           >
-            {attributeColumns.map((columnItems, index) => (
-              <AttributeColumn key={`column-${index}`} items={columnItems} />
-            ))}
-          </div>
-        </section>
+            ›
+          </button>
+        </div>
       </div>
     </main>
   );
