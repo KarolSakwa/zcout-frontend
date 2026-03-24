@@ -1,33 +1,34 @@
 .page {
-  padding: 28px 28px 40px;
+  padding: 18px 18px 28px;
 }
 
 .header {
   display: flex;
   justify-content: center;
-  margin: 10px 0 18px;
+  margin: 6px 0 12px;
 }
 
 .title {
-  font-size: 44px;
-  letter-spacing: 10px;
+  font-size: 32px;
+  letter-spacing: 6px;
   font-weight: 700;
   color: var(--ui-accent-primary);
 }
 
 .errorText {
-  max-width: 1200px;
+  max-width: 980px;
   margin: 0 auto;
   color: var(--ui-text-primary);
   opacity: 0.7;
+  font-size: 12px;
 }
 
 .grid {
-  max-width: 1200px;
+  max-width: 980px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--ui-space-lg);
+  gap: 12px;
 }
 
 .card {
@@ -44,7 +45,7 @@
     var(--club-secondary) 100%
   );
   box-shadow: var(--ui-shadow-panel-soft);
-  padding: 16px;
+  padding: 12px;
   position: relative;
   overflow: hidden;
   text-decoration: none;
@@ -65,15 +66,16 @@
 
 .cardTitle {
   font-weight: 750;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
+  font-size: 15px;
+  letter-spacing: 0.6px;
+  margin-bottom: 10px;
   color: var(--ui-text-primary);
 }
 
 .statsGrid {
   display: grid;
-  grid-template-columns: 1fr 70px;
-  gap: 10px;
+  grid-template-columns: 1fr 58px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -83,8 +85,8 @@
 
 .statKey {
   color: var(--ui-text-muted);
-  font-size: 12px;
-  letter-spacing: 2px;
+  font-size: 10px;
+  letter-spacing: 1.4px;
 }
 
 .statValue {
@@ -92,6 +94,7 @@
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-primary);
   font-weight: 700;
+  font-size: 12px;
 }
 
 .statValueEmpty {
@@ -106,7 +109,7 @@
 
 @media (max-width: 680px) {
   .page {
-    padding: 22px 18px 32px;
+    padding: 16px 14px 24px;
   }
 
   .grid {

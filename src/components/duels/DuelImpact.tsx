@@ -45,11 +45,11 @@ export default function DuelImpact({
         borderRadius: 'var(--ui-radius-lg)',
         background: 'var(--ui-surface-soft)',
         border: '1px solid var(--ui-border-subtle)',
-        boxShadow: '0 18px 44px rgba(0,0,0,0.46)',
-        padding: '14px 14px 12px',
+        boxShadow: '0 12px 28px rgba(0,0,0,0.4)',
+        padding: '10px 10px 9px',
       }}
     >
-      <ImpactDeltaBar before={before} after={after} delta={delta} min={0} max={100} height={14} />
+      <ImpactDeltaBar before={before} after={after} delta={delta} min={0} max={100} height={10} />
     </div>
   );
 }

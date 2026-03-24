@@ -9,7 +9,7 @@ type Props = {
   size?: number;
 };
 
-export default function ZLoader({ label, size = 46 }: Props) {
+export default function ZLoader({ label, size = 34 }: Props) {
   const loaderStyle: CSSProperties & Record<'--size', string> = {
     '--size': `${size}px`,
   };

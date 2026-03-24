@@ -1,35 +1,35 @@
 .page {
-  padding: 28px 28px 40px;
+  padding: 18px 18px 28px;
 }
 
 .header {
   display: flex;
   justify-content: center;
-  margin: 10px 0 18px;
+  margin: 6px 0 12px;
 }
 
 .title {
-  font-size: 44px;
-  letter-spacing: 10px;
+  font-size: 32px;
+  letter-spacing: 6px;
   font-weight: 700;
   color: var(--ui-accent-primary);
-  text-shadow: 0 0 24px color-mix(in srgb, var(--ui-accent-primary) 16%, transparent);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--ui-accent-primary) 16%, transparent);
 }
 
 .controlsRow {
   display: flex;
-  gap: var(--ui-space-lg);
+  gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
-  margin: 14px 0 10px;
+  margin: 10px 0 8px;
 }
 
 .control {
   display: flex;
   align-items: center;
-  gap: var(--ui-space-md);
-  min-width: 220px;
-  padding: 12px 14px;
+  gap: 8px;
+  min-width: 190px;
+  padding: 9px 11px;
   border-radius: var(--ui-radius-lg);
   border: var(--ui-border-width-thin) solid var(--ui-border-accent);
   background: var(--ui-surface-elevated);
@@ -39,22 +39,22 @@
 .controlValue {
   color: var(--ui-text-primary);
   font-weight: 650;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .metaRow {
-  max-width: 1200px;
-  margin: 8px auto 18px;
+  max-width: 980px;
+  margin: 6px auto 12px;
   display: flex;
   justify-content: flex-start;
   color: var(--ui-text-dim);
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .tableWrap {
-  max-width: 1200px;
+  max-width: 980px;
   margin: 0 auto;
   border-radius: var(--ui-radius-lg);
   overflow: hidden;
@@ -72,19 +72,19 @@
 
 .thead th {
   text-align: left;
-  padding: 14px 14px;
-  font-size: 12px;
-  letter-spacing: 2px;
+  padding: 11px 12px;
+  font-size: 10px;
+  letter-spacing: 1.4px;
   font-weight: 700;
   color: var(--ui-accent-primary);
   border-bottom: var(--ui-border-width-thin) solid var(--ui-border-subtle);
 }
 
 .row td {
-  padding: 14px 14px;
+  padding: 11px 12px;
   border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 80%, transparent);
   color: var(--ui-text-primary);
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .row:hover td {
@@ -92,7 +92,7 @@
 }
 
 .rankCell {
-  width: 56px;
+  width: 46px;
   color: var(--ui-text-secondary);
 }
 
@@ -105,31 +105,31 @@
 }
 
 .posCell {
-  width: 80px;
+  width: 64px;
   color: var(--ui-text-secondary);
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
 }
 
 .ratingCell {
-  width: 120px;
+  width: 96px;
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-primary);
 }
 
 .confCell {
-  width: 220px;
+  width: 180px;
 }
 
 .confGrid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: var(--ui-space-md);
+  gap: 8px;
   align-items: center;
 }
 
 .confBar {
-  height: 10px;
+  height: 8px;
   border-radius: var(--ui-radius-pill);
   background: var(--ui-surface-soft-2);
   overflow: hidden;
@@ -146,21 +146,22 @@
 }
 
 .confPct {
-  width: 52px;
+  width: 44px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-secondary);
+  font-size: 11px;
 }
 
 .votesNum {
-  width: 44px;
+  width: 40px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-muted);
 }
 
 .profileCell {
-  width: 120px;
+  width: 100px;
   text-align: right;
 }
 
@@ -168,14 +169,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 14px;
+  padding: 7px 11px;
   border-radius: var(--ui-radius-lg);
   border: var(--ui-border-width-thin) solid var(--ui-border-accent);
   color: var(--ui-accent-primary);
   text-decoration: none;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 10px;
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent);
 }
 
@@ -190,9 +191,9 @@
   outline: none;
   color: var(--ui-text-primary);
   font-weight: 650;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
 }
 

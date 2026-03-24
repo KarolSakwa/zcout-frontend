@@ -64,7 +64,7 @@ export default function ImpactDeltaBar({
   goldHex = 'var(--ui-accent-primary)',
   positiveHex = 'var(--ui-accent-success)',
   negativeHex = 'var(--ui-danger)',
-  height = 14,
+  height = 10,
   animMs = 1300,
   delayMs = 333,
   timing = 'linear',
@@ -131,7 +131,7 @@ export default function ImpactDeltaBar({
           background: 'rgba(0,0,0,0.28)',
           border: '1px solid var(--ui-border-subtle)',
           overflow: 'hidden',
-          boxShadow: '0 12px 26px rgba(0,0,0,0.36)',
+          boxShadow: '0 8px 18px rgba(0,0,0,0.3)',
         }}
         aria-hidden
       >
@@ -163,9 +163,9 @@ export default function ImpactDeltaBar({
               bottom: 0,
               left: `${deltaStart}%`,
               width: `${deltaWidth}%`,
-              minWidth: 10,
+              minWidth: 8,
               background: deltaFill,
-              boxShadow: `0 0 18px ${deltaGlow}`,
+              boxShadow: `0 0 14px ${deltaGlow}`,
               transitionProperty: 'width',
               transitionDuration: `${animMs}ms`,
               transitionTimingFunction: timing,
@@ -196,14 +196,14 @@ export default function ImpactDeltaBar({
 
       <div
         style={{
-          marginTop: 10,
+          marginTop: 8,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: 12,
-          fontSize: 14,
+          gap: 10,
+          fontSize: 12,
           fontWeight: 950,
-          letterSpacing: '0.02em',
+          letterSpacing: '0.01em',
           color: 'var(--ui-text-primary)',
         }}
       >
@@ -213,14 +213,14 @@ export default function ImpactDeltaBar({
 
         <span
           style={{
-            marginLeft: 6,
-            padding: '2px 10px',
+            marginLeft: 4,
+            padding: '2px 8px',
             borderRadius: 'var(--ui-radius-pill)',
             border: `1px solid ${alphaColor(deltaHex, 0.38)}`,
             background: alphaColor(deltaHex, 0.12),
             color: deltaTextColor,
-            fontSize: 13,
-            letterSpacing: '0.06em',
+            fontSize: 11,
+            letterSpacing: '0.04em',
           }}
         >
           {formatDelta(delta)}
@@ -229,7 +229,7 @@ export default function ImpactDeltaBar({
 
       <div
         style={{
-          marginTop: 8,
+          marginTop: 6,
           height: 1,
           background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
           opacity: 0.7,

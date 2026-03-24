@@ -70,7 +70,7 @@ export default function DuelRevealPanel({
 
   return (
     <div
-      style={{ maxWidth: 996, margin: '30px auto 0', cursor: inspectHover ? 'help' : 'default' }}
+      style={{ maxWidth: 720, margin: '20px auto 0', cursor: inspectHover ? 'help' : 'default' }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
@@ -78,9 +78,9 @@ export default function DuelRevealPanel({
         style={{
           display: 'flex',
           justifyContent: 'center',
-          marginBottom: 10,
-          fontSize: 11,
-          letterSpacing: '0.14em',
+          marginBottom: 8,
+          fontSize: 10,
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: verdictReady ? 'var(--ui-text-muted)' : 'var(--ui-text-dim)',
           fontWeight: 900,
@@ -103,14 +103,14 @@ export default function DuelRevealPanel({
 
       <div
         style={{
-          marginTop: 20,
+          marginTop: 14,
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) 96px minmax(0, 1fr)',
+          gridTemplateColumns: 'minmax(0, 1fr) 84px minmax(0, 1fr)',
           alignItems: 'start',
-          gap: 64,
+          gap: 36,
         }}
       >
-        <div style={{ marginTop: 8 }}>
+        <div>
           <DuelImpact
             show={showImpact}
             impact={leftImpact}
@@ -124,7 +124,7 @@ export default function DuelRevealPanel({
 
         <div />
 
-        <div style={{ marginTop: 8 }}>
+        <div>
           <DuelImpact
             show={showImpact}
             impact={rightImpact}
@@ -137,7 +137,7 @@ export default function DuelRevealPanel({
         </div>
       </div>
 
-      <div style={{ display: 'grid', placeItems: 'center', marginTop: 18 }}>
+      <div style={{ display: 'grid', placeItems: 'center', marginTop: 14 }}>
         <button
           type="button"
           onClick={goNext}
@@ -147,18 +147,19 @@ export default function DuelRevealPanel({
           onFocus={() => setNextHover(true)}
           onBlur={() => setNextHover(false)}
           style={{
-            height: 34,
-            padding: '0 16px',
+            height: 30,
+            padding: '0 12px',
+            fontSize: 11,
             borderRadius: 'var(--ui-radius-pill)',
             border: `1px solid ${nextIsHover ? 'var(--ui-accent-primary)' : 'var(--ui-border-accent)'}`,
             background: nextIsHover ? 'var(--ui-accent-primary-soft)' : 'color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
             color: 'var(--ui-accent-primary)',
             fontWeight: 950,
-            letterSpacing: '0.12em',
+            letterSpacing: '0.1em',
             textTransform: 'uppercase',
             boxShadow: nextIsHover
-              ? '0 14px 30px rgba(0,0,0,0.40), 0 0 22px var(--ui-accent-primary-soft)'
-              : '0 12px 28px rgba(0,0,0,0.35), 0 0 18px color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
+              ? '0 10px 22px rgba(0,0,0,0.36), 0 0 16px var(--ui-accent-primary-soft)'
+              : '0 8px 18px rgba(0,0,0,0.32), 0 0 12px color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
             opacity: nextDisabled ? 0.55 : 1,
             cursor: nextDisabled ? 'not-allowed' : 'pointer',
             userSelect: 'none',

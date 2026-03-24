@@ -26,11 +26,11 @@ export default function DuelCardsRow({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 96px minmax(0, 1fr)',
+        gridTemplateColumns: 'minmax(0, 1fr) 84px minmax(0, 1fr)',
         alignItems: 'start',
-        gap: 64,
-        maxWidth: 996,
-        margin: '28px auto 0',
+        gap: 36,
+        width: 'min(100%, 720px)',
+        margin: '16px auto 0',
       }}
     >
       <div className="flex flex-col gap-2" style={cardStyle('left')}>
@@ -58,7 +58,7 @@ export default function DuelCardsRow({
           pointerEvents: 'none',
         }}
       >
-        {showPendingUi ? <ZLoader /> : <div style={{ width: 46, height: 46 }} />}
+        {showPendingUi ? <ZLoader /> : <div style={{ width: 30, height: 30 }} />}
       </div>
 
       <div className="flex flex-col gap-2" style={cardStyle('right')}>

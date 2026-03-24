@@ -1,7 +1,7 @@
 .wrap {
   display: grid;
   place-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .coin {
@@ -13,36 +13,36 @@
   place-items: center;
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 78%, transparent);
   border: 1px solid var(--ui-border-accent);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(6px);
 }
 
 .ring {
   position: absolute;
-  inset: -6px;
+  inset: -4px;
   border-radius: var(--ui-radius-pill);
-  border: 2px solid color-mix(in srgb, var(--ui-accent-primary) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ui-accent-primary) 22%, transparent);
   border-top-color: var(--ui-accent-primary);
-  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
   animation: spin 650ms linear infinite;
 }
 
 .z {
   font-weight: 950;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--ui-accent-primary);
-  text-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
-  font-size: calc(var(--size) * 0.42);
-  transform: translateY(-1px);
+  text-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  font-size: calc(var(--size) * 0.38);
+  transform: translateY(-0.5px);
 }
 
 .label {
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   color: var(--ui-text-secondary);
-  font-size: 12px;
+  font-size: 10px;
   text-transform: uppercase;
-  text-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
 }
 
 @keyframes spin {

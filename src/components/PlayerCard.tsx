@@ -66,8 +66,8 @@ export default function PlayerCard({
             <div className="flag" aria-hidden>
               <img
                 src={flagSrc}
-                width={28}
-                height={18}
+                width={22}
+                height={14}
                 alt=""
                 loading="lazy"
                 draggable={false}
@@ -93,7 +93,7 @@ export default function PlayerCard({
           position: relative;
           width: 100%;
           aspect-ratio: 2 / 3;
-          border-radius: calc(var(--ui-radius-xl) + var(--ui-radius-sm));
+          border-radius: calc(var(--ui-radius-xl) + 2px);
           cursor: pointer;
           user-select: none;
           transform: translateZ(0);
@@ -101,19 +101,19 @@ export default function PlayerCard({
         }
 
         .card:hover {
-          transform: translateY(-2px);
-          filter: brightness(1.03);
+          transform: translateY(-1px);
+          filter: brightness(1.02);
         }
 
         .card:focus-visible {
           outline: 2px solid color-mix(in srgb, var(--ui-text-primary) 82%, transparent);
-          outline-offset: 4px;
-          border-radius: calc(var(--ui-radius-xl) + 8px);
+          outline-offset: 3px;
+          border-radius: calc(var(--ui-radius-xl) + 4px);
         }
 
         .card[data-state='winner'] {
-          transform: translateY(-2px) scale(1.05);
-          filter: brightness(1.04);
+          transform: translateY(-1px) scale(1.03);
+          filter: brightness(1.03);
         }
 
         .card[data-state='loser'] {
@@ -123,8 +123,8 @@ export default function PlayerCard({
         }
 
         .card[data-state='winner']:hover {
-          transform: translateY(-2px) scale(1.05);
-          filter: brightness(1.04);
+          transform: translateY(-1px) scale(1.03);
+          filter: brightness(1.03);
         }
 
         .card[data-state='loser']:hover {
@@ -136,31 +136,31 @@ export default function PlayerCard({
         .frame {
           position: absolute;
           inset: 0;
-          border-radius: calc(var(--ui-radius-xl) + var(--ui-radius-sm));
+          border-radius: calc(var(--ui-radius-xl) + 2px);
           background: linear-gradient(
             180deg,
             color-mix(in srgb, var(--ui-accent-primary) 100%, white) 0%,
             color-mix(in srgb, var(--ui-accent-primary) 72%, black) 100%
           );
-          box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+          box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
           transition: box-shadow 160ms ease;
         }
 
         .card[data-state='winner'] .frame {
           box-shadow:
-            0 18px 50px rgba(0, 0, 0, 0.55),
+            0 14px 38px rgba(0, 0, 0, 0.5),
             0 0 0 var(--ui-border-width-strong) var(--ui-accent-primary),
-            0 0 28px 10px color-mix(in srgb, var(--glow) 55%, transparent);
+            0 0 22px 8px color-mix(in srgb, var(--glow) 55%, transparent);
         }
 
         .card[data-state='loser'] .frame {
-          box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
         }
 
         .inner {
           position: absolute;
-          inset: var(--ui-space-xs);
-          border-radius: var(--ui-radius-xl);
+          inset: 3px;
+          border-radius: calc(var(--ui-radius-xl) - 1px);
           overflow: hidden;
           background: linear-gradient(
             135deg,
@@ -175,7 +175,7 @@ export default function PlayerCard({
 
         .top {
           position: relative;
-          padding: 12px 12px 8px;
+          padding: 9px 9px 6px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -183,16 +183,20 @@ export default function PlayerCard({
 
         .name {
           font-weight: 900;
-          letter-spacing: 0.06em;
-          font-size: 22px;
+          letter-spacing: 0.03em;
+          font-size: 15px;
           color: var(--ui-text-primary);
           text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+          max-width: calc(100% - 84px);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .flag {
           position: absolute;
-          left: 12px;
-          top: 14px;
+          left: 9px;
+          top: 11px;
           filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
         }
 
@@ -205,41 +209,41 @@ export default function PlayerCard({
 
         .posBadge {
           position: absolute;
-          right: 12px;
-          top: 10px;
-          width: 54px;
-          height: 44px;
+          right: 9px;
+          top: 7px;
+          width: 38px;
+          height: 32px;
           background: rgba(0, 0, 0, 0.55);
-          border: var(--ui-border-width-strong) solid var(--ui-accent-primary);
+          border: var(--ui-border-width-thin) solid var(--ui-accent-primary);
           border-radius: var(--ui-radius-md);
           display: grid;
           place-items: center;
-          box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45);
+          box-shadow: 0 8px 18px rgba(0, 0, 0, 0.42);
         }
 
         .posText {
           font-weight: 900;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.04em;
           color: color-mix(in srgb, var(--ui-accent-primary) 100%, white);
-          font-size: 16px;
+          font-size: 11px;
         }
 
         .mid {
           position: relative;
-          height: 64%;
+          height: 63%;
           display: grid;
           place-items: center;
         }
 
         .number {
           font-weight: 950;
-          font-size: clamp(84px, 9vw, 132px);
+          font-size: clamp(58px, 6vw, 94px);
           line-height: 1;
           color: color-mix(in srgb, var(--ui-text-primary) 96%, white);
           text-shadow:
-            0 10px 24px rgba(0, 0, 0, 0.55),
-            0 2px 0 rgba(0, 0, 0, 0.35);
-          -webkit-text-stroke: 6px rgba(0, 0, 0, 0.55);
+            0 8px 20px rgba(0, 0, 0, 0.5),
+            0 2px 0 rgba(0, 0, 0, 0.32);
+          -webkit-text-stroke: 3px rgba(0, 0, 0, 0.52);
           paint-order: stroke fill;
         }
 
@@ -248,7 +252,7 @@ export default function PlayerCard({
           left: 0;
           right: 0;
           bottom: 0;
-          padding: 10px 12px;
+          padding: 8px 10px;
           background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.55));
           border-top: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-text-primary) 12%, transparent);
           display: grid;
@@ -257,17 +261,21 @@ export default function PlayerCard({
 
         .club {
           font-weight: 900;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.045em;
           color: color-mix(in srgb, var(--ui-text-primary) 92%, transparent);
-          font-size: 16px;
+          font-size: 12px;
           text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .texture {
           position: absolute;
           inset: 0;
           pointer-events: none;
-          opacity: 0.22;
+          opacity: 0.18;
           background:
             radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.55) 0, transparent 2px),
             radial-gradient(1px 1px at 70% 35%, rgba(255, 255, 255, 0.45) 0, transparent 2px),
@@ -284,11 +292,24 @@ export default function PlayerCard({
 
         @media (max-width: 900px) {
           .name {
-            font-size: 20px;
+            font-size: 14px;
           }
 
           .club {
-            font-size: 15px;
+            font-size: 11px;
+          }
+
+          .number {
+            font-size: clamp(52px, 5.8vw, 82px);
+          }
+
+          .posBadge {
+            width: 34px;
+            height: 29px;
+          }
+
+          .posText {
+            font-size: 10px;
           }
         }
 

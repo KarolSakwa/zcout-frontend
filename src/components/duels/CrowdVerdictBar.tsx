@@ -137,18 +137,18 @@ export default function CrowdVerdictBar({
         <div
           style={{
             position: 'absolute',
-            top: -34,
+            top: -30,
             left: tip.x,
             transform: 'translateX(-50%)',
             zIndex: 20,
             pointerEvents: 'none',
-            padding: '8px 10px',
+            padding: '6px 8px',
             borderRadius: 'var(--ui-radius-md)',
             background: 'rgba(0,0,0,0.86)',
             border: '1px solid var(--ui-border-accent)',
-            boxShadow: '0 14px 28px rgba(0,0,0,0.55)',
+            boxShadow: '0 10px 20px rgba(0,0,0,0.5)',
             color: 'var(--ui-text-primary)',
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 800,
             letterSpacing: '0.02em',
             whiteSpace: 'nowrap',
@@ -166,13 +166,13 @@ export default function CrowdVerdictBar({
           overflow: 'hidden',
           border: '1px solid var(--ui-border-subtle)',
           background: 'rgba(0,0,0,0.35)',
-          boxShadow: '0 10px 22px rgba(0,0,0,0.32)',
+          boxShadow: '0 8px 18px rgba(0,0,0,0.28)',
           position: 'relative',
           cursor: 'default',
         }}
         aria-hidden
       >
-        <div style={{ display: 'flex', height: 22 }}>
+        <div style={{ display: 'flex', height: 18 }}>
           <div
             style={{
               width: `${displayLeft}%`,

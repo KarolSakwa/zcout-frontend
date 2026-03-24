@@ -141,9 +141,9 @@ export default function RegisterPage() {
   };
 
   const shellStyle: React.CSSProperties = {
-    maxWidth: 420,
-    margin: '40px auto',
-    padding: 16,
+    maxWidth: 360,
+    margin: '24px auto',
+    padding: 12,
   };
 
   const cardStyle: React.CSSProperties = {
@@ -151,30 +151,31 @@ export default function RegisterPage() {
     border: '1px solid var(--ui-border-subtle)',
     background: 'var(--ui-surface-elevated)',
     boxShadow: 'var(--ui-shadow-panel-soft)',
-    padding: 18,
+    padding: 14,
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: 22,
-    margin: '0 0 16px',
+    fontSize: 18,
+    margin: '0 0 12px',
     color: 'var(--ui-text-primary)',
     fontWeight: 800,
-    letterSpacing: '0.02em',
+    letterSpacing: '0.01em',
   };
 
   const inputStyle: React.CSSProperties = {
-    padding: 10,
+    padding: '8px 10px',
     borderRadius: 'var(--ui-radius-md)',
     border: '1px solid var(--ui-border-subtle)',
     background: 'color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent)',
     color: 'var(--ui-text-primary)',
     outline: 'none',
     width: '100%',
+    fontSize: 13,
   };
 
   const primaryButtonStyle: React.CSSProperties = {
-    minHeight: 'var(--ui-action-height)',
-    padding: '0 var(--ui-action-pad-x)',
+    minHeight: 34,
+    padding: '0 12px',
     borderRadius: 'var(--ui-radius-md)',
     border: '1px solid var(--ui-action-primary-border)',
     background: 'linear-gradient(180deg, var(--ui-action-primary-bg-1) 0%, var(--ui-action-primary-bg-2) 100%)',
@@ -182,19 +183,20 @@ export default function RegisterPage() {
     cursor: loading ? 'default' : 'pointer',
     width: '100%',
     fontWeight: 800,
+    fontSize: 13,
     boxShadow: 'var(--ui-shadow-button)',
   };
 
   const errorStyle: React.CSSProperties = {
-    marginTop: 6,
+    marginTop: 4,
     color: 'var(--ui-danger)',
-    fontSize: 12,
+    fontSize: 11,
     lineHeight: 1.2,
   };
 
   const formErrorStyle: React.CSSProperties = {
     color: 'var(--ui-danger)',
-    fontSize: 13,
+    fontSize: 12,
     lineHeight: 1.3,
   };
 
@@ -203,7 +205,7 @@ export default function RegisterPage() {
       <div style={cardStyle}>
         <h1 style={titleStyle}>Create account</h1>
 
-        <form onSubmit={onSubmit} style={{ display: 'grid', gap: 12 }}>
+        <form onSubmit={onSubmit} style={{ display: 'grid', gap: 10 }}>
           <div>
             <input
               value={name}

@@ -582,16 +582,14 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
       </div>
 
       {!showReveal && pair && (
-        <div
-          style={{
-            position: 'fixed',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            bottom: 'clamp(120px, 14vh, 170px)',
-            zIndex: 60,
-            pointerEvents: showOverlayLoader ? 'none' : 'auto',
-          }}
-        >
+         <div
+            style={{
+              display: 'grid',
+              placeItems: 'center',
+              marginTop: 18,
+              pointerEvents: showOverlayLoader ? 'none' : 'auto',
+            }}
+          >
           <button
             type="button"
             onClick={handleSkip}

@@ -1,48 +1,48 @@
 .page {
-  min-height: calc(100vh - 64px);
-  padding: var(--ui-card-pad-y) 28px 44px;
+  min-height: calc(100vh - 56px);
+  padding: 18px 18px 28px;
 }
 
 .header {
   display: grid;
   justify-items: center;
-  margin: 6px 0 var(--ui-section-gap);
+  margin: 4px 0 12px;
 }
 
 .title {
-  font-size: 46px;
-  letter-spacing: 10px;
+  font-size: 32px;
+  letter-spacing: 6px;
   font-weight: 800;
   color: var(--ui-accent-primary);
   text-transform: uppercase;
-  text-shadow: 0 16px 50px rgba(0, 0, 0, 0.65);
+  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
 }
 
 .sub {
-  margin-top: 8px;
-  font-size: 13px;
-  letter-spacing: 2px;
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--ui-text-muted);
 }
 
 .grid {
-  max-width: 1240px;
+  max-width: 980px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 40% 60%;
-  gap: var(--ui-section-gap);
+  grid-template-columns: 38% 62%;
+  gap: 12px;
   align-items: start;
 }
 
 .left {
   display: grid;
-  gap: var(--ui-space-lg);
+  gap: 12px;
 }
 
 .right {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .panel {
@@ -51,31 +51,31 @@
   border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
   background: var(--ui-surface-elevated);
   box-shadow: var(--ui-shadow-panel-soft);
-  padding: var(--ui-space-xl);
+  padding: 14px;
   overflow: hidden;
 }
 
 .panel::before {
   content: '';
   position: absolute;
-  inset: -20px;
+  inset: -16px;
   background:
-    radial-gradient(700px 260px at 20% 15%, color-mix(in oklab, var(--c1), transparent 70%), transparent 60%),
-    radial-gradient(540px 220px at 85% 30%, color-mix(in oklab, var(--c3), transparent 82%), transparent 60%),
-    radial-gradient(520px 260px at 55% 110%, color-mix(in oklab, var(--c2), transparent 82%), transparent 60%);
-  opacity: 0.55;
-  filter: blur(18px);
+    radial-gradient(520px 220px at 20% 15%, color-mix(in oklab, var(--c1), transparent 72%), transparent 60%),
+    radial-gradient(420px 180px at 85% 30%, color-mix(in oklab, var(--c3), transparent 84%), transparent 60%),
+    radial-gradient(420px 220px at 55% 110%, color-mix(in oklab, var(--c2), transparent 84%), transparent 60%);
+  opacity: 0.5;
+  filter: blur(14px);
   pointer-events: none;
 }
 
 .panelTitle {
   position: relative;
-  font-size: 12px;
-  letter-spacing: 3px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--ui-accent-primary);
   font-weight: 800;
-  margin-bottom: var(--ui-space-lg);
+  margin-bottom: 10px;
 }
 
 .clubOverallRow {
@@ -83,19 +83,19 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .clubOverallLabel {
-  font-size: 12px;
-  letter-spacing: 3px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--ui-text-muted);
 }
 
 .clubOverallValue {
-  font-size: 38px;
-  letter-spacing: 1px;
+  font-size: 30px;
+  letter-spacing: 0.5px;
   font-weight: 950;
   color: var(--ui-text-primary);
 }
@@ -103,26 +103,26 @@
 .statRows {
   position: relative;
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .statRow {
   display: grid;
-  grid-template-columns: 92px 1fr 52px;
-  gap: 12px;
+  grid-template-columns: 74px 1fr 42px;
+  gap: 10px;
   align-items: center;
 }
 
 .statKey {
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--ui-text-muted);
   font-weight: 800;
 }
 
 .statBar {
-  height: 9px;
+  height: 7px;
   border-radius: var(--ui-radius-pill);
   background: var(--ui-surface-soft-2);
   overflow: hidden;
@@ -144,35 +144,36 @@
   font-variant-numeric: tabular-nums;
   font-weight: 900;
   color: var(--ui-text-primary);
+  font-size: 12px;
 }
 
 .topCard {
   position: relative;
   display: grid;
-  gap: var(--ui-space-lg);
+  gap: 10px;
 }
 
 .topHead {
   display: grid;
-  grid-template-columns: 60px 1fr 78px;
-  gap: var(--ui-space-lg);
+  grid-template-columns: 48px 1fr 60px;
+  gap: 10px;
   align-items: center;
 }
 
 .topAvatar {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--ui-radius-pill);
   border: var(--ui-border-width-thin) solid var(--ui-border-accent);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   display: grid;
   place-items: center;
 }
 
 .topAvatarInner {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--ui-radius-pill);
   background: radial-gradient(circle at 40% 30%, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.22));
   border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
@@ -187,7 +188,7 @@
 .topNameRow {
   display: flex;
   align-items: center;
-  gap: var(--ui-space-md);
+  gap: 8px;
   min-width: 0;
 }
 
@@ -195,25 +196,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 26px;
-  padding: 0 10px;
+  height: 22px;
+  padding: 0 8px;
   border-radius: var(--ui-radius-md);
   border: var(--ui-border-width-thin) solid var(--ui-border-accent);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent);
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 1.2px;
   color: var(--ui-accent-primary);
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .topName {
   font-weight: 950;
-  letter-spacing: 1px;
+  letter-spacing: 0.4px;
   color: var(--ui-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 14px;
 }
 
 .topOverall {
@@ -222,14 +224,14 @@
 }
 
 .topOverallLabel {
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--ui-text-muted);
 }
 
 .topOverallValue {
-  font-size: 38px;
+  font-size: 30px;
   font-weight: 950;
   line-height: 1;
   color: var(--ui-text-primary);
@@ -237,12 +239,12 @@
 
 .topConf {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .topConfLabel {
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--ui-text-muted);
   font-weight: 800;
@@ -250,13 +252,13 @@
 
 .confGrid {
   display: grid;
-  grid-template-columns: 1fr 48px;
-  gap: 12px;
+  grid-template-columns: 1fr 40px;
+  gap: 10px;
   align-items: center;
 }
 
 .confBar {
-  height: 10px;
+  height: 8px;
   border-radius: var(--ui-radius-pill);
   background: var(--ui-surface-soft-2);
   overflow: hidden;
@@ -278,6 +280,7 @@
   font-variant-numeric: tabular-nums;
   font-weight: 900;
   color: var(--ui-text-primary);
+  font-size: 11px;
 }
 
 .topActions {
@@ -289,21 +292,21 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 6px 2px 0;
+  padding: 4px 2px 0;
 }
 
 .listTitle {
-  font-size: 13px;
-  letter-spacing: 3px;
+  font-size: 11px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   font-weight: 900;
   color: var(--ui-accent-primary);
 }
 
 .listMeta {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--ui-text-muted);
-  letter-spacing: 1px;
+  letter-spacing: 0.6px;
 }
 
 .tableWrap {
@@ -320,9 +323,9 @@
 }
 
 .thead th {
-  padding: 14px 14px;
-  font-size: 12px;
-  letter-spacing: 3px;
+  padding: 11px 12px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   font-weight: 900;
   color: var(--ui-accent-primary);
@@ -332,7 +335,7 @@
 .sortLink {
   display: inline-flex;
   align-items: center;
-  gap: var(--ui-space-md);
+  gap: 6px;
   text-decoration: none;
   color: var(--ui-accent-primary);
 }
@@ -346,14 +349,15 @@
 }
 
 .sortArrow {
-  font-size: 10px;
+  font-size: 9px;
   opacity: 0.9;
   transform: translateY(-1px);
 }
 
 .row td {
-  padding: 13px 14px;
+  padding: 10px 12px;
   border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 80%, transparent);
+  font-size: 12px;
 }
 
 .row:last-child td {
@@ -361,42 +365,42 @@
 }
 
 .rankCell {
-  width: 44px;
+  width: 36px;
   color: var(--ui-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
 .playerCell {
-  min-width: 240px;
+  min-width: 180px;
 }
 
 .playerName {
   font-weight: 900;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   color: var(--ui-text-primary);
 }
 
 .posCell {
-  width: 92px;
+  width: 74px;
 }
 
 .posPill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 26px;
-  padding: 0 10px;
+  height: 22px;
+  padding: 0 8px;
   border-radius: var(--ui-radius-md);
   border: var(--ui-border-width-thin) solid var(--ui-border-accent);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent);
   font-weight: 900;
-  letter-spacing: 2px;
-  font-size: 12px;
+  letter-spacing: 1.2px;
+  font-size: 10px;
   color: var(--ui-text-primary);
 }
 
 .ovrCell {
-  width: 86px;
+  width: 68px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-weight: 900;
@@ -404,11 +408,11 @@
 }
 
 .confCell {
-  width: 260px;
+  width: 180px;
 }
 
 .profileCell {
-  width: 120px;
+  width: 96px;
   text-align: right;
 }
 
@@ -416,16 +420,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
-  padding: 0 14px;
+  height: 28px;
+  padding: 0 11px;
   border-radius: var(--ui-radius-md);
   border: var(--ui-border-width-thin) solid var(--ui-border-accent);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent);
   color: var(--ui-accent-primary);
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 10px;
   text-decoration: none;
 }
 
@@ -436,11 +440,11 @@
 
 .backLink {
   display: inline-block;
-  margin-top: 4px;
+  margin-top: 2px;
   color: var(--ui-text-muted);
   text-decoration: none;
-  letter-spacing: 1px;
-  font-size: 12px;
+  letter-spacing: 0.6px;
+  font-size: 11px;
 }
 
 .backLink:hover {
@@ -448,21 +452,65 @@
 }
 
 .error {
-  max-width: 1240px;
+  max-width: 980px;
   margin: 0 auto;
   color: var(--ui-text-primary);
   display: grid;
-  gap: var(--ui-space-md);
+  gap: 8px;
+  font-size: 12px;
 }
 
 .empty {
   color: var(--ui-text-muted);
-  font-size: 13px;
-  letter-spacing: 1px;
+  font-size: 12px;
+  letter-spacing: 0.6px;
 }
 
 @media (max-width: 1100px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 16px 14px 24px;
+  }
+
+  .title {
+    font-size: 26px;
+    letter-spacing: 4px;
+  }
+
+  .topHead {
+    grid-template-columns: 42px 1fr 54px;
+  }
+
+  .topAvatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .topAvatarInner {
+    width: 24px;
+    height: 24px;
+  }
+
+  .clubOverallValue,
+  .topOverallValue {
+    font-size: 26px;
+  }
+
+  .statRow {
+    grid-template-columns: 66px 1fr 38px;
+    gap: 8px;
+  }
+
+  .confCell {
+    width: 150px;
+  }
+
+  .playerCell {
+    min-width: 140px;
   }
 }
