@@ -1,5 +1,5 @@
 .pageShell {
-  padding: 22px 22px 44px;
+  padding: 18px 18px 36px;
 }
 
 .pageInner {
@@ -12,23 +12,30 @@
   opacity: 0.72;
 }
 
-.topCard {
+.topCard,
+.attributesCard {
+  display: block;
   width: 100%;
-  padding: 14px 18px 18px;
+  box-sizing: border-box;
+}
+
+.topCard {
+  padding: 12px 14px 14px;
   border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-panel);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 88%, black);
   box-shadow: var(--ui-shadow-panel-soft);
+  overflow: visible;
 }
 
 .topCardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  min-height: 40px;
-  padding: 0 2px 12px;
-  margin-bottom: 14px;
+  gap: 14px;
+  min-height: 34px;
+  padding: 0 2px 10px;
+  margin-bottom: 10px;
   border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 86%, transparent);
 }
 
@@ -48,53 +55,56 @@
   border: 0;
   background: transparent;
   color: var(--ui-text-secondary);
-  font-size: 0.94rem;
+  font-size: 0.82rem;
   letter-spacing: 0.01em;
 }
 
 .topCardReport {
   justify-content: center;
-  min-height: 38px;
-  padding: 0 15px;
+  min-height: 32px;
+  padding: 0 12px;
   border: var(--ui-border-width-thin) solid var(--ui-action-primary-border);
   border-radius: var(--ui-radius-control);
   background: var(--ui-accent-primary);
   color: #ffffff;
-  font-size: 0.86rem;
-  letter-spacing: 0.06em;
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
 }
 
 .topCardMain {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 48px;
-  gap: 12px;
+  grid-template-columns: 40px minmax(0, 1fr) 40px;
+  gap: 10px;
   align-items: stretch;
-  min-height: 284px;
+  height: 252px;
+  overflow: visible;
 }
 
 .switchRail {
   display: flex;
   align-items: center;
   justify-content: center;
-  align-self: stretch;
-  width: 48px;
-  min-height: 100%;
+  align-self: center;
+  width: 38px;
+  height: 78%;
+  min-height: 0;
   padding: 0;
   border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 92%, transparent);
   border-radius: var(--ui-radius-rail);
   background: color-mix(in srgb, var(--ui-surface-soft) 88%, transparent);
   color: var(--ui-text-dim);
-  font-size: 1.55rem;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1;
 }
 
 .topCardGrid {
   display: grid;
-  grid-template-columns: minmax(300px, 1.08fr) minmax(210px, 0.62fr) minmax(230px, 0.78fr);
-  gap: 18px;
-  align-items: center;
-  min-height: 284px;
+  grid-template-columns: minmax(280px, 1.02fr) minmax(124px, 0.38fr) minmax(360px, 1.06fr);
+  gap: 4px;
+  align-items: stretch;
+  height: 100%;
+  overflow: visible;
 }
 
 .topCardLeft {
@@ -105,14 +115,14 @@
 
 .topCardIdentity {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   max-width: 100%;
 }
 
 .playerName {
   margin: 0;
-  font-size: clamp(2.14rem, 3.38vw, 3.28rem);
+  font-size: clamp(1.78rem, 2.82vw, 2.72rem);
   line-height: 0.94;
   font-weight: 900;
   letter-spacing: -0.035em;
@@ -122,7 +132,7 @@
 }
 
 .playerNumberInline {
-  margin-right: 10px;
+  margin-right: 8px;
   color: var(--ui-text-dim);
   font-weight: 800;
   font-size: 0.92em;
@@ -135,7 +145,7 @@
   gap: 9px;
   min-width: 0;
   margin-top: 4px;
-  font-size: 0.98rem;
+  font-size: 0.86rem;
   line-height: 1.4;
   font-weight: 700;
   color: var(--ui-text-secondary);
@@ -148,19 +158,19 @@
 .topCardCenter {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding-left: 2px;
+  justify-content: flex-end;
+  padding-right: 0;
 }
 
 .overallBlock {
   display: grid;
   justify-items: center;
   align-content: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .overallLabel {
-  font-size: 0.8rem;
+  font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.15em;
   color: var(--ui-text-dim);
@@ -169,35 +179,37 @@
 
 .overallRow {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .overallMetricCluster {
   display: grid;
-  grid-template-columns: 26px auto 6px;
+  grid-template-columns: 28px auto 5px;
   align-items: center;
-  gap: 8px;
+  gap: 3px;
 }
 
 .overallDeltaSlot {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  min-width: 26px;
+  width: 28px;
+  min-width: 28px;
+  padding-bottom: 3px;
 }
 
 .overallDeltaSlot .attributeDelta {
-  width: 26px;
-  font-size: 1.42rem;
+  width: 28px;
+  font-size: 1.8rem;
+  line-height: 0.82;
 }
 
 .overallValue {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-end;
-  font-size: clamp(4.8rem, 8vw, 7rem);
-  line-height: 0.8;
+  font-size: clamp(3.95rem, 6.6vw, 5.7rem);
+  line-height: 0.78;
   font-weight: 900;
   letter-spacing: -0.05em;
   text-shadow: var(--ui-shadow-metric-text);
@@ -206,8 +218,9 @@
 .overallConfidence {
   display: flex;
   align-items: flex-end;
-  width: 6px;
-  height: 98px;
+  width: 5px;
+  height: 80px;
+  margin-left: 8px;
   padding: 1px;
   border: var(--ui-border-width-thin) solid var(--ui-metric-track-border);
   border-radius: var(--ui-radius-meter);
@@ -223,20 +236,35 @@
 
 .topCardRight {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-end;
   min-width: 0;
+  height: 100%;
+  overflow: visible;
 }
 
 .radarPlaceholder {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-end;
   width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: visible;
+}
+
+.radarPlaceholder > div {
+  width: 100%;
+  height: 100%;
+}
+
+.radarPlaceholder svg,
+.radarPlaceholder canvas {
+  overflow: visible;
 }
 
 .radarPlaceholderInner {
-  width: min(100%, 228px);
+  width: min(100%, 188px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -251,8 +279,7 @@
 }
 
 .attributesCard {
-  width: 100%;
-  margin-top: 16px;
+  margin-top: 12px;
   border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-panel);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 92%, black);
@@ -264,6 +291,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
+  width: 100%;
 }
 
 .attributeColumn {
@@ -277,12 +305,12 @@
 .attributePanelHeader {
   display: flex;
   align-items: center;
-  min-height: 36px;
-  padding: 0 14px;
+  min-height: 32px;
+  padding: 0 12px;
   border-bottom: var(--ui-border-width-thin) solid var(--ui-border-subtle);
   background: color-mix(in srgb, var(--ui-surface-soft) 88%, transparent);
   color: var(--ui-text-primary);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 900;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -290,18 +318,18 @@
 
 .attributeRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(148px, 46%);
+  grid-template-columns: minmax(0, 1fr) minmax(132px, 44%);
   align-items: center;
-  gap: 10px;
-  min-height: 38px;
-  padding: 0 12px;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 10px;
   border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 88%, transparent);
 }
 
 .attributeLead {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -310,9 +338,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
   border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-accent-primary) 56%, var(--ui-border-subtle));
   border-radius: var(--ui-radius-control);
   background: color-mix(in srgb, var(--ui-surface-soft) 92%, transparent);
@@ -321,7 +349,7 @@
 
 .attributeIcon::before {
   content: '✦';
-  font-size: 9px;
+  font-size: 8px;
   line-height: 1;
   color: color-mix(in srgb, var(--ui-accent-primary) 88%, white);
   transform: translateY(-0.5px);
@@ -329,7 +357,7 @@
 
 .attributeName {
   min-width: 0;
-  font-size: 0.98rem;
+  font-size: 0.86rem;
   font-weight: 800;
   color: var(--ui-text-secondary);
   white-space: nowrap;
@@ -341,7 +369,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   justify-self: stretch;
 }
@@ -350,9 +378,9 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
-  padding-right: 4px;
+  padding-right: 2px;
 }
 
 .attributeYouValue {
@@ -366,7 +394,7 @@
 
 .attributeYouDivider {
   width: 1px;
-  height: 16px;
+  height: 14px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--ui-border-subtle) 110%, transparent);
   flex: 0 0 1px;
@@ -374,9 +402,9 @@
 
 .attributeMetricCluster {
   display: grid;
-  grid-template-columns: 12px 42px 3px;
+  grid-template-columns: 10px 28px 3px;
   align-items: center;
-  column-gap: 2px;
+  column-gap: 0px;
   justify-content: end;
 }
 
@@ -384,17 +412,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 12px;
-  min-width: 12px;
-  margin-right: 6px;
+  width: 10px;
+  min-width: 10px;
+  margin-right: 1px;
 }
 
 .attributeDelta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 12px;
-  font-size: 0.82rem;
+  width: 10px;
+  font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
   user-select: none;
@@ -425,7 +453,7 @@
   align-items: center;
   justify-content: flex-end;
   text-align: right;
-  font-size: 1.12rem;
+  font-size: 0.96rem;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -434,8 +462,8 @@
 .attributeConfidence {
   display: flex;
   align-items: flex-end;
-  width: 3px;
-  height: 24px;
+  width: 2px;
+  height: 20px;
   padding: 1px 0;
   border: var(--ui-border-width-thin) solid var(--ui-metric-track-border);
   border-radius: var(--ui-radius-meter);
@@ -463,16 +491,16 @@
 
 @media (max-width: 1180px) {
   .topCardGrid {
-    grid-template-columns: minmax(260px, 1.02fr) minmax(180px, 0.64fr) minmax(200px, 0.78fr);
-    gap: 16px;
+    grid-template-columns: minmax(280px, 1fr) minmax(130px, 0.4fr) minmax(340px, 1.08fr);
+    gap: 4px;
   }
 
   .topCardMain {
-    min-height: 260px;
+    height: 284px;
   }
 
   .topCardGrid {
-    min-height: 260px;
+    height: 100%;
   }
 
   .playerName {
@@ -510,7 +538,7 @@
   .topCardMain {
     grid-template-columns: 42px minmax(0, 1fr) 42px;
     gap: 10px;
-    min-height: auto;
+    height: auto;
   }
 
   .switchRail {
@@ -522,7 +550,7 @@
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     gap: 22px;
-    min-height: auto;
+    height: auto;
   }
 
   .topCardLeft,
@@ -547,6 +575,8 @@
 
   .radarPlaceholder {
     justify-content: flex-start;
+    min-height: 260px;
+    padding: 0;
   }
 
   .radarPlaceholderInner {
@@ -645,13 +675,13 @@
   }
 
   .attributeMetricCluster {
-    grid-template-columns: 12px 38px 3px;
-    column-gap: 2px;
+    grid-template-columns: 12px 34px 3px;
+    column-gap: 1px;
   }
 
   .overallMetricCluster {
-    grid-template-columns: 26px auto 6px;
-    gap: 8px;
+    grid-template-columns: 34px auto 6px;
+    gap: 4px;
   }
 }
 

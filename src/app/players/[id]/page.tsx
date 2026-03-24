@@ -4,17 +4,25 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import Tooltip from '@/components/Tooltip';
 import styles from './page.module.css';
+import PlayerRadarChart from './PlayerRadarChart';
 
 type PlayerProfileAttribute = {
   id: number;
   key: string;
   label: string;
-  group: string;
+  group: 'technical' | 'mental' | 'physical' | string;
   rating: number;
   confidence: number;
   weight_sum: number;
   votes_count: number;
   last_vote_at: string | null;
+};
+
+type PlayerRadarAxis = {
+  key: string;
+  label: string;
+  attribute_keys: string[];
+  value: number;
 };
 
 type PlayerProfileResponse = {
@@ -38,6 +46,7 @@ type PlayerProfileResponse = {
     iso2: string | null;
   } | null;
   overall_confidence: number;
+  radar_axes: PlayerRadarAxis[];
   attributes: PlayerProfileAttribute[];
 };
 
@@ -89,6 +98,30 @@ const PHYSICAL_ORDER = [
   'strength',
   'agility',
   'stamina',
+] as const;
+
+const GK_GOALKEEPING_ORDER = [
+  'gk_reflexes',
+  'gk_one_on_ones',
+  'gk_handling',
+  'gk_command_of_area',
+  'passing',
+  'gk_throwing',
+  'gk_rushing_out',
+  'gk_eccentricity',
+] as const;
+
+const GK_MENTAL_ORDER = [
+  'leadership',
+  'concentration',
+  'composure',
+] as const;
+
+const GK_PHYSICAL_ORDER = [
+  'pace',
+  'acceleration',
+  'strength',
+  'agility',
 ] as const;
 
 const MOCK_USER_ATTRIBUTE_RATINGS: Record<string, number> = {
@@ -335,6 +368,7 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
         const userRating = getUserAttributeRating(attr);
         const delta7d = getAttributeDelta7d(attr);
         const hasDelta = delta7d != null && Math.abs(delta7d) > 0.001;
+        const confidencePct = pctFromConfidence(attr.confidence);
 
         return (
           <div key={item.id} className={styles.attributeRow}>
@@ -392,15 +426,23 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
                   </span>
                 </Tooltip>
 
-                <div
-                  className={styles.attributeConfidence}
-                  aria-label={`${attr.label} confidence`}
+                <Tooltip
+                  content={`Confidence: ${confidencePct}%`}
+                  side="top"
+                  align="end"
                 >
-                  <div
-                    className={styles.attributeConfidenceFill}
-                    style={{ height: `${pctFromConfidence(attr.confidence)}%` }}
-                  />
-                </div>
+                  <span className={styles.infoHover}>
+                    <div
+                      className={styles.attributeConfidence}
+                      aria-label={`${attr.label} confidence`}
+                    >
+                      <div
+                        className={styles.attributeConfidenceFill}
+                        style={{ height: `${confidencePct}%` }}
+                      />
+                    </div>
+                  </span>
+                </Tooltip>
               </div>
             </div>
           </div>
@@ -437,23 +479,43 @@ export default async function PlayerPage({
 
   const data = (await res.json()) as PlayerProfileResponse;
 
+  const radarData = data.radar_axes.map((axis) => ({
+    key: axis.key,
+    label: axis.label,
+    value: axis.value,
+  }));
+
   const age = calcAge(data.date_of_birth);
   const overall = avgOverall(data.attributes);
   const overallExact = exactOverall(data.attributes);
   const overallDelta7d = MOCK_OVERALL_DELTA_7D;
   const hasOverallDelta = Math.abs(overallDelta7d) > 0.001;
+  const overallConfidencePct = pctFromConfidence(data.overall_confidence);
+  const isGoalkeeper = data.position?.toUpperCase() === 'GK';
+
+  const goalkeeping = pickAttrsByKeys(data.attributes, GK_GOALKEEPING_ORDER);
+  const gkMental = pickAttrsByKeys(data.attributes, GK_MENTAL_ORDER);
+  const gkPhysical = pickAttrsByKeys(data.attributes, GK_PHYSICAL_ORDER);
 
   const technical = pickAttrsByKeys(data.attributes, LEFT_COLUMN_ORDER);
   const mental = pickAttrsByKeys(data.attributes, MENTAL_ORDER);
   const physical = pickAttrsByKeys(data.attributes, PHYSICAL_ORDER);
 
+  const attributeSections = isGoalkeeper
+    ? [
+        { title: 'Goalkeeping', items: goalkeeping },
+        { title: 'Mental', items: gkMental },
+        { title: 'Physical', items: gkPhysical },
+      ]
+    : [
+        { title: 'Technical', items: technical },
+        { title: 'Mental', items: mental },
+        { title: 'Physical', items: physical },
+      ];
+
   const attributeColumns = buildAttributeColumns(
-    [
-      { title: 'Technical', items: technical },
-      { title: 'Mental', items: mental },
-      { title: 'Physical', items: physical },
-    ],
-    3
+    attributeSections,
+    isGoalkeeper ? 2 : 3
   );
 
   return (
@@ -549,28 +611,33 @@ export default async function PlayerPage({
                         </span>
                       </Tooltip>
 
-                      <div
-                        className={styles.overallConfidence}
-                        aria-label="Overall confidence"
+                      <Tooltip
+                        content={`Confidence: ${overallConfidencePct}%`}
+                        side="top"
+                        align="end"
                       >
-                        <div
-                          className={styles.overallConfidenceFill}
-                          style={{
-                            height: `${pctFromConfidence(data.overall_confidence)}%`,
-                          }}
-                        />
-                      </div>
+                        <span className={styles.infoHover}>
+                          <div
+                            className={styles.overallConfidence}
+                            aria-label="Overall confidence"
+                          >
+                            <div
+                              className={styles.overallConfidenceFill}
+                              style={{
+                                height: `${overallConfidencePct}%`,
+                              }}
+                            />
+                          </div>
+                        </span>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className={styles.topCardRight}>
-                <div
-                  className={styles.radarPlaceholder}
-                  aria-label="Radar placeholder"
-                >
-                  <div className={styles.radarPlaceholderInner}>Radar</div>
+                <div className={styles.radarPlaceholder} aria-label="Player radar chart">
+                  <PlayerRadarChart data={radarData} />
                 </div>
               </div>
             </div>
@@ -586,7 +653,14 @@ export default async function PlayerPage({
         </section>
 
         <section className={styles.attributesCard}>
-          <div className={styles.attributesColumns}>
+          <div
+            className={styles.attributesColumns}
+            style={
+              isGoalkeeper
+                ? { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }
+                : undefined
+            }
+          >
             {attributeColumns.map((columnItems, index) => (
               <AttributeColumn key={`column-${index}`} items={columnItems} />
             ))}
