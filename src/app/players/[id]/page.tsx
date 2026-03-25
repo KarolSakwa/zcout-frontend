@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Tooltip from '@/components/Tooltip';
 import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
+import { formatOverall } from '@/lib/ratings';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -48,6 +49,7 @@ type PlayerProfileResponse = {
   overall_confidence: number;
   radar_axes: PlayerRadarAxis[];
   attributes: PlayerProfileAttribute[];
+  overall: number | null;
 };
 
 type AttributeSection = {
@@ -489,8 +491,8 @@ export default async function PlayerPage({
   }));
 
   const age = calcAge(data.date_of_birth);
-  const overall = avgOverall(data.attributes);
-  const overallExact = exactOverall(data.attributes);
+  const overall = formatOverall(data.overall, 'rounded');
+  const overallExact = formatOverall(data.overall, 'exact');
   const overallDelta7d = MOCK_OVERALL_DELTA_7D;
   const hasOverallDelta = Math.abs(overallDelta7d) > 0.001;
   const overallConfidencePct = pctFromConfidence(data.overall_confidence);

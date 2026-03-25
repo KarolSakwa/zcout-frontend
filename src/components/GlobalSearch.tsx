@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
+import { formatOverall } from '@/lib/ratings';
 
 const MIN_QUERY_LENGTH = 3;
 const DEBOUNCE_MS = 150;
@@ -402,7 +403,7 @@ export default function GlobalSearch() {
                       >
                         {player.position ? `${player.position} • ` : null}
                         {player.club ? `${player.club}` : null}
-                        {player.overall != null ? (
+                        {formatOverall(player.overall, 'rounded') != null ? (
                           <>
                             {' • '}
                             <span
@@ -417,7 +418,7 @@ export default function GlobalSearch() {
                                 color: 'var(--ui-text-primary)',
                               }}
                             >
-                              {player.overall}
+                              {formatOverall(player.overall, 'rounded')}
                             </span>
                           </>
                         ) : null}
