@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './TopNav.module.css';
 import AuthStatus from './AuthStatus';
+import GlobalSearch from './GlobalSearch';
 
 const ITEMS = [
   { href: '/duels', label: 'DUEL' },
@@ -42,10 +43,14 @@ export default function TopNav() {
           })}
         </nav>
 
-        <div className={styles.spacer} />
+        <div className={styles.rightTools}>
+          <div className={styles.search}>
+            <GlobalSearch />
+          </div>
 
-        <div className={styles.auth}>
-          <AuthStatus />
+          <div className={styles.auth}>
+            <AuthStatus />
+          </div>
         </div>
       </div>
     </header>

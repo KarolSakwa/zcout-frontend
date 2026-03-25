@@ -111,13 +111,7 @@ export default function AuthStatus() {
   if (isAuthRoute) return null;
 
   if (!user) {
-    return (
-      <div>
-        <Link href="/login">Log in</Link>
-        <span style={{ opacity: 0.5, margin: '0 10px' }}>|</span>
-        <Link href="/register">Create account</Link>
-      </div>
-    );
+    return <Link href="/login">Log in</Link>;
   }
 
   return (
