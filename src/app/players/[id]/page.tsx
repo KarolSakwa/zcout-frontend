@@ -605,14 +605,14 @@ export default async function PlayerPage({
                           </div>
 
                           <Tooltip
-                            content={<>Crowd rating: <span className="ratingValue">{formatTwoDecimals(overallExact)}</span></>}
+                            content={<>Crowd rating: <span className="ratingValue">{overallExact}</span></>}
                             side="top"
                             align="end"
                           >
                             <span
                               className={`${styles.overallValue} ${styles.metricHover}`}
-                              style={metricStyle(overall)}
-                              aria-label={`Crowd rating ${formatTwoDecimals(overallExact)}`}
+                              style={metricStyle(data.overall ?? 0)}
+                              aria-label={`Crowd rating ${overallExact}`}
                             >
                               {overall}
                             </span>
