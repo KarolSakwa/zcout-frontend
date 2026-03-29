@@ -1,8 +1,12 @@
 import AttributeRankingPage from '../[attributeKey]/page';
 
-export default function RankingsIndexPage() {
+export default function RankingsIndexPage({
+  searchParams,
+}: {
+  searchParams?: { limit?: string; position?: string; search?: string };
+}) {
   return AttributeRankingPage({
-    params: { attributeKey: 'dribbling' },
-    searchParams: {},
+    params: { attributeKey: 'overall' },
+    searchParams: searchParams ?? {},
   });
 }

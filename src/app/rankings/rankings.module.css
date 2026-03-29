@@ -113,6 +113,7 @@
 
 .ratingCell {
   width: 96px;
+  text-align: center;
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-primary);
 }
@@ -231,4 +232,134 @@
 .select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.searchInput {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--ui-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.searchInput::placeholder {
+  color: var(--ui-text-muted);
+  opacity: 1;
+}
+
+.searchInput:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.headerLink {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: var(--ui-accent-primary);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.playerLink {
+  color: var(--ui-text-primary);
+  text-decoration: none;
+  font-weight: 650;
+}
+
+.playerLink:hover {
+  color: var(--ui-accent-primary);
+}
+
+.clubLink {
+  color: var(--ui-text-muted);
+  text-decoration: none;
+}
+
+.clubLink:hover {
+  color: var(--ui-text-primary);
+}
+
+.clubText {
+  color: var(--ui-text-muted);
+}
+
+.thead th.centerHeader {
+  text-align: center;
+}
+
+.thead th.trendCell {
+  text-align: center;
+}
+
+.trendCell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.headerLinkActive {
+  color: var(--ui-text-primary);
+}
+
+.headerSortArrow {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 5px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--ui-accent-primary);
+}
+
+.pagination {
+  max-width: 980px;
+  margin: 14px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paginationLink {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
+  border-radius: var(--ui-radius-md);
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.paginationLink:hover {
+  background: var(--ui-surface-soft);
+  border-color: var(--ui-border-accent);
+  color: var(--ui-text-primary);
+}
+
+.paginationLinkActive {
+  background: color-mix(in srgb, var(--ui-accent-primary) 14%, transparent);
+  border-color: var(--ui-border-accent);
+  color: var(--ui-text-primary);
 }
