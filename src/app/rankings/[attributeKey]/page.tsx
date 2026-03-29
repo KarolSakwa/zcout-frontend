@@ -206,8 +206,6 @@ export default async function RankingsPage({
           gkAttributeOptions={meta?.gk_attributes ?? []}
         />
 
-        <div className={styles.metaRow}>{data.total} players</div>
-
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead className={styles.thead}>
