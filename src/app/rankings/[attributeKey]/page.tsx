@@ -276,7 +276,7 @@ export default async function RankingsPage({
                     active={activeSort === 'pos'}
                     dir={activeDir}
                   >
-                    POS
+                    POSITION
                   </RankingsSortLink>
                 </th>
 

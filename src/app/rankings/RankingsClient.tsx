@@ -100,7 +100,7 @@ export default function RankingsClient(props: {
               <th>#</th>
               <th>PLAYER</th>
               <th>CLUB</th>
-              <th>POS</th>
+              <th>POSITION</th>
               <th>RATING</th>
               <th>TREND 7D</th>
             </tr>

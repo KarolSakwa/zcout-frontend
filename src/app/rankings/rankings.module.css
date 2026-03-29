@@ -109,6 +109,7 @@
   color: var(--ui-text-secondary);
   letter-spacing: 0.8px;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .ratingCell {
@@ -362,4 +363,40 @@
   background: color-mix(in srgb, var(--ui-accent-primary) 14%, transparent);
   border-color: var(--ui-border-accent);
   color: var(--ui-text-primary);
+}
+
+.resetSlot {
+  display: flex;
+  align-items: center;
+}
+
+.resetButton {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--ui-radius-lg);
+  border: var(--ui-border-width-thin) solid var(--ui-border-accent);
+  background: var(--ui-surface-elevated);
+  box-shadow: var(--ui-shadow-panel-soft);
+  outline: none;
+  color: var(--ui-text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.resetButton:hover {
+  background: var(--ui-surface-soft);
+  color: var(--ui-text-primary);
+}
+
+.resetButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

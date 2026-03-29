@@ -239,6 +239,23 @@ export default function RankingsControls(props: {
         </select>
       </div>
 
+      <div className={styles.resetSlot}>
+        <button
+          type="button"
+          className={styles.resetButton}
+          disabled={isFilterPending}
+          onClick={() => {
+            setPendingKind('filter');
+
+            startTransition(() => {
+              router.push(pathname === '/rankings' ? '/rankings' : '/rankings/overall');
+            });
+          }}
+        >
+          Reset
+        </button>
+      </div>
+
       <style jsx>{`
         @keyframes spin {
           to {
