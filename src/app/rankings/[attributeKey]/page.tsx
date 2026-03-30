@@ -6,6 +6,7 @@ import RankingsControls from '../RankingsControls';
 import RankingsSortLink from '../RankingsSortLink';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import ZLoader from '@/components/ZLoader';
+import { getRatingColor } from '@/lib/ratings';
 
 type Option = { value: string; label: string };
 
@@ -352,9 +353,10 @@ export default async function RankingsPage({
                         <RatingWithConfidence
                           rating={it.rating}
                           confidence={it.confidence}
-                          size="md"
+                          fontSize={13}
                           decimals={2}
                           align="center"
+                          ratingColor={getRatingColor(it.rating)}
                         />
                       </div>
                     </td>

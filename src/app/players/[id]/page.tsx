@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Tooltip from '@/components/Tooltip';
 import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
-import { formatOverall } from '@/lib/ratings';
+import RatingWithConfidence from '@/components/RatingWithConfidence';
+import { formatOverall, getRatingColor } from '@/lib/ratings';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -417,37 +418,21 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
                   ) : null}
                 </div>
 
-                <Tooltip
-                  content={<>Crowd rating: <span className="ratingValue">{formatTwoDecimals(attr.rating)}</span></>}
-                  side="top"
+                <RatingWithConfidence
+                  rating={Math.round(normalizeRating(attr.rating))}
+                  confidence={attr.confidence}
+                  fontSize={16}
+                  scalePx={16}
+                  decimals={0}
                   align="end"
-                >
-                  <span
-                    className={`${styles.attributeValue} ${styles.metricHover}`}
-                    style={metricStyle(attr.rating)}
-                    aria-label={`Crowd rating ${formatTwoDecimals(attr.rating)}`}
-                  >
-                    {Math.round(normalizeRating(attr.rating))}
-                  </span>
-                </Tooltip>
-
-                <Tooltip
-                  content={`Confidence: ${confidencePct}%`}
-                  side="top"
-                  align="end"
-                >
-                  <span className={styles.infoHover}>
-                    <div
-                      className={styles.attributeConfidence}
-                      aria-label={`${attr.label} confidence`}
-                    >
-                      <div
-                        className={styles.attributeConfidenceFill}
-                        style={{ height: `${confidencePct}%` }}
-                      />
-                    </div>
-                  </span>
-                </Tooltip>
+                  expand={false}
+                  ratingColor={getRatingColor(attr.rating)}
+                  ratingTooltipContent={
+                    <>
+                      Crowd rating: <span className="ratingValue">{formatTwoDecimals(attr.rating)}</span>
+                    </>
+                  }
+                />
               </div>
             </div>
           </div>
@@ -604,39 +589,21 @@ export default async function PlayerPage({
                             ) : null}
                           </div>
 
-                          <Tooltip
-                            content={<>Crowd rating: <span className="ratingValue">{overallExact}</span></>}
-                            side="top"
+                          <RatingWithConfidence
+                            rating={overall}
+                            confidence={data.overall_confidence}
+                            fontSize="clamp(3.95rem, 6.6vw, 5.7rem)"
+                            scalePx={72}
+                            decimals={0}
                             align="end"
-                          >
-                            <span
-                              className={`${styles.overallValue} ${styles.metricHover}`}
-                              style={metricStyle(data.overall ?? 0)}
-                              aria-label={`Crowd rating ${overallExact}`}
-                            >
-                              {overall}
-                            </span>
-                          </Tooltip>
-
-                          <Tooltip
-                            content={`Confidence: ${overallConfidencePct}%`}
-                            side="top"
-                            align="end"
-                          >
-                            <span className={styles.infoHover}>
-                              <div
-                                className={styles.overallConfidence}
-                                aria-label="Overall confidence"
-                              >
-                                <div
-                                  className={styles.overallConfidenceFill}
-                                  style={{
-                                    height: `${overallConfidencePct}%`,
-                                  }}
-                                />
-                              </div>
-                            </span>
-                          </Tooltip>
+                            expand={false}
+                            ratingColor={getRatingColor(data.overall)}
+                            ratingTooltipContent={
+                              <>
+                                Crowd rating: <span className="ratingValue">{overallExact}</span>
+                              </>
+                            }
+                          />
                         </div>
                       </div>
                     </div>

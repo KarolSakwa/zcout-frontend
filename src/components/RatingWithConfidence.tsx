@@ -1,35 +1,20 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Tooltip from './Tooltip';
 
 type RatingWithConfidenceProps = {
-  rating: number | string;
-  confidence: number;
-  size?: 'sm' | 'md' | 'lg';
+  rating: number | string | null | undefined;
+  confidence: number | null | undefined;
+  fontSize?: number | string;
+  scalePx?: number;
   decimals?: number;
   align?: 'start' | 'center' | 'end';
+  expand?: boolean;
+  ratingColor?: string;
+  ratingTooltipContent?: ReactNode;
+  confidenceTooltipContent?: ReactNode | false;
 };
-
-const SIZE_MAP = {
-  sm: {
-    gap: '5px',
-    fontSize: '11px',
-    barWidth: '4px',
-    barHeight: '14px',
-  },
-  md: {
-    gap: '6px',
-    fontSize: '13px',
-    barWidth: '4px',
-    barHeight: '18px',
-  },
-  lg: {
-    gap: '8px',
-    fontSize: '17px',
-    barWidth: '5px',
-    barHeight: '24px',
-  },
-} as const;
 
 const JUSTIFY_MAP = {
   start: 'flex-start',
@@ -40,16 +25,94 @@ const JUSTIFY_MAP = {
 export default function RatingWithConfidence({
   rating,
   confidence,
-  size = 'md',
+  fontSize = 13,
+  scalePx,
   decimals = 2,
   align = 'end',
+  expand = true,
+  ratingColor = 'var(--ui-text-primary)',
+  ratingTooltipContent,
+  confidenceTooltipContent,
 }: RatingWithConfidenceProps) {
-  const cfg = SIZE_MAP[size];
-  const normalizedConfidence = Math.max(0, Math.min(100, confidence));
+  const resolvedScalePx = Math.max(
+    10,
+    scalePx ?? (typeof fontSize === 'number' ? fontSize : 13)
+  );
+
+  const resolvedFontSize =
+    typeof fontSize === 'number' ? `${fontSize}px` : fontSize;
+
+  const gap = Math.max(4, Math.round(resolvedScalePx * 0.32));
+  const barWidth = Math.max(6, Math.round(resolvedScalePx * 0.24));
+  const barHeight = Math.max(14, Math.round(resolvedScalePx * 1.35));
+  const normalizedConfidence = Math.max(0, Math.min(100, Number(confidence ?? 0)));
   const roundedFill = Math.round(normalizedConfidence);
 
   const displayRating =
-    typeof rating === 'number' ? rating.toFixed(decimals) : rating;
+    typeof rating === 'number'
+      ? rating.toFixed(decimals)
+      : rating == null
+        ? '—'
+        : String(rating);
+
+  const resolvedConfidenceTooltipContent =
+    confidenceTooltipContent === undefined
+      ? `Confidence: ${normalizedConfidence.toFixed(2)}%`
+      : confidenceTooltipContent;
+
+  const ratingNode = (
+    <span
+      style={{
+        fontFamily: 'var(--font-rating), "Segoe UI", system-ui, sans-serif',
+        fontSize: resolvedFontSize,
+        fontWeight: 700,
+        lineHeight: 1,
+        letterSpacing: '-0.04em',
+        fontVariantNumeric: 'tabular-nums lining-nums',
+        fontFeatureSettings: '"tnum" 1, "lnum" 1',
+        color: ratingColor,
+        cursor: ratingTooltipContent ? 'help' : 'default',
+      }}
+    >
+      {displayRating}
+    </span>
+  );
+
+  const confidenceNode = (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}
+    >
+      <span
+        style={{
+          width: `${barWidth}px`,
+          height: `${barHeight}px`,
+          borderRadius: '999px',
+          background: 'var(--ui-surface-soft-2)',
+          border: '1px solid color-mix(in srgb, white 24%, transparent)',
+          boxSizing: 'border-box',
+          overflow: 'hidden',
+          position: 'relative',
+          flexShrink: 0,
+          cursor: resolvedConfidenceTooltipContent === false ? 'default' : 'help',
+        }}
+      >
+        <span
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: `${roundedFill}%`,
+            borderRadius: '999px',
+            background: 'var(--ui-accent-primary)',
+          }}
+        />
+      </span>
+    </span>
+  );
 
   return (
     <div
@@ -57,57 +120,25 @@ export default function RatingWithConfidence({
         display: 'flex',
         justifyContent: JUSTIFY_MAP[align],
         alignItems: 'center',
-        gap: cfg.gap,
-        width: '100%',
+        gap: `${gap}px`,
+        width: expand ? '100%' : 'auto',
       }}
     >
-      <span
-        style={{
-          fontFamily: 'var(--font-rating), "Segoe UI", system-ui, sans-serif',
-          fontSize: cfg.fontSize,
-          fontWeight: 700,
-          lineHeight: 1,
-          letterSpacing: '-0.04em',
-          fontVariantNumeric: 'tabular-nums lining-nums',
-          fontFeatureSettings: '"tnum" 1, "lnum" 1',
-        }}
-      >
-        {displayRating}
-      </span>
+      {ratingTooltipContent ? (
+        <Tooltip content={ratingTooltipContent}>
+          {ratingNode}
+        </Tooltip>
+      ) : (
+        ratingNode
+      )}
 
-      <Tooltip content={`Confidence: ${normalizedConfidence.toFixed(2)}%`}>
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-          }}
-        >
-          <span
-            style={{
-              width: cfg.barWidth,
-              height: cfg.barHeight,
-              borderRadius: '999px',
-              background: 'var(--ui-surface-soft-2)',
-              overflow: 'hidden',
-              position: 'relative',
-              flexShrink: 0,
-              cursor: 'help',
-            }}
-          >
-            <span
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: `${roundedFill}%`,
-                borderRadius: '999px',
-                background: 'var(--ui-accent-primary)',
-              }}
-            />
-          </span>
-        </span>
-      </Tooltip>
+      {resolvedConfidenceTooltipContent !== false ? (
+        <Tooltip content={resolvedConfidenceTooltipContent}>
+          {confidenceNode}
+        </Tooltip>
+      ) : (
+        confidenceNode
+      )}
     </div>
   );
 }

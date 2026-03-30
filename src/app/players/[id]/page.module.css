@@ -246,28 +246,10 @@
   line-height: 0.82;
 }
 
-.overallValue,
-.attributeValue {
-  font-family: var(--font-rating), "Segoe UI", system-ui, sans-serif;
-  font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: "tnum" 1, "lnum" 1;
-}
-
 .attributeYouRating {
   font-family: var(--font-rating), "Segoe UI", system-ui, sans-serif;
   font-variant-numeric: tabular-nums lining-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
-}
-
-.overallValue {
-  display: inline-flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  font-size: clamp(3.95rem, 6.6vw, 5.7rem);
-  line-height: 0.74;
-  font-weight: 700;
-  letter-spacing: -0.075em;
-  text-shadow: var(--ui-shadow-metric-text);
 }
 
 .overallConfidence {
@@ -280,13 +262,6 @@
   border: var(--ui-border-width-thin) solid var(--ui-metric-track-border);
   border-radius: var(--ui-radius-meter);
   background: var(--ui-metric-track-bg);
-}
-
-.overallConfidenceFill {
-  width: 100%;
-  border-radius: var(--ui-radius-meter);
-  background: var(--ui-metric-fill);
-  box-shadow: var(--ui-shadow-glow-success);
 }
 
 .topCardRight {
@@ -522,37 +497,6 @@
   color: color-mix(in srgb, var(--ui-accent-primary) 92%, white);
 }
 
-.attributeValue {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 2ch;
-  text-align: right;
-  font-size: 1.04rem;
-  font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 1;
-  text-shadow: var(--ui-shadow-metric-text);
-}
-
-.attributeConfidence {
-  display: flex;
-  align-items: flex-end;
-  width: 2px;
-  height: 20px;
-  padding: 1px 0;
-  border: var(--ui-border-width-thin) solid var(--ui-metric-track-border);
-  border-radius: var(--ui-radius-meter);
-  background: var(--ui-metric-track-bg);
-}
-
-.attributeConfidenceFill {
-  width: 100%;
-  border-radius: var(--ui-radius-meter);
-  background: var(--ui-metric-fill);
-  box-shadow: var(--ui-shadow-glow-success-sm);
-}
-
 .metricHover {
   cursor: default;
 }
@@ -594,10 +538,6 @@
     max-width: 12ch;
   }
 
-  .overallValue {
-    font-size: clamp(4.2rem, 7vw, 6rem);
-  }
-
   .radarPlaceholderInner {
     width: min(100%, 204px);
   }
@@ -609,10 +549,6 @@
 
   .attributeName {
     font-size: 0.94rem;
-  }
-
-  .attributeValue {
-    font-size: 1.08rem;
   }
 
   .attributeYouValue {
