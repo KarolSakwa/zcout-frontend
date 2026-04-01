@@ -31,8 +31,12 @@
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-  transform: scale(0.92);
-  transform-origin: left center;
+}
+
+.brandLogo {
+  display: block;
+  height: 24px;
+  width: auto;
 }
 
 .menu {

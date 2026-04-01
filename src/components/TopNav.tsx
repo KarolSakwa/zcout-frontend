@@ -21,7 +21,7 @@ export default function TopNav() {
     <header className={styles.topnav}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="Zcout">
-          <Image src="/logo.png" alt="Zcout" width={92} height={28} priority quality={100} />
+          <img src="/logo.png" alt="Zcout" className={styles.brandLogo} />
         </Link>
 
         <nav className={styles.menu} aria-label="Main">
