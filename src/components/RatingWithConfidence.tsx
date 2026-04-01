@@ -42,9 +42,9 @@ export default function RatingWithConfidence({
   const resolvedFontSize =
     typeof fontSize === 'number' ? `${fontSize}px` : fontSize;
 
-  const gap = Math.max(4, Math.round(resolvedScalePx * 0.32));
+  const gap = Math.max(4, Math.round(resolvedScalePx * 0.15));
   const barWidth = Math.max(6, Math.round(resolvedScalePx * 0.24));
-  const barHeight = Math.max(14, Math.round(resolvedScalePx * 1.35));
+  const barHeight = Math.max(10, Math.round(resolvedScalePx * 1.2));
   const normalizedConfidence = Math.max(0, Math.min(100, Number(confidence ?? 0)));
   const roundedFill = Math.round(normalizedConfidence);
 

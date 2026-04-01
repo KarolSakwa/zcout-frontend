@@ -421,8 +421,8 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
                 <RatingWithConfidence
                   rating={Math.round(normalizeRating(attr.rating))}
                   confidence={attr.confidence}
-                  fontSize={16}
-                  scalePx={16}
+                  fontSize={15}
+                  scalePx={15}
                   decimals={0}
                   align="end"
                   expand={false}
@@ -592,8 +592,8 @@ export default async function PlayerPage({
                           <RatingWithConfidence
                             rating={overall}
                             confidence={data.overall_confidence}
-                            fontSize="clamp(3.95rem, 6.6vw, 5.7rem)"
-                            scalePx={72}
+                            fontSize="clamp(3.3rem, 5.3vw, 4.85rem)"
+                            scalePx={62}
                             decimals={0}
                             align="end"
                             expand={false}

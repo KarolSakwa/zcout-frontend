@@ -1,9 +1,9 @@
 .pageShell {
-  padding: 18px 18px 36px;
+  padding: 12px 16px 28px;
 }
 
 .pageInner {
-  max-width: 1280px;
+  max-width: 1160px;
   margin: 0 auto;
 }
 
@@ -22,35 +22,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 92px;
+  width: 40px;
+  height: 82px;
   padding: 0;
-  border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 84%, transparent);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--ui-surface-elevated) 72%, transparent);
+  border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--ui-surface-elevated) 68%, transparent);
   color: var(--ui-text-dim);
-  font-size: 1rem;
+  font-size: 0.94rem;
   font-weight: 800;
   line-height: 1;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
   z-index: 3;
 }
 
 .profileNav:hover {
   transform: translateY(calc(-50% - 1px));
-  background: color-mix(in srgb, var(--ui-surface-elevated) 84%, transparent);
+  background: color-mix(in srgb, var(--ui-surface-elevated) 82%, transparent);
   border-color: color-mix(in srgb, var(--ui-border-subtle) 100%, transparent);
   color: var(--ui-text-secondary);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.26);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
 }
 
 .profileNavLeft {
-  left: -60px;
+  left: -50px;
 }
 
 .profileNavRight {
-  right: -60px;
+  right: -50px;
 }
 
 .errorText {
@@ -66,7 +66,7 @@
 }
 
 .topCard {
-  padding: 16px 18px 18px;
+  padding: 12px 16px 14px;
   border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-panel);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 88%, black);
@@ -78,11 +78,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  min-height: 38px;
-  padding: 0 4px 12px;
-  margin-bottom: 14px;
-  border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 86%, transparent);
+  gap: 14px;
+  min-height: 34px;
+  padding: 0 2px 10px;
+  margin-bottom: 10px;
+  border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
 }
 
 .topCardBack,
@@ -101,24 +101,24 @@
   border: 0;
   background: transparent;
   color: var(--ui-text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   letter-spacing: 0.01em;
 }
 
 .topCardReport {
   justify-content: center;
-  min-height: 32px;
-  padding: 0 12px;
+  min-height: 30px;
+  padding: 0 11px;
   border: var(--ui-border-width-thin) solid var(--ui-action-primary-border);
   border-radius: var(--ui-radius-control);
   background: var(--ui-accent-primary);
   color: #ffffff;
-  font-size: 0.74rem;
+  font-size: 0.68rem;
   letter-spacing: 0.05em;
 }
 
 .topCardMain {
-  height: 264px;
+  height: 232px;
   overflow: visible;
 }
 
@@ -142,8 +142,8 @@
 
 .topCardGrid {
   display: grid;
-  grid-template-columns: minmax(280px, 1.02fr) minmax(124px, 0.38fr) minmax(360px, 1.06fr);
-  gap: 10px;
+  grid-template-columns: minmax(250px, 0.98fr) minmax(108px, 0.34fr) minmax(290px, 0.84fr);
+  gap: 6px;
   align-items: stretch;
   height: 100%;
   overflow: visible;
@@ -157,38 +157,38 @@
 
 .topCardIdentity {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
   max-width: 100%;
 }
 
 .playerName {
   margin: 0;
-  font-size: clamp(1.78rem, 2.82vw, 2.72rem);
-  line-height: 0.94;
+  font-size: clamp(1.56rem, 2.45vw, 2.36rem);
+  line-height: 0.92;
   font-weight: 900;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.038em;
   color: var(--ui-text-primary);
   text-wrap: pretty;
-  max-width: 12ch;
+  max-width: 11.5ch;
 }
 
 .playerNumberInline {
-  margin-right: 8px;
+  margin-right: 7px;
   color: var(--ui-text-dim);
   font-weight: 800;
-  font-size: 0.92em;
+  font-size: 0.9em;
 }
 
 .playerMeta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   min-width: 0;
-  margin-top: 4px;
-  font-size: 0.86rem;
-  line-height: 1.4;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  line-height: 1.35;
   font-weight: 700;
   color: var(--ui-text-secondary);
 }
@@ -208,15 +208,15 @@
   display: grid;
   justify-items: center;
   align-content: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .overallLabel {
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 900;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   color: var(--ui-text-dim);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .overallRow {
@@ -226,23 +226,23 @@
 
 .overallMetricCluster {
   display: grid;
-  grid-template-columns: 28px auto 5px;
+  grid-template-columns: 22px auto 5px;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .overallDeltaSlot {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  min-width: 28px;
-  padding-bottom: 3px;
+  width: 22px;
+  min-width: 22px;
+  padding-bottom: 2px;
 }
 
 .overallDeltaSlot .attributeDelta {
-  width: 28px;
-  font-size: 1.8rem;
+  width: 22px;
+  font-size: 1.45rem;
   line-height: 0.82;
 }
 
@@ -270,6 +270,7 @@
   justify-content: flex-end;
   min-width: 0;
   height: 100%;
+  padding-right: 16px;
   overflow: visible;
 }
 
@@ -278,8 +279,10 @@
   align-items: stretch;
   justify-content: flex-end;
   width: 100%;
+  max-width: 370px;
   height: 100%;
-  padding: 0;
+  margin-left: auto;
+  padding-right: 20px;
   overflow: visible;
 }
 
@@ -309,7 +312,7 @@
 }
 
 .attributesCard {
-  margin-top: 14px;
+  margin-top: 10px;
   border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-panel);
   background: color-mix(in srgb, var(--ui-surface-panel-solid) 92%, black);
@@ -322,8 +325,8 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
   width: 100%;
-  gap: 14px;
-  padding: 0 10px 10px;
+  gap: 10px;
+  padding: 0 8px 8px;
 }
 
 .attributeColumn + .attributeColumn {
@@ -338,35 +341,35 @@
   display: inline-flex;
   align-items: center;
   min-height: 0;
-  margin: 10px 8px 6px;
+  margin: 8px 6px 5px;
   padding: 0 2px;
   border-bottom: 0;
   background: transparent;
   color: var(--ui-text-primary);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 900;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
 .attributeRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(132px, 44%);
+  grid-template-columns: minmax(0, 1fr) minmax(118px, 41%);
   align-items: center;
-  gap: 10px;
-  min-height: 38px;
-  margin: 4px 8px;
-  padding: 0 12px;
-  border: 1px solid color-mix(in srgb, var(--ui-border-subtle) 48%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--ui-surface-elevated) 22%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  gap: 8px;
+  min-height: 34px;
+  margin: 3px 6px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border-subtle) 44%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--ui-surface-elevated) 18%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
 }
 
 .attributeLead {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
 }
 
@@ -375,18 +378,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
-  flex: 0 0 14px;
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
   border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-accent-primary) 56%, var(--ui-border-subtle));
-  border-radius: var(--ui-radius-control);
+  border-radius: 4px;
   background: color-mix(in srgb, var(--ui-surface-soft) 92%, transparent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .attributeIcon::before {
   content: '✦';
-  font-size: 8px;
+  font-size: 7px;
   line-height: 1;
   color: color-mix(in srgb, var(--ui-accent-primary) 88%, white);
   transform: translateY(-0.5px);
@@ -394,7 +397,7 @@
 
 .attributeName {
   min-width: 0;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--ui-text-secondary);
   white-space: nowrap;
@@ -406,7 +409,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   justify-self: stretch;
 }
@@ -415,17 +418,17 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
-  padding-right: 2px;
+  padding-right: 0;
 }
 
 .attributeYouValue {
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--ui-text-primary);
-  opacity: 0.78;
+  opacity: 0.76;
   white-space: nowrap;
   text-align: right;
 }
@@ -443,7 +446,7 @@
 
 .attributeYouDivider {
   width: 1px;
-  height: 14px;
+  height: 12px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--ui-border-subtle) 110%, transparent);
   flex: 0 0 1px;
@@ -451,7 +454,7 @@
 
 .attributeMetricCluster {
   display: grid;
-  grid-template-columns: 14px 28px 3px;
+  grid-template-columns: 12px 26px 3px;
   align-items: center;
   column-gap: 0;
   justify-content: end;
@@ -461,17 +464,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  min-width: 14px;
-  margin-right: 4px;
+  width: 12px;
+  min-width: 12px;
+  margin-right: 2px;
 }
 
 .attributeDelta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 10px;
-  font-size: 0.72rem;
+  width: 9px;
+  font-size: 0.68rem;
   font-weight: 900;
   line-height: 1;
   user-select: none;
@@ -511,22 +514,26 @@
 
 @media (max-width: 1420px) {
   .profileNavLeft {
-    left: -54px;
+    left: -44px;
   }
 
   .profileNavRight {
-    right: -54px;
+    right: -44px;
   }
 }
 
 @media (max-width: 1180px) {
+  .pageInner {
+    max-width: 1100px;
+  }
+
   .topCardGrid {
-    grid-template-columns: minmax(280px, 1fr) minmax(130px, 0.4fr) minmax(340px, 1.08fr);
+    grid-template-columns: minmax(240px, 1fr) minmax(108px, 0.34fr) minmax(270px, 0.82fr);
     gap: 4px;
   }
 
   .topCardMain {
-    height: 284px;
+    height: 238px;
   }
 
   .topCardGrid {
@@ -534,25 +541,25 @@
   }
 
   .playerName {
-    font-size: clamp(2rem, 3.1vw, 3rem);
+    font-size: clamp(1.66rem, 2.7vw, 2.48rem);
     max-width: 12ch;
   }
 
-  .radarPlaceholderInner {
-    width: min(100%, 204px);
+  .radarPlaceholder {
+    max-width: 286px;
   }
 
   .attributeRow {
-    grid-template-columns: minmax(0, 1fr) minmax(140px, 45%);
-    padding: 0 10px;
+    grid-template-columns: minmax(0, 1fr) minmax(122px, 42%);
+    padding: 0 9px;
   }
 
   .attributeName {
-    font-size: 0.94rem;
+    font-size: 0.82rem;
   }
 
   .attributeYouValue {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 }
 
@@ -571,7 +578,7 @@
   .topCardGrid {
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
-    gap: 22px;
+    gap: 18px;
     height: auto;
   }
 
@@ -597,7 +604,9 @@
 
   .radarPlaceholder {
     justify-content: flex-start;
-    min-height: 260px;
+    max-width: none;
+    min-height: 238px;
+    margin-left: 0;
     padding: 0;
   }
 
@@ -615,13 +624,13 @@
   }
 
   .attributeRow {
-    grid-template-columns: minmax(0, 1fr) minmax(152px, 48%);
-    min-height: 42px;
-    padding: 0 14px;
+    grid-template-columns: minmax(0, 1fr) minmax(148px, 48%);
+    min-height: 40px;
+    padding: 0 12px;
   }
 
   .attributeName {
-    font-size: 1rem;
+    font-size: 0.96rem;
   }
 
   .attributeValue {
@@ -629,15 +638,15 @@
   }
 
   .attributeYouValue {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
 
   .profileNav {
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 84px;
-    font-size: 0.96rem;
+    width: 38px;
+    height: 78px;
+    font-size: 0.92rem;
   }
 
   .profileNav:hover {
@@ -655,26 +664,26 @@
 
 @media (max-width: 760px) {
   .pageShell {
-    padding: 18px 14px 34px;
+    padding: 16px 12px 30px;
   }
 
   .topCard {
-    padding: 12px 14px 14px;
+    padding: 12px 13px 13px;
   }
 
   .topCardHeader {
     padding-bottom: 10px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .topCardBack {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 
   .topCardReport {
-    min-height: 36px;
-    padding: 0 13px;
-    font-size: 0.8rem;
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 0.78rem;
   }
 
   .topCardMain {
@@ -687,19 +696,19 @@
   }
 
   .playerMeta {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 
   .attributePanelHeader {
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 0.84rem;
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 0.82rem;
   }
 
   .attributeRow {
-    grid-template-columns: minmax(0, 1fr) minmax(144px, 50%);
-    min-height: 40px;
-    padding: 0 12px;
+    grid-template-columns: minmax(0, 1fr) minmax(142px, 50%);
+    min-height: 39px;
+    padding: 0 11px;
   }
 
   .attributeIcon {
@@ -709,33 +718,33 @@
   }
 
   .attributeName {
-    font-size: 0.94rem;
+    font-size: 0.92rem;
   }
 
   .attributeValue {
-    font-size: 1.06rem;
+    font-size: 1.04rem;
   }
 
   .attributeMetricCluster {
-    grid-template-columns: 16px 34px 3px;
+    grid-template-columns: 16px 32px 3px;
     column-gap: 1px;
   }
 
   .attributeDeltaSlot {
     width: 16px;
     min-width: 16px;
-    margin-right: 4px;
+    margin-right: 3px;
   }
 
   .overallMetricCluster {
-    grid-template-columns: 34px auto 6px;
+    grid-template-columns: 30px auto 6px;
     gap: 4px;
   }
 
   .profileNav {
     width: 34px;
-    height: 74px;
-    font-size: 0.92rem;
+    height: 72px;
+    font-size: 0.9rem;
   }
 }
 
@@ -746,7 +755,7 @@
   }
 
   .playerName {
-    font-size: 2rem;
+    font-size: 1.92rem;
     max-width: none;
   }
 
