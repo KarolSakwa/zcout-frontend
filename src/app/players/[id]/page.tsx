@@ -7,6 +7,7 @@ import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import { formatOverall, getRatingColor } from '@/lib/ratings';
+import AttributeIcon from '@/components/AttributeIcon';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -376,7 +377,12 @@ function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
         return (
           <div key={item.id} className={styles.attributeRow}>
             <div className={styles.attributeLead}>
-              <span className={styles.attributeIcon} aria-hidden="true" />
+              <AttributeIcon
+                attributeKey={attr.key}
+                label={attr.label}
+                size={18}
+                className={styles.attributeIcon}
+              />
               <div className={styles.attributeName}>{attr.label}</div>
             </div>
 

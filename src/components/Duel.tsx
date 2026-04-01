@@ -528,7 +528,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
           pointerEvents: overlayBlur ? 'none' : 'auto',
         }}
       >
-        <DuelAttributeHeader attribute={String(pair?.attributeLabel ?? attribute)} />
+        <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
 
         {error && (
           <div

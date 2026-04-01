@@ -1,6 +1,15 @@
 'use client';
 
 import React from 'react';
+import AttributeIcon from '@/components/AttributeIcon';
+
+function formatAttributeLabel(attribute: string) {
+  return attribute
+    .replace(/^gk_/, '')
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 export default function DuelAttributeHeader({ attribute }: { attribute: string }) {
   if (!attribute) return null;
@@ -24,14 +33,10 @@ export default function DuelAttributeHeader({ attribute }: { attribute: string }
           placeItems: 'center',
           background: 'var(--ui-accent-primary-soft)',
           border: '1px solid var(--ui-border-accent)',
-          color: 'var(--ui-accent-primary)',
-          fontWeight: 900,
           boxShadow: '0 8px 18px rgba(0,0,0,0.35)',
-          fontSize: 16,
         }}
-        aria-hidden
       >
-        ★
+        <AttributeIcon attributeKey={attribute} label={attribute} size={20} />
       </div>
 
       <div
@@ -44,7 +49,7 @@ export default function DuelAttributeHeader({ attribute }: { attribute: string }
           textShadow: '0 6px 18px rgba(0,0,0,0.55)',
         }}
       >
-        {String(attribute)}
+        {formatAttributeLabel(String(attribute))}
       </div>
 
       <div
