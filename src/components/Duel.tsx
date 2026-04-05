@@ -558,23 +558,26 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
               lastWinner={lastWinner}
               glow={glow}
               handleVote={handleVote}
+              showImpact={showImpact}
+              postVoteRatings={postVoteRatings}
+              barPct={barPct}
             />
 
             {showImpact && postVoteRatings && (
               <DuelRevealPanel
                 pair={pair}
-                showImpact={showImpact}
                 onMouseEnter={pauseAutoNext}
                 onMouseLeave={resumeAutoNext}
                 duelVotePct={duelVotePct}
                 lastWinner={lastWinner}
-                glow={glow}
-                barPct={barPct}
-                postVoteRatings={postVoteRatings}
                 nextDisabled={nextDisabled}
                 nextIsHover={nextIsHover}
                 setNextHover={setNextHover}
                 goNext={goNext}
+                showImpact={showImpact}
+                postVoteRatings={postVoteRatings}
+                glow={glow}
+                barPct={barPct}
               />
             )}
           </div>
@@ -586,7 +589,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
             style={{
               display: 'grid',
               placeItems: 'center',
-              marginTop: 18,
+              marginTop: 28,
               pointerEvents: showOverlayLoader ? 'none' : 'auto',
             }}
           >

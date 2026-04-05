@@ -1,44 +1,41 @@
 import React, { useMemo, useState } from 'react';
 import type { PairResponse, RatingsMap } from './duelTypes';
-import DuelImpact from './DuelImpact';
 import CrowdVerdictBar from './CrowdVerdictBar';
+import DuelImpact from './DuelImpact';
 
 export default function DuelRevealPanel({
   pair,
-  showImpact,
   onMouseEnter,
   onMouseLeave,
   duelVotePct,
   lastWinner,
-  glow,
-  barPct,
-  postVoteRatings,
   nextDisabled,
   nextIsHover,
   setNextHover,
   goNext,
+  showImpact = false,
+  postVoteRatings,
+  glow = 'var(--ui-accent-primary)',
+  barPct = {},
 }: {
   pair: PairResponse;
-  showImpact: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   duelVotePct: { left: number; right: number } | null;
   lastWinner: number | null;
-  glow: string;
-  barPct: Record<string, number>;
-  postVoteRatings: RatingsMap;
   nextDisabled: boolean;
   nextIsHover: boolean;
   setNextHover: (v: boolean) => void;
   goNext: () => void;
+  showImpact?: boolean;
+  postVoteRatings?: RatingsMap;
+  glow?: string;
+  barPct?: Record<string, number>;
 }) {
   const [inspectHover, setInspectHover] = useState(false);
 
   const leftId = pair.left.id;
   const rightId = pair.right.id;
-
-  const leftImpact = postVoteRatings ? postVoteRatings[String(leftId)] : undefined;
-  const rightImpact = postVoteRatings ? postVoteRatings[String(rightId)] : undefined;
 
   const votedLeft = lastWinner === leftId;
   const votedRight = lastWinner === rightId;
@@ -58,6 +55,9 @@ export default function DuelRevealPanel({
 
   const label = useMemo(() => 'Crowd verdict', []);
 
+  const leftImpact = postVoteRatings ? postVoteRatings[String(leftId)] : undefined;
+  const rightImpact = postVoteRatings ? postVoteRatings[String(rightId)] : undefined;
+
   const handleEnter = () => {
     setInspectHover(true);
     onMouseEnter?.();
@@ -70,71 +70,95 @@ export default function DuelRevealPanel({
 
   return (
     <div
-      style={{ maxWidth: 720, margin: '20px auto 0', cursor: inspectHover ? 'help' : 'default' }}
+      style={{ maxWidth: 720, margin: '16px auto 0', cursor: inspectHover ? 'help' : 'default' }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
       <div
         style={{
+          width: 'calc(100% - 96px)',
+          margin: '0 auto',
           display: 'flex',
-          justifyContent: 'center',
-          marginBottom: 8,
-          fontSize: 10,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: verdictReady ? 'var(--ui-text-muted)' : 'var(--ui-text-dim)',
-          fontWeight: 900,
+          flexDirection: 'column',
+          gap: 12,
         }}
       >
-        {label}
-      </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: -4,
+            fontSize: 10,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: verdictReady ? 'var(--ui-text-muted)' : 'var(--ui-text-dim)',
+            fontWeight: 900,
+          }}
+        >
+          {label}
+        </div>
 
-      <CrowdVerdictBar
-        ready={verdictReady}
-        leftName={pair.left.name}
-        rightName={pair.right.name}
-        leftColor={leftPrimary}
-        rightColor={rightPrimary}
-        leftPct={pctLeft}
-        rightPct={pctRight}
-        votedLeft={votedLeft}
-        votedRight={votedRight}
+        <CrowdVerdictBar
+          ready={verdictReady}
+          leftName={pair.left.name}
+          rightName={pair.right.name}
+          leftColor={leftPrimary}
+          rightColor={rightPrimary}
+          leftPct={pctLeft}
+          rightPct={pctRight}
+          votedLeft={votedLeft}
+          votedRight={votedRight}
+        />
+
+        {showImpact && postVoteRatings ? (
+  <div
+    style={{
+      width: '100%',
+      minHeight: 46,
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1fr) 1px minmax(0, 1fr)',
+      alignItems: 'center',
+      borderRadius: '14px',
+      background: 'color-mix(in srgb, var(--ui-surface-soft) 82%, transparent)',
+      border: '1px solid color-mix(in srgb, var(--ui-border-subtle) 82%, transparent)',
+      boxShadow: '0 8px 20px rgba(0,0,0,0.22)',
+      backdropFilter: 'blur(6px)',
+      WebkitBackdropFilter: 'blur(6px)',
+      overflow: 'hidden',
+    }}
+  >
+    <div style={{ minWidth: 0 }}>
+      <DuelImpact
+        show={showImpact}
+        impact={leftImpact}
+        playerId={leftId}
+        winner={votedLeft}
+        attribute=""
+        glow={glow}
+        barPct={barPct}
       />
+    </div>
 
-      <div
-        style={{
-          marginTop: 14,
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) 84px minmax(0, 1fr)',
-          alignItems: 'start',
-          gap: 36,
-        }}
-      >
-        <div>
-          <DuelImpact
-            show={showImpact}
-            impact={leftImpact}
-            playerId={leftId}
-            winner={votedLeft}
-            attribute=""
-            glow={glow}
-            barPct={barPct}
-          />
-        </div>
+    <div
+      style={{
+        alignSelf: 'stretch',
+        background: 'color-mix(in srgb, var(--ui-border-subtle) 90%, transparent)',
+      }}
+    />
 
-        <div />
-
-        <div>
-          <DuelImpact
-            show={showImpact}
-            impact={rightImpact}
-            playerId={rightId}
-            winner={votedRight}
-            attribute=""
-            glow={glow}
-            barPct={barPct}
-          />
-        </div>
+    <div style={{ minWidth: 0 }}>
+      <DuelImpact
+        show={showImpact}
+        impact={rightImpact}
+        playerId={rightId}
+        winner={votedRight}
+        attribute=""
+        glow={glow}
+        barPct={barPct}
+      />
+    </div>
+  </div>
+) : null}
       </div>
 
       <div style={{ display: 'grid', placeItems: 'center', marginTop: 14 }}>
@@ -152,7 +176,9 @@ export default function DuelRevealPanel({
             fontSize: 11,
             borderRadius: 'var(--ui-radius-pill)',
             border: `1px solid ${nextIsHover ? 'var(--ui-accent-primary)' : 'var(--ui-border-accent)'}`,
-            background: nextIsHover ? 'var(--ui-accent-primary-soft)' : 'color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
+            background: nextIsHover
+              ? 'var(--ui-accent-primary-soft)'
+              : 'color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
             color: 'var(--ui-accent-primary)',
             fontWeight: 950,
             letterSpacing: '0.1em',

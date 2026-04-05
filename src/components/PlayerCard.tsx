@@ -15,6 +15,7 @@ type PlayerCardProps = {
   reveal?: boolean;
   isWinner?: boolean;
   glowColor?: string;
+  revealFooter?: React.ReactNode;
 };
 
 export default function PlayerCard({
@@ -29,6 +30,7 @@ export default function PlayerCard({
   reveal,
   isWinner,
   glowColor,
+  revealFooter,
 }: PlayerCardProps) {
   const state = reveal ? (isWinner ? 'winner' : 'loser') : 'idle';
 
@@ -84,6 +86,8 @@ export default function PlayerCard({
         <div className="bottom">
           <div className="club">{String(club ?? '—').toUpperCase()}</div>
         </div>
+
+        {revealFooter ? <div className="revealFooter">{revealFooter}</div> : null}
 
         <div className="texture" />
       </div>
@@ -269,6 +273,19 @@ export default function PlayerCard({
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+
+        .revealFooter {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 3;
+        }
+
+        .card[data-state='winner'] .revealFooter,
+        .card[data-state='loser'] .revealFooter {
+          opacity: 1;
         }
 
         .texture {

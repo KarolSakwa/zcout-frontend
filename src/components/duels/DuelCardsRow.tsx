@@ -3,7 +3,7 @@
 import React from 'react';
 import PlayerCard from '../PlayerCard';
 import ZLoader from '../ZLoader';
-import type { PairResponse } from './duelTypes';
+import type { PairResponse, RatingsMap } from './duelTypes';
 
 export default function DuelCardsRow({
   pair,
@@ -13,6 +13,9 @@ export default function DuelCardsRow({
   lastWinner,
   glow,
   handleVote,
+  showImpact,
+  postVoteRatings,
+  barPct,
 }: {
   pair: PairResponse;
   cardStyle: (side: 'left' | 'right') => React.CSSProperties;
@@ -21,7 +24,14 @@ export default function DuelCardsRow({
   lastWinner: number | null;
   glow: string;
   handleVote: (winnerId: number) => void;
+  showImpact: boolean;
+  postVoteRatings: RatingsMap;
+  barPct: Record<string, number>;
 }) {
+  void showImpact;
+  void postVoteRatings;
+  void barPct;
+
   return (
     <div
       style={{
@@ -30,7 +40,7 @@ export default function DuelCardsRow({
         alignItems: 'start',
         gap: 36,
         width: 'min(100%, 720px)',
-        margin: '16px auto 0',
+        margin: '28px auto 0',
       }}
     >
       <div className="flex flex-col gap-2" style={cardStyle('left')}>

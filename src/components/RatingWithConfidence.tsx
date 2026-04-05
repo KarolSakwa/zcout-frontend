@@ -14,6 +14,7 @@ type RatingWithConfidenceProps = {
   ratingColor?: string;
   ratingTooltipContent?: ReactNode;
   confidenceTooltipContent?: ReactNode | false;
+  showConfidence?: boolean;
 };
 
 const JUSTIFY_MAP = {
@@ -33,6 +34,7 @@ export default function RatingWithConfidence({
   ratingColor = 'var(--ui-text-primary)',
   ratingTooltipContent,
   confidenceTooltipContent,
+  showConfidence = true,
 }: RatingWithConfidenceProps) {
   const resolvedScalePx = Math.max(
     10,
@@ -120,7 +122,7 @@ export default function RatingWithConfidence({
         display: 'flex',
         justifyContent: JUSTIFY_MAP[align],
         alignItems: 'center',
-        gap: `${gap}px`,
+        gap: showConfidence ? `${gap}px` : '0px',
         width: expand ? '100%' : 'auto',
       }}
     >
@@ -132,13 +134,15 @@ export default function RatingWithConfidence({
         ratingNode
       )}
 
-      {resolvedConfidenceTooltipContent !== false ? (
-        <Tooltip content={resolvedConfidenceTooltipContent}>
-          {confidenceNode}
-        </Tooltip>
-      ) : (
-        confidenceNode
-      )}
+      {showConfidence ? (
+        resolvedConfidenceTooltipContent !== false ? (
+          <Tooltip content={resolvedConfidenceTooltipContent}>
+            {confidenceNode}
+          </Tooltip>
+        ) : (
+          confidenceNode
+        )
+      ) : null}
     </div>
   );
 }
