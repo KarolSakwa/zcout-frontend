@@ -1,11 +1,14 @@
 'use client';
 
 import AttributeIcon from '@/components/AttributeIcon';
+import Link from 'next/link';
 
 export type RecentVoteItem = {
   id: string;
   winner: string;
   loser: string;
+  winnerPlayerId: number;
+  loserPlayerId: number;
   attributeKey: string;
   attributeLabel: string;
 };
@@ -131,35 +134,41 @@ export default function RecentVotesWidget({
                   ★
                 </span>
 
-                <span
-                  style={{
-                    color: 'rgba(232,240,252,0.95)',
-                    fontSize: 13,
-                    fontWeight: 700,
-                  }}
-                >
-                  {item.winner}
-                </span>
+                <Link
+                    href={`/players/${item.winnerPlayerId}`}
+                    className="recentVotePlayerLink recentVotePlayerLinkWinner"
+                    style={{
+                        color: 'rgba(232,240,252,0.95)',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                    }}
+                    >
+                    {item.winner}
+                    </Link>
 
-                <span
-                  style={{
-                    color: 'rgba(170,184,205,0.68)',
-                    fontSize: 12,
-                    fontWeight: 600,
-                  }}
-                >
-                  vs
-                </span>
+                    <span
+                    style={{
+                        color: 'rgba(170,184,205,0.68)',
+                        fontSize: 12,
+                        fontWeight: 600,
+                    }}
+                    >
+                    vs
+                    </span>
 
-                <span
-                  style={{
-                    color: 'rgba(232,240,252,0.78)',
-                    fontSize: 13,
-                    fontWeight: 600,
-                  }}
-                >
-                  {item.loser}
-                </span>
+                    <Link
+                    href={`/players/${item.loserPlayerId}`}
+                    className="recentVotePlayerLink recentVotePlayerLinkLoser"
+                    style={{
+                        color: 'rgba(232,240,252,0.78)',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                    }}
+                    >
+                    {item.loser}
+                    </Link>
               </div>
 
               <div

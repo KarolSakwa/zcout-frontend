@@ -562,14 +562,14 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const showLocalNextLoader = !!pair && loadingPair;
 
 const recentVotesPool: RecentVoteItem[] = [
-  { id: 'rv-1', winner: 'Bukayo Saka', loser: 'Phil Foden', attributeKey: 'dribbling', attributeLabel: 'Dribbling' },
-  { id: 'rv-2', winner: 'Rodri', loser: 'Declan Rice', attributeKey: 'passing', attributeLabel: 'Passing' },
-  { id: 'rv-3', winner: 'Virgil van Dijk', loser: 'William Saliba', attributeKey: 'marking', attributeLabel: 'Marking' },
-  { id: 'rv-4', winner: 'Cole Palmer', loser: 'Martin Odegaard', attributeKey: 'creativity', attributeLabel: 'Creativity' },
-  { id: 'rv-5', winner: 'Erling Haaland', loser: 'Alexander Isak', attributeKey: 'finishing', attributeLabel: 'Finishing' },
-  { id: 'rv-6', winner: 'Bruno Fernandes', loser: 'James Maddison', attributeKey: 'long_shots', attributeLabel: 'Long Shots' },
-  { id: 'rv-7', winner: 'Mohamed Salah', loser: 'Jarrod Bowen', attributeKey: 'acceleration', attributeLabel: 'Acceleration' },
-  { id: 'rv-8', winner: 'Gabriel Magalhaes', loser: 'Cristian Romero', attributeKey: 'heading', attributeLabel: 'Heading' },
+  { id: 'rv-1', winner: 'Bukayo Saka', loser: 'Phil Foden', winnerPlayerId: 1, loserPlayerId: 2, attributeKey: 'dribbling', attributeLabel: 'Dribbling' },
+  { id: 'rv-2', winner: 'Rodri', loser: 'Declan Rice', winnerPlayerId: 3, loserPlayerId: 4, attributeKey: 'passing', attributeLabel: 'Passing' },
+  { id: 'rv-3', winner: 'Virgil van Dijk', loser: 'William Saliba', winnerPlayerId: 5, loserPlayerId: 6, attributeKey: 'marking', attributeLabel: 'Marking' },
+  { id: 'rv-4', winner: 'Cole Palmer', loser: 'Martin Odegaard', winnerPlayerId: 7, loserPlayerId: 8, attributeKey: 'creativity', attributeLabel: 'Creativity' },
+  { id: 'rv-5', winner: 'Erling Haaland', loser: 'Alexander Isak', winnerPlayerId: 9, loserPlayerId: 10, attributeKey: 'finishing', attributeLabel: 'Finishing' },
+  { id: 'rv-6', winner: 'Bruno Fernandes', loser: 'James Maddison', winnerPlayerId: 11, loserPlayerId: 12, attributeKey: 'long_shots', attributeLabel: 'Long Shots' },
+  { id: 'rv-7', winner: 'Mohamed Salah', loser: 'Jarrod Bowen', winnerPlayerId: 13, loserPlayerId: 14, attributeKey: 'acceleration', attributeLabel: 'Acceleration' },
+  { id: 'rv-8', winner: 'Gabriel Magalhaes', loser: 'Cristian Romero', winnerPlayerId: 15, loserPlayerId: 16, attributeKey: 'heading', attributeLabel: 'Heading' },
 ];
 
 const [recentVotesMock, setRecentVotesMock] = useState<RecentVoteItem[]>(() => recentVotesPool.slice(0, 5));

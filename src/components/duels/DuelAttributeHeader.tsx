@@ -14,16 +14,29 @@ function formatAttributeLabel(attribute: string) {
 export default function DuelAttributeHeader({ attribute }: { attribute: string }) {
   if (!attribute) return null;
 
-  return (
+    return (
     <div
       style={{
         maxWidth: 720,
-        margin: '12px auto 18px',
+        margin: '4px auto 30px',
+        gap: 14,
         display: 'grid',
         placeItems: 'center',
-        gap: 8,
       }}
     >
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: 'var(--ui-text-muted)',
+          opacity: 0.82,
+        }}
+      >
+        Who&apos;s better at...
+      </div>
+
       <div
         style={{
           width: 40,
