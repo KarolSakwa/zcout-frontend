@@ -8,6 +8,7 @@ import DuelCountdownBar from './duels/DuelCountdownBar';
 import DuelAttributeHeader from './duels/DuelAttributeHeader';
 import DuelCardsRow from './duels/DuelCardsRow';
 import DuelRevealPanel from './duels/DuelRevealPanel';
+import RecentVotesWidget, { type RecentVoteItem } from './duels/RecentVotesWidget';
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -392,6 +393,47 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     });
   }, [postVoteRatings]);
 
+  
+
+    const pushRecentVoteMock = useCallback((winnerId: number) => {
+      if (!pair) return;
+
+      const winner = winnerId === pair.left.id ? pair.left : pair.right;
+      const loser = winnerId === pair.left.id ? pair.right : pair.left;
+
+      const attributeKey =
+        ATTR_MAP[String(pair.attribute ?? 'DRI').toUpperCase()] ?? String(pair.attribute ?? 'dribbling').toLowerCase();
+
+      const attributeLabel = String(pair.attribute ?? 'Dribbling')
+        .replace(/^gk_/i, '')
+        .split('_')
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+
+      const item: RecentVoteItem = {
+        id: `local-${winner.id}-${loser.id}-${attributeKey}`,
+        winner: winner.name,
+        loser: loser.name,
+        attributeKey,
+        attributeLabel,
+      };
+
+      setLatestRecentVoteId(item.id);
+      setRecentVotesMock((prev) =>
+        [
+          item,
+          ...prev.filter(
+            (entry) =>
+              !(
+                entry.winner === item.winner &&
+                entry.loser === item.loser &&
+                entry.attributeKey === item.attributeKey
+              )
+          ),
+        ].slice(0, 5)
+      );
+    }, [pair]);
+
   const handleVote = useCallback(
     async (winnerId: number) => {
       if (!pair || voting) return;
@@ -484,6 +526,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         }
 
         setPostVoteRatings(map);
+        pushRecentVoteMock(winnerId);
         setImpactVisible(true);
 
         setShowPendingUi(false);
@@ -502,7 +545,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         setVoting(false);
       }
     },
-    [pair, voting, transition, clearAutoNext, scheduleAutoNextAfterReveal, lastWinner, goNext]
+    [pair, voting, transition, clearAutoNext, scheduleAutoNextAfterReveal, lastWinner, goNext, pushRecentVoteMock]
   );
 
   const showImpact = impactVisible && !!postVoteRatings;
@@ -516,6 +559,36 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
   const skipDisabled = !pair || skipping || voting || loadingPair || transition !== 'idle' || showReveal;
 
+const recentVotesPool: RecentVoteItem[] = [
+  { id: 'rv-1', winner: 'Bukayo Saka', loser: 'Phil Foden', attributeKey: 'dribbling', attributeLabel: 'Dribbling' },
+  { id: 'rv-2', winner: 'Rodri', loser: 'Declan Rice', attributeKey: 'passing', attributeLabel: 'Passing' },
+  { id: 'rv-3', winner: 'Virgil van Dijk', loser: 'William Saliba', attributeKey: 'marking', attributeLabel: 'Marking' },
+  { id: 'rv-4', winner: 'Cole Palmer', loser: 'Martin Odegaard', attributeKey: 'creativity', attributeLabel: 'Creativity' },
+  { id: 'rv-5', winner: 'Erling Haaland', loser: 'Alexander Isak', attributeKey: 'finishing', attributeLabel: 'Finishing' },
+  { id: 'rv-6', winner: 'Bruno Fernandes', loser: 'James Maddison', attributeKey: 'long_shots', attributeLabel: 'Long Shots' },
+  { id: 'rv-7', winner: 'Mohamed Salah', loser: 'Jarrod Bowen', attributeKey: 'acceleration', attributeLabel: 'Acceleration' },
+  { id: 'rv-8', winner: 'Gabriel Magalhaes', loser: 'Cristian Romero', attributeKey: 'heading', attributeLabel: 'Heading' },
+];
+
+const [recentVotesMock, setRecentVotesMock] = useState<RecentVoteItem[]>(() => recentVotesPool.slice(0, 5));
+
+const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    let index = 5;
+
+    const interval = window.setInterval(() => {
+      const nextItem = recentVotesPool[index % recentVotesPool.length];
+      index += 1;
+
+      setLatestRecentVoteId(nextItem.id);
+      setRecentVotesMock((prev) => [nextItem, ...prev.filter((entry) => entry.id !== nextItem.id)].slice(0, 5));
+    }, 6000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
@@ -528,60 +601,72 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
           pointerEvents: overlayBlur ? 'none' : 'auto',
         }}
       >
-        <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: 1600,
+            margin: '0 auto',
+          }}
+        >
+          <div style={{ maxWidth: 996, margin: '0 auto' }}>
+            <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
 
-        {error && (
-          <div
-            style={{
-              maxWidth: 996,
-              margin: '0 auto 12px',
-              padding: '12px 14px',
-              borderRadius: 'var(--ui-radius-md)',
-              border: '1px solid var(--ui-border-subtle)',
-              background: 'var(--ui-surface-soft)',
-              color: 'var(--ui-text-primary)',
-              whiteSpace: 'pre-wrap',
-              boxShadow: 'var(--ui-shadow-panel-soft)',
-            }}
-          >
-            {error}
-          </div>
-        )}
+            {error && (
+              <div
+                style={{
+                  maxWidth: 996,
+                  margin: '0 auto 12px',
+                  padding: '12px 14px',
+                  borderRadius: 'var(--ui-radius-md)',
+                  border: '1px solid var(--ui-border-subtle)',
+                  background: 'var(--ui-surface-soft)',
+                  color: 'var(--ui-text-primary)',
+                  whiteSpace: 'pre-wrap',
+                  boxShadow: 'var(--ui-shadow-panel-soft)',
+                }}
+              >
+                {error}
+              </div>
+            )}
 
-        {pair && (
-          <div style={{ position: 'relative' }}>
-            <DuelCardsRow
-              pair={pair}
-              cardStyle={cardStyle}
-              showPendingUi={showPendingUi}
-              showReveal={showReveal}
-              lastWinner={lastWinner}
-              glow={glow}
-              handleVote={handleVote}
-              showImpact={showImpact}
-              postVoteRatings={postVoteRatings}
-              barPct={barPct}
-            />
+            {pair && (
+              <div style={{ position: 'relative' }}>
+                <DuelCardsRow
+                  pair={pair}
+                  cardStyle={cardStyle}
+                  showPendingUi={showPendingUi}
+                  showReveal={showReveal}
+                  lastWinner={lastWinner}
+                  glow={glow}
+                  handleVote={handleVote}
+                  showImpact={showImpact}
+                  postVoteRatings={postVoteRatings}
+                  barPct={barPct}
+                />
 
-            {showImpact && postVoteRatings && (
-              <DuelRevealPanel
-                pair={pair}
-                onMouseEnter={pauseAutoNext}
-                onMouseLeave={resumeAutoNext}
-                duelVotePct={duelVotePct}
-                lastWinner={lastWinner}
-                nextDisabled={nextDisabled}
-                nextIsHover={nextIsHover}
-                setNextHover={setNextHover}
-                goNext={goNext}
-                showImpact={showImpact}
-                postVoteRatings={postVoteRatings}
-                glow={glow}
-                barPct={barPct}
-              />
+                {showImpact && postVoteRatings && (
+                  <DuelRevealPanel
+                    pair={pair}
+                    onMouseEnter={pauseAutoNext}
+                    onMouseLeave={resumeAutoNext}
+                    duelVotePct={duelVotePct}
+                    lastWinner={lastWinner}
+                    nextDisabled={nextDisabled}
+                    nextIsHover={nextIsHover}
+                    setNextHover={setNextHover}
+                    goNext={goNext}
+                    showImpact={showImpact}
+                    postVoteRatings={postVoteRatings}
+                    glow={glow}
+                    barPct={barPct}
+                  />
+                )}
+              </div>
             )}
           </div>
-        )}
+          <RecentVotesWidget items={recentVotesMock} latestItemId={latestRecentVoteId} />
+        </div>
       </div>
 
       {!showReveal && pair && (
