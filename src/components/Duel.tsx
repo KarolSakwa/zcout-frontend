@@ -59,6 +59,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
   const [nextHover, setNextHover] = useState(false);
   const [duelVotePct, setDuelVotePct] = useState<{ left: number; right: number } | null>(null);
+  const [showDelayedNextPending, setShowDelayedNextPending] = useState(false);
 
   const autoNextStartTimerRef = useRef<number | null>(null);
   const autoNextIntervalRef = useRef<number | null>(null);
@@ -554,10 +555,11 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const nextDisabled = transition !== 'idle' || loadingPair;
   const nextIsHover = nextHover && !nextDisabled;
 
-  const showOverlayLoader = loadingPair || skipping;
+  const showOverlayLoader = !pair && (loadingPair || skipping);
   const overlayBlur = showOverlayLoader && !!pair;
 
   const skipDisabled = !pair || skipping || voting || loadingPair || transition !== 'idle' || showReveal;
+  const showLocalNextLoader = !!pair && loadingPair;
 
 const recentVotesPool: RecentVoteItem[] = [
   { id: 'rv-1', winner: 'Bukayo Saka', loser: 'Phil Foden', attributeKey: 'dribbling', attributeLabel: 'Dribbling' },
@@ -589,6 +591,19 @@ const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null
     return () => window.clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (!pair || !loadingPair) {
+      setShowDelayedNextPending(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setShowDelayedNextPending(true);
+    }, 180);
+
+    return () => window.clearTimeout(timeout);
+  }, [pair, loadingPair]);
+
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
@@ -609,59 +624,89 @@ const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null
             margin: '0 auto',
           }}
         >
-          <div style={{ maxWidth: 996, margin: '0 auto' }}>
-            <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
+          <div
+            style={{
+              maxWidth: 996,
+              margin: '0 auto',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                filter: showDelayedNextPending ? 'blur(2px)' : 'none',
+                opacity: showDelayedNextPending ? 0.5 : 1,
+                transition: 'filter 180ms ease, opacity 180ms ease',
+              }}
+            >
+              <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
 
-            {error && (
-              <div
-                style={{
-                  maxWidth: 996,
-                  margin: '0 auto 12px',
-                  padding: '12px 14px',
-                  borderRadius: 'var(--ui-radius-md)',
-                  border: '1px solid var(--ui-border-subtle)',
-                  background: 'var(--ui-surface-soft)',
-                  color: 'var(--ui-text-primary)',
-                  whiteSpace: 'pre-wrap',
-                  boxShadow: 'var(--ui-shadow-panel-soft)',
-                }}
-              >
-                {error}
-              </div>
-            )}
+              {error && (
+                <div
+                  style={{
+                    maxWidth: 996,
+                    margin: '0 auto 12px',
+                    padding: '12px 14px',
+                    borderRadius: 'var(--ui-radius-md)',
+                    border: '1px solid var(--ui-border-subtle)',
+                    background: 'var(--ui-surface-soft)',
+                    color: 'var(--ui-text-primary)',
+                    whiteSpace: 'pre-wrap',
+                    boxShadow: 'var(--ui-shadow-panel-soft)',
+                  }}
+                >
+                  {error}
+                </div>
+              )}
 
-            {pair && (
-              <div style={{ position: 'relative' }}>
-                <DuelCardsRow
-                  pair={pair}
-                  cardStyle={cardStyle}
-                  showPendingUi={showPendingUi}
-                  showReveal={showReveal}
-                  lastWinner={lastWinner}
-                  glow={glow}
-                  handleVote={handleVote}
-                  showImpact={showImpact}
-                  postVoteRatings={postVoteRatings}
-                  barPct={barPct}
-                />
-
-                {showImpact && postVoteRatings && (
-                  <DuelRevealPanel
+              {pair && (
+                <div style={{ position: 'relative' }}>
+                  <DuelCardsRow
                     pair={pair}
-                    onMouseEnter={pauseAutoNext}
-                    onMouseLeave={resumeAutoNext}
-                    duelVotePct={duelVotePct}
+                    cardStyle={cardStyle}
+                    showPendingUi={showPendingUi}
+                    showReveal={showReveal}
                     lastWinner={lastWinner}
-                    nextDisabled={nextDisabled}
-                    nextIsHover={nextIsHover}
-                    setNextHover={setNextHover}
-                    goNext={goNext}
+                    glow={glow}
+                    handleVote={handleVote}
                     showImpact={showImpact}
                     postVoteRatings={postVoteRatings}
-                    glow={glow}
                     barPct={barPct}
                   />
-                )}
+
+                  {showImpact && postVoteRatings && (
+                    <DuelRevealPanel
+                      pair={pair}
+                      onMouseEnter={pauseAutoNext}
+                      onMouseLeave={resumeAutoNext}
+                      duelVotePct={duelVotePct}
+                      lastWinner={lastWinner}
+                      nextDisabled={nextDisabled}
+                      nextIsHover={nextIsHover}
+                      setNextHover={setNextHover}
+                      goNext={goNext}
+                      showImpact={showImpact}
+                      postVoteRatings={postVoteRatings}
+                      glow={glow}
+                      barPct={barPct}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {showDelayedNextPending && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 15,
+                  display: 'grid',
+                  placeItems: 'center',
+                  pointerEvents: 'none',
+                }}
+                aria-hidden
+              >
+                <ZLoader />
               </div>
             )}
           </div>
