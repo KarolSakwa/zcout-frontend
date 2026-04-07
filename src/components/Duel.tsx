@@ -9,7 +9,7 @@ import DuelAttributeHeader from './duels/DuelAttributeHeader';
 import DuelCardsRow from './duels/DuelCardsRow';
 import DuelRevealPanel from './duels/DuelRevealPanel';
 import RecentVotesWidget, { type RecentVoteItem } from './duels/RecentVotesWidget';
-import TopRisersWidget from './duels/TopRisersWidget';
+import TopRisersWidget, { type TopRiserItem } from './duels/TopRisersWidget';
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -607,10 +607,63 @@ const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null
     return () => window.clearTimeout(timeout);
   }, [pair, loadingPair]);
 
+  const topRisersMock: TopRiserItem[] = [
+  { id: 'tr-1', playerId: 101, player: 'Cole Palmer', attributeKey: 'creativity', attributeLabel: 'Creativity', delta: '+0.42' },
+  { id: 'tr-2', playerId: 102, player: 'Alexander Isak', attributeKey: 'finishing', attributeLabel: 'Finishing', delta: '+0.37' },
+  { id: 'tr-3', playerId: 103, player: 'Milos Kerkez', attributeKey: 'acceleration', attributeLabel: 'Acceleration', delta: '+0.31' },
+  { id: 'tr-4', playerId: 104, player: 'Morgan Rogers', attributeKey: 'dribbling', attributeLabel: 'Dribbling', delta: '+0.28' },
+  { id: 'tr-5', playerId: 105, player: 'Morgan Gibbs-White', attributeKey: 'passing', attributeLabel: 'Passing', delta: '+0.24' },
+];
+
+const topFallersMock: TopRiserItem[] = [
+  { id: 'tf-1', playerId: 201, player: 'Casemiro', attributeKey: 'stamina', attributeLabel: 'Stamina', delta: '-0.39' },
+  { id: 'tf-2', playerId: 202, player: 'Raheem Sterling', attributeKey: 'acceleration', attributeLabel: 'Acceleration', delta: '-0.34' },
+  { id: 'tf-3', playerId: 203, player: 'Kalvin Phillips', attributeKey: 'passing', attributeLabel: 'Passing', delta: '-0.29' },
+  { id: 'tf-4', playerId: 204, player: 'Ben Chilwell', attributeKey: 'crossing', attributeLabel: 'Crossing', delta: '-0.23' },
+  { id: 'tf-5', playerId: 205, player: 'Jordan Henderson', attributeKey: 'work_rate', attributeLabel: 'Work Rate', delta: '-0.20' },
+];
+
+const getTodayKey = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const pickDailyTopRisersMode = (): 'risers' | 'fallers' => (Math.random() < 0.6 ? 'risers' : 'fallers');
+
+const [topRisersMode, setTopRisersMode] = useState<'risers' | 'fallers'>('risers');
+
+useEffect(() => {
+  const storageKey = 'zcout-duels-side-widget-mode';
+  const today = getTodayKey();
+
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { day: string; mode: 'risers' | 'fallers' };
+      if (parsed.day === today && (parsed.mode === 'risers' || parsed.mode === 'fallers')) {
+        setTopRisersMode(parsed.mode);
+        return;
+      }
+    }
+  } catch {}
+
+  const nextMode = pickDailyTopRisersMode();
+  setTopRisersMode(nextMode);
+
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify({ day: today, mode: nextMode }));
+  } catch {}
+}, []);
+
+const topRisersItems = topRisersMode === 'risers' ? topRisersMock : topFallersMock;
+
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
-      <TopRisersWidget />
+      <TopRisersWidget items={topRisersItems} mode={topRisersMode} />
       
       <div
         style={{

@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-type TopRiserItem = {
+export type TopRiserItem = {
   id: string;
   playerId: number;
   player: string;
@@ -14,70 +13,15 @@ type TopRiserItem = {
 
 type WidgetMode = 'risers' | 'fallers';
 
-const topRisersMock: TopRiserItem[] = [
-  { id: 'tr-1', playerId: 101, player: 'Cole Palmer', attributeKey: 'creativity', attributeLabel: 'Creativity', delta: '+0.42' },
-  { id: 'tr-2', playerId: 102, player: 'Alexander Isak', attributeKey: 'finishing', attributeLabel: 'Finishing', delta: '+0.37' },
-  { id: 'tr-3', playerId: 103, player: 'Milos Kerkez', attributeKey: 'acceleration', attributeLabel: 'Acceleration', delta: '+0.31' },
-  { id: 'tr-4', playerId: 104, player: 'Morgan Rogers', attributeKey: 'dribbling', attributeLabel: 'Dribbling', delta: '+0.28' },
-  { id: 'tr-5', playerId: 105, player: 'Morgan Gibbs-White', attributeKey: 'passing', attributeLabel: 'Passing', delta: '+0.24' },
-];
-
-const topFallersMock: TopRiserItem[] = [
-  { id: 'tf-1', playerId: 201, player: 'Casemiro', attributeKey: 'stamina', attributeLabel: 'Stamina', delta: '-0.39' },
-  { id: 'tf-2', playerId: 202, player: 'Raheem Sterling', attributeKey: 'acceleration', attributeLabel: 'Acceleration', delta: '-0.34' },
-  { id: 'tf-3', playerId: 203, player: 'Kalvin Phillips', attributeKey: 'passing', attributeLabel: 'Passing', delta: '-0.29' },
-  { id: 'tf-4', playerId: 204, player: 'Ben Chilwell', attributeKey: 'crossing', attributeLabel: 'Crossing', delta: '-0.23' },
-  { id: 'tf-5', playerId: 205, player: 'Jordan Henderson', attributeKey: 'work_rate', attributeLabel: 'Work Rate', delta: '-0.20' },
-];
-
-function getTodayKey() {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-function pickDailyMode(): WidgetMode {
-  return Math.random() < 0.6 ? 'risers' : 'fallers';
-}
-
-export default function TopRisersWidget() {
-  const [mode, setMode] = useState<WidgetMode>('risers');
-
-  useEffect(() => {
-    const storageKey = 'zcout-duels-side-widget-mode';
-    const today = getTodayKey();
-
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (raw) {
-        const parsed = JSON.parse(raw) as { day: string; mode: WidgetMode };
-        if (parsed.day === today && (parsed.mode === 'risers' || parsed.mode === 'fallers')) {
-          setMode(parsed.mode);
-          return;
-        }
-      }
-    } catch {}
-
-    const nextMode = pickDailyMode();
-    setMode(nextMode);
-
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify({ day: today, mode: nextMode }));
-    } catch {}
-  }, []);
-
-  const items = mode === 'risers' ? topRisersMock : topFallersMock;
+export default function TopRisersWidget({
+  items,
+  mode,
+}: {
+  items: TopRiserItem[];
+  mode: WidgetMode;
+}) {
   const title = mode === 'risers' ? 'Top risers' : 'Top fallers';
-  const deltaColor =
-  mode === 'risers'
-    ? 'var(--ui-accent-primary)'
-    : 'var(--ui-accent-faller)';
-  const accentColor =
-  mode === 'risers'
-    ? 'var(--ui-accent-primary)'
-    : 'color-mix(in srgb, var(--ui-danger) 72%, var(--ui-accent-primary) 28%)';
+  const deltaColor = mode === 'risers' ? 'var(--ui-accent-primary)' : 'var(--ui-accent-faller)';
 
   return (
     <aside
@@ -212,7 +156,7 @@ export default function TopRisersWidget() {
         }
 
         .topRiserPlayerLink:hover {
-          color: ${accentColor} !important;
+          color: var(--ui-accent-primary) !important;
           text-shadow: 0 0 10px rgba(92, 163, 255, 0.18);
         }
 
