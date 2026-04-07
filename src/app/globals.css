@@ -42,6 +42,7 @@
   --ui-action-primary-bg-2: color-mix(in srgb, var(--ui-accent-primary) 72%, black);
   --ui-action-primary-border: color-mix(in srgb, var(--ui-accent-primary) 70%, white);
   --ui-action-primary-text: white;
+  --ui-accent-faller: #c98f9a;
 
   --ui-action-secondary-bg-1: rgba(78, 86, 101, 0.92);
   --ui-action-secondary-bg-2: rgba(56, 63, 76, 0.94);

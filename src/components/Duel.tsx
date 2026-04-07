@@ -9,6 +9,7 @@ import DuelAttributeHeader from './duels/DuelAttributeHeader';
 import DuelCardsRow from './duels/DuelCardsRow';
 import DuelRevealPanel from './duels/DuelRevealPanel';
 import RecentVotesWidget, { type RecentVoteItem } from './duels/RecentVotesWidget';
+import TopRisersWidget from './duels/TopRisersWidget';
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -415,6 +416,8 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         id: `local-${winner.id}-${loser.id}-${attributeKey}`,
         winner: winner.name,
         loser: loser.name,
+        winnerPlayerId: Number(winner.id),
+        loserPlayerId: Number(loser.id),
         attributeKey,
         attributeLabel,
       };
@@ -607,7 +610,8 @@ const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
-
+      <TopRisersWidget />
+      
       <div
         style={{
           filter: overlayBlur ? 'blur(4px) saturate(0.9)' : 'none',
