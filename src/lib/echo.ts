@@ -25,13 +25,13 @@ export function initEcho(): Echo | null {
 
   echoInstance = new Echo({
     broadcaster: 'pusher',
-    key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY || 'zcout-key',
-    wsHost: process.env.NEXT_PUBLIC_PUSHER_HOST || 'localhost',
-    wsPort: Number(process.env.NEXT_PUBLIC_PUSHER_PORT || 6001),
-    wssPort: Number(process.env.NEXT_PUBLIC_PUSHER_PORT || 6001),
+    key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
+    wsHost: process.env.NEXT_PUBLIC_PUSHER_HOST!,
+    wsPort: Number(process.env.NEXT_PUBLIC_PUSHER_PORT!),
+    wssPort: Number(process.env.NEXT_PUBLIC_PUSHER_PORT!),
     forceTLS: false,
-    enabledTransports: ['ws', 'wss'],
-    cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER || 'mt1',
+    enabledTransports: ['ws'],
+    cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER!,
   })
 
   window.Echo = echoInstance
