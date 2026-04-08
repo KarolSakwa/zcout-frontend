@@ -3,12 +3,13 @@
 import AttributeIcon from '@/components/AttributeIcon';
 import Link from 'next/link';
 
-export type RecentVoteItem = {
+type RecentVoteItem = {
   id: string;
-  winner: string;
-  loser: string;
+  leftPlayer: string;
+  rightPlayer: string;
+  leftPlayerId: number;
+  rightPlayerId: number;
   winnerPlayerId: number;
-  loserPlayerId: number;
   attributeKey: string;
   attributeLabel: string;
 };
@@ -103,6 +104,8 @@ export default function RecentVotesWidget({
       >
         {items.map((item) => {
           const isLatest = item.id === latestItemId;
+          const leftWon = item.winnerPlayerId === item.leftPlayerId;
+          const rightWon = item.winnerPlayerId === item.rightPlayerId;
 
           return (
             <div
@@ -124,51 +127,71 @@ export default function RecentVotesWidget({
                   textAlign: 'center',
                 }}
               >
-                <span
+                <Link
+                  href={`/players/${item.leftPlayerId}`}
+                  className="recentVotePlayerLink"
                   style={{
-                    color: 'var(--ui-accent-primary)',
-                    fontSize: 11,
-                    fontWeight: 800,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    color: leftWon ? 'rgba(232,240,252,0.95)' : 'rgba(232,240,252,0.78)',
+                    fontSize: 13,
+                    fontWeight: leftWon ? 700 : 600,
+                    textDecoration: 'none',
                   }}
                 >
-                  ★
+                  {leftWon && (
+                    <span
+                      style={{
+                        color: 'var(--ui-accent-primary)',
+                        fontWeight: 800,
+                        lineHeight: 1,
+                      }}
+                    >
+                      ★
+                    </span>
+                  )}
+                  <span>{item.leftPlayer}</span>
+                </Link>
+
+                <span
+                  style={{
+                    color: 'rgba(170,184,205,0.52)',
+                    fontSize: 9,
+                    fontWeight: 600,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  vs
                 </span>
 
                 <Link
-                    href={`/players/${item.winnerPlayerId}`}
-                    className="recentVotePlayerLink recentVotePlayerLinkWinner"
-                    style={{
-                        color: 'rgba(232,240,252,0.95)',
-                        fontSize: 13,
-                        fontWeight: 700,
-                        textDecoration: 'none',
-                    }}
-                    >
-                    {item.winner}
-                    </Link>
-
+                  href={`/players/${item.rightPlayerId}`}
+                  className="recentVotePlayerLink"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    color: rightWon ? 'rgba(232,240,252,0.95)' : 'rgba(232,240,252,0.78)',
+                    fontSize: 13,
+                    fontWeight: rightWon ? 700 : 600,
+                    textDecoration: 'none',
+                  }}
+                >
+                  {rightWon && (
                     <span
-                    style={{
-                        color: 'rgba(170,184,205,0.68)',
-                        fontSize: 12,
-                        fontWeight: 600,
-                    }}
+                      style={{
+                        color: 'var(--ui-accent-primary)',
+                        fontWeight: 800,
+                        lineHeight: 1,
+                      }}
                     >
-                    vs
+                      ★
                     </span>
-
-                    <Link
-                    href={`/players/${item.loserPlayerId}`}
-                    className="recentVotePlayerLink recentVotePlayerLinkLoser"
-                    style={{
-                        color: 'rgba(232,240,252,0.78)',
-                        fontSize: 13,
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                    }}
-                    >
-                    {item.loser}
-                    </Link>
+                  )}
+                  <span>{item.rightPlayer}</span>
+                </Link>
               </div>
 
               <div

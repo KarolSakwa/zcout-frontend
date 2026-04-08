@@ -75,11 +75,10 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const glow = 'var(--ui-accent-success)';
 
   const {
-    recentVotesItems,
+    recentVotes,
     latestRecentVoteId,
-    topRisersItems,
-    topRisersMode,
-    pushRecentVoteMock,
+    topMoversMode,
+    topMoverItems,
   } = useDuelSideWidgets(pair);
 
   const clearAutoNext = useCallback((resetProgress: boolean) => {
@@ -509,7 +508,6 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         }
 
         setPostVoteRatings(map);
-        pushRecentVoteMock(winnerId);
         setImpactVisible(true);
 
         setShowPendingUi(false);
@@ -528,7 +526,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         setVoting(false);
       }
     },
-    [pair, voting, transition, clearAutoNext, scheduleAutoNextAfterReveal, lastWinner, goNext, pushRecentVoteMock]
+    [pair, voting, transition, clearAutoNext, scheduleAutoNextAfterReveal, lastWinner, goNext]
   );
 
   const showImpact = impactVisible && !!postVoteRatings;
@@ -544,7 +542,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
-      <TopRisersWidget items={topRisersItems} mode={topRisersMode} />
+      <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
 
       <div
         style={{
@@ -649,7 +647,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
             )}
           </div>
 
-          <RecentVotesWidget items={recentVotesItems} latestItemId={latestRecentVoteId} />
+          <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
         </div>
       </div>
 

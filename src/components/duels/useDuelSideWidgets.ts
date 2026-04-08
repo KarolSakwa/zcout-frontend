@@ -4,14 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { initEcho } from '@/lib/echo'
 
 type RecentVoteItem = {
-  id: string;
-  winner: string;
-  loser: string;
-  winnerPlayerId: number;
-  loserPlayerId: number;
-  attributeKey: string;
-  attributeLabel: string;
-};
+  id: string
+  leftPlayer: string
+  rightPlayer: string
+  leftPlayerId: number
+  rightPlayerId: number
+  winnerPlayerId: number
+  attributeKey: string
+  attributeLabel: string
+}
 
 type EchoLike = {
   channel: (name: string) => {
