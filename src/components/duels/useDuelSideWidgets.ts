@@ -1,22 +1,22 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { initEcho } from '@/lib/echo'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { initEcho } from '@/lib/echo';
 
 type RecentVoteItem = {
-  id: string
-  leftPlayer: string
-  rightPlayer: string
-  leftPlayerId: number
-  rightPlayerId: number
-  winnerPlayerId: number
-  attributeKey: string
-  attributeLabel: string
-}
+  id: string;
+  leftPlayer: string;
+  rightPlayer: string;
+  leftPlayerId: number;
+  rightPlayerId: number;
+  winnerPlayerId: number;
+  attributeKey: string;
+  attributeLabel: string;
+};
 
 type EchoLike = {
   channel: (name: string) => {
-    listen: (event: string, callback: (payload: RecentVoteItem) => void) => void;
+    listen: <T = unknown>(event: string, callback: (payload: T) => void) => void;
     stopListening?: (event: string) => void;
     unsubscribe?: () => void;
   };
@@ -43,12 +43,14 @@ type RecentVotesResponse = {
   items: RecentVoteItem[];
 };
 
-type TopMoversResponse = {
-  items: TopRiserItem[];
+type TopMoversSummaryResponse = {
+  risers: TopRiserItem[];
+  fallers: TopRiserItem[];
 };
 
 const DAILY_MODE_STORAGE_KEY = 'zcout:duels:top-movers-mode';
 const LIVE_ITEMS_LIMIT = 5;
+const TOP_MOVERS_REFETCH_DEBOUNCE_MS = 5000;
 
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -95,6 +97,15 @@ async function fetchJson<T>(input: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+async function fetchTopMoversSummary(
+  signal?: AbortSignal
+): Promise<TopMoversSummaryResponse> {
+  return fetchJson<TopMoversSummaryResponse>(
+    `/api/live/top-movers-summary?period=7d&limit=${LIVE_ITEMS_LIMIT}`,
+    signal
+  );
+}
+
 export function useDuelSideWidgets(_pair: unknown) {
   const [recentVotes, setRecentVotes] = useState<RecentVoteItem[]>([]);
   const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null);
@@ -105,6 +116,19 @@ export function useDuelSideWidgets(_pair: unknown) {
 
   const [isRecentVotesLoading, setIsRecentVotesLoading] = useState(true);
   const [isTopMoversLoading, setIsTopMoversLoading] = useState(true);
+
+  const topMoversDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refetchTopMoversSummary = useCallback(async () => {
+    try {
+      const summary = await fetchTopMoversSummary();
+
+      setRiserItems(Array.isArray(summary.risers) ? summary.risers : []);
+      setFallerItems(Array.isArray(summary.fallers) ? summary.fallers : []);
+    } catch (error) {
+      console.error('Failed to refetch top movers summary', error);
+    }
+  }, []);
 
   useEffect(() => {
     setTopMoversMode(resolveDailyMode());
@@ -144,19 +168,10 @@ export function useDuelSideWidgets(_pair: unknown) {
       try {
         setIsTopMoversLoading(true);
 
-        const [risersData, fallersData] = await Promise.all([
-          fetchJson<TopMoversResponse>(
-            `/api/live/top-movers?direction=risers&period=7d&limit=${LIVE_ITEMS_LIMIT}`,
-            controller.signal
-          ),
-          fetchJson<TopMoversResponse>(
-            `/api/live/top-movers?direction=fallers&period=7d&limit=${LIVE_ITEMS_LIMIT}`,
-            controller.signal
-          ),
-        ]);
+        const summary = await fetchTopMoversSummary(controller.signal);
 
-        setRiserItems(Array.isArray(risersData.items) ? risersData.items : []);
-        setFallerItems(Array.isArray(fallersData.items) ? fallersData.items : []);
+        setRiserItems(Array.isArray(summary.risers) ? summary.risers : []);
+        setFallerItems(Array.isArray(summary.fallers) ? summary.fallers : []);
       } catch {
         setRiserItems([]);
         setFallerItems([]);
@@ -168,12 +183,9 @@ export function useDuelSideWidgets(_pair: unknown) {
     return () => controller.abort();
   }, []);
 
-  
-useEffect(() => {
-    initEcho()
-}, [])
-
   useEffect(() => {
+    initEcho();
+
     if (typeof window === 'undefined' || !window.Echo) {
       return;
     }
@@ -189,13 +201,31 @@ useEffect(() => {
       setLatestRecentVoteId(item.id);
     };
 
-    channel.listen('.live.recent-vote.created', handleRecentVote);
+    const handleTopMoversMaybeChanged = () => {
+      if (topMoversDebounceRef.current) {
+        clearTimeout(topMoversDebounceRef.current);
+      }
+
+      topMoversDebounceRef.current = setTimeout(() => {
+        void refetchTopMoversSummary();
+        topMoversDebounceRef.current = null;
+      }, TOP_MOVERS_REFETCH_DEBOUNCE_MS);
+    };
+
+    channel.listen<RecentVoteItem>('.live.recent-vote.created', handleRecentVote);
+    channel.listen('.live.top-movers.maybe-changed', handleTopMoversMaybeChanged);
 
     return () => {
+      if (topMoversDebounceRef.current) {
+        clearTimeout(topMoversDebounceRef.current);
+        topMoversDebounceRef.current = null;
+      }
+
       channel.stopListening?.('.live.recent-vote.created');
+      channel.stopListening?.('.live.top-movers.maybe-changed');
       channel.unsubscribe?.();
     };
-  }, []);
+  }, [refetchTopMoversSummary]);
 
   const topMoverItems = useMemo(
     () => (topMoversMode === 'risers' ? riserItems : fallerItems),

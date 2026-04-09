@@ -542,7 +542,6 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   return (
     <div className="flex flex-col gap-4">
       <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
-      <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
 
       <div
         style={{
@@ -565,8 +564,11 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
               maxWidth: 996,
               margin: '0 auto',
               position: 'relative',
+              overflow: 'visible',
             }}
           >
+            <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
+            <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
             <div
               style={{
                 filter: showDelayedNextPending ? 'blur(2px)' : 'none',
@@ -646,8 +648,6 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
               </div>
             )}
           </div>
-
-          <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
         </div>
       </div>
 

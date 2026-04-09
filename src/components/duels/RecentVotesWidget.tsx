@@ -1,6 +1,6 @@
 'use client';
 
-import AttributeIcon from '@/components/AttributeIcon';
+import LiveWidgetAttributeMeta from '@/components/duels/LiveWidgetAttributeMeta';
 import Link from 'next/link';
 
 type RecentVoteItem = {
@@ -25,10 +25,10 @@ export default function RecentVotesWidget({
     <aside
       className="recentVotesWidget"
       style={{
-        position: 'fixed',
-        top: '50%',
-        right: 40,
-        transform: 'translateY(-50%)',
+        position: 'absolute',
+        top: 'clamp(210px, 20vh, 300px)',
+        transform: 'none',
+        left: 'calc(100% + 40px)',
         width: 318,
         height: 'auto',
         borderRadius: '22px',
@@ -200,27 +200,13 @@ export default function RecentVotesWidget({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 6,
-                  color: 'rgba(170,184,205,0.74)',
-                  fontSize: 11,
-                  fontWeight: 500,
-                  lineHeight: 1.2,
                   textAlign: 'center',
                 }}
               >
-                <span
-                  style={{
-                    width: 12,
-                    height: 12,
-                    display: 'inline-grid',
-                    placeItems: 'center',
-                    color: 'var(--ui-accent-primary)',
-                    opacity: 0.92,
-                  }}
-                >
-                  <AttributeIcon attributeKey={item.attributeKey} label={item.attributeLabel} size={10} />
-                </span>
-                <span>{item.attributeLabel}</span>
+                <LiveWidgetAttributeMeta
+                  attributeKey={item.attributeKey}
+                  attributeLabel={item.attributeLabel}
+                />
               </div>
             </div>
           );

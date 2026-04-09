@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import LiveWidgetAttributeMeta from '@/components/duels/LiveWidgetAttributeMeta';
 
 export type TopRiserItem = {
   id: string;
@@ -27,10 +28,10 @@ export default function TopRisersWidget({
     <aside
       className="topRisersWidget"
       style={{
-        position: 'fixed',
-        top: '50%',
-        left: 40,
-        transform: 'translateY(-50%)',
+        position: 'absolute',
+        top: 'clamp(210px, 20vh, 300px)',
+        transform: 'none',
+        right: 'calc(100% + 40px)',
         width: 318,
         borderRadius: '22px',
         border: '1px solid rgba(140, 170, 210, 0.16)',
@@ -130,7 +131,10 @@ export default function TopRisersWidget({
                     lineHeight: 1.2,
                   }}
                 >
-                  {item.attributeLabel}
+                  <LiveWidgetAttributeMeta
+                    attributeKey={item.attributeKey}
+                    attributeLabel={item.attributeLabel}
+                  />
                 </div>
               </div>
 
