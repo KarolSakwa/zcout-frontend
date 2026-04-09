@@ -31,8 +31,8 @@ export default function TopRisersWidget({
         position: 'absolute',
         top: 'clamp(210px, 20vh, 300px)',
         transform: 'none',
-        right: 'calc(100% + 40px)',
-        width: 318,
+        right: 'calc(100% + var(--duel-widget-offset, 40px))',
+        width: 'var(--duel-widget-width, 318px)',
         borderRadius: '22px',
         border: '1px solid rgba(140, 170, 210, 0.16)',
         background: 'linear-gradient(180deg, rgba(14,22,36,0.88), rgba(8,14,24,0.82))',
@@ -164,7 +164,7 @@ export default function TopRisersWidget({
           text-shadow: 0 0 10px rgba(92, 163, 255, 0.18);
         }
 
-        @media (max-width: 1460px) {
+        @media (max-width: 1240px) {
           .topRisersWidget {
             display: none;
           }

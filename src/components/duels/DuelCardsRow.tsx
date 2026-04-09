@@ -33,60 +33,80 @@ export default function DuelCardsRow({
   void barPct;
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 84px minmax(0, 1fr)',
-        alignItems: 'start',
-        gap: 36,
-        width: 'min(100%, 720px)',
-        margin: '28px auto 0',
-      }}
-    >
-      <div className="flex flex-col gap-2" style={cardStyle('left')}>
-        <PlayerCard
-          name={pair.left.name}
-          position={pair.left.position}
-          club={pair.left.club ?? '—'}
-          color={pair.left.color ?? 'var(--ui-surface-panel-solid)'}
-          secondaryColor={pair.left.secondaryColor}
-          avatarSrc={pair.left.avatarSrc ?? `/players/${pair.left.id}.png`}
-          countryIso2={pair.left.countryIso2}
-          number={pair.left.number}
-          onClick={() => handleVote(pair.left.id)}
-          reveal={showReveal}
-          isWinner={lastWinner === pair.left.id}
-          glowColor={glow}
-        />
+    <>
+      <div className="duelCardsRow">
+        <div className="flex flex-col gap-2" style={cardStyle('left')}>
+          <PlayerCard
+            name={pair.left.name}
+            position={pair.left.position}
+            club={pair.left.club ?? 'â€”'}
+            color={pair.left.color ?? 'var(--ui-surface-panel-solid)'}
+            secondaryColor={pair.left.secondaryColor}
+            avatarSrc={pair.left.avatarSrc ?? `/players/${pair.left.id}.png`}
+            countryIso2={pair.left.countryIso2}
+            number={pair.left.number}
+            onClick={() => handleVote(pair.left.id)}
+            reveal={showReveal}
+            isWinner={lastWinner === pair.left.id}
+            glowColor={glow}
+          />
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            placeItems: 'center',
+            alignSelf: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          {showPendingUi ? <ZLoader /> : <div style={{ width: 30, height: 30 }} />}
+        </div>
+
+        <div className="flex flex-col gap-2" style={cardStyle('right')}>
+          <PlayerCard
+            name={pair.right.name}
+            position={pair.right.position}
+            club={pair.right.club ?? 'â€”'}
+            color={pair.right.color ?? 'var(--ui-surface-panel-solid)'}
+            secondaryColor={pair.right.secondaryColor}
+            avatarSrc={pair.right.avatarSrc ?? `/players/${pair.right.id}.png`}
+            countryIso2={pair.right.countryIso2}
+            number={pair.right.number}
+            onClick={() => handleVote(pair.right.id)}
+            reveal={showReveal}
+            isWinner={lastWinner === pair.right.id}
+            glowColor={glow}
+          />
+        </div>
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          placeItems: 'center',
-          alignSelf: 'center',
-          pointerEvents: 'none',
-        }}
-      >
-        {showPendingUi ? <ZLoader /> : <div style={{ width: 30, height: 30 }} />}
-      </div>
+      <style jsx>{`
+        .duelCardsRow {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr);
+          align-items: start;
+          gap: 36px;
+          width: min(100%, 720px);
+          margin: 28px auto 0;
+        }
 
-      <div className="flex flex-col gap-2" style={cardStyle('right')}>
-        <PlayerCard
-          name={pair.right.name}
-          position={pair.right.position}
-          club={pair.right.club ?? '—'}
-          color={pair.right.color ?? 'var(--ui-surface-panel-solid)'}
-          secondaryColor={pair.right.secondaryColor}
-          avatarSrc={pair.right.avatarSrc ?? `/players/${pair.right.id}.png`}
-          countryIso2={pair.right.countryIso2}
-          number={pair.right.number}
-          onClick={() => handleVote(pair.right.id)}
-          reveal={showReveal}
-          isWinner={lastWinner === pair.right.id}
-          glowColor={glow}
-        />
-      </div>
-    </div>
+        @media (max-width: 1720px) {
+          .duelCardsRow {
+            grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+            gap: 24px;
+            width: min(100%, 660px);
+          }
+        }
+
+        @media (max-width: 1360px) {
+        .duelCardsRow {
+          grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+          gap: 20px;
+          width: min(100%, 620px);
+        }
+      }
+      `}</style>
+    </>
   );
 }

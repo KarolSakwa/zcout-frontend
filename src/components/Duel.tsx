@@ -74,12 +74,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const attribute = pair?.attribute ?? '';
   const glow = 'var(--ui-accent-success)';
 
-  const {
-    recentVotes,
-    latestRecentVoteId,
-    topMoversMode,
-    topMoverItems,
-  } = useDuelSideWidgets(pair);
+  const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } = useDuelSideWidgets(pair);
 
   const clearAutoNext = useCallback((resetProgress: boolean) => {
     if (autoNextStartTimerRef.current) window.clearTimeout(autoNextStartTimerRef.current);
@@ -540,186 +535,214 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const skipDisabled = !pair || skipping || voting || loadingPair || transition !== 'idle' || showReveal;
 
   return (
-    <div className="flex flex-col gap-4">
-      <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
+    <>
+      <div className="flex flex-col gap-4">
+        <DuelCountdownBar
+          show={showCountdown}
+          progress={autoNextProgress}
+          paused={autoNextPaused}
+          height={COUNTDOWN_BAR_H}
+        />
 
-      <div
-        style={{
-          filter: overlayBlur ? 'blur(4px) saturate(0.9)' : 'none',
-          opacity: overlayBlur ? 0.55 : 1,
-          transition: 'filter 180ms ease, opacity 180ms ease',
-          pointerEvents: overlayBlur ? 'none' : 'auto',
-        }}
-      >
         <div
           style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: 1600,
-            margin: '0 auto',
+            filter: overlayBlur ? 'blur(4px) saturate(0.9)' : 'none',
+            opacity: overlayBlur ? 0.55 : 1,
+            transition: 'filter 180ms ease, opacity 180ms ease',
+            pointerEvents: overlayBlur ? 'none' : 'auto',
           }}
         >
-          <div
-            style={{
-              maxWidth: 996,
-              margin: '0 auto',
-              position: 'relative',
-              overflow: 'visible',
-            }}
-          >
-            <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
-            <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
-            <div
-              style={{
-                filter: showDelayedNextPending ? 'blur(2px)' : 'none',
-                opacity: showDelayedNextPending ? 0.5 : 1,
-                transition: 'filter 180ms ease, opacity 180ms ease',
-              }}
-            >
-              <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
+          <div className="duelStageOuter">
+            <div className="duelStageCenter">
+              <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
+              <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
 
-              {error && (
-                <div
-                  style={{
-                    maxWidth: 996,
-                    margin: '0 auto 12px',
-                    padding: '12px 14px',
-                    borderRadius: 'var(--ui-radius-md)',
-                    border: '1px solid var(--ui-border-subtle)',
-                    background: 'var(--ui-surface-soft)',
-                    color: 'var(--ui-text-primary)',
-                    whiteSpace: 'pre-wrap',
-                    boxShadow: 'var(--ui-shadow-panel-soft)',
-                  }}
-                >
-                  {error}
-                </div>
-              )}
+              <div
+                style={{
+                  filter: showDelayedNextPending ? 'blur(2px)' : 'none',
+                  opacity: showDelayedNextPending ? 0.5 : 1,
+                  transition: 'filter 180ms ease, opacity 180ms ease',
+                }}
+              >
+                <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
 
-              {pair && (
-                <div style={{ position: 'relative' }}>
-                  <DuelCardsRow
-                    pair={pair}
-                    cardStyle={cardStyle}
-                    showPendingUi={showPendingUi}
-                    showReveal={showReveal}
-                    lastWinner={lastWinner}
-                    glow={glow}
-                    handleVote={handleVote}
-                    showImpact={showImpact}
-                    postVoteRatings={postVoteRatings}
-                    barPct={barPct}
-                  />
+                {error && (
+                  <div
+                    style={{
+                      maxWidth: 996,
+                      margin: '0 auto 12px',
+                      padding: '12px 14px',
+                      borderRadius: 'var(--ui-radius-md)',
+                      border: '1px solid var(--ui-border-subtle)',
+                      background: 'var(--ui-surface-soft)',
+                      color: 'var(--ui-text-primary)',
+                      whiteSpace: 'pre-wrap',
+                      boxShadow: 'var(--ui-shadow-panel-soft)',
+                    }}
+                  >
+                    {error}
+                  </div>
+                )}
 
-                  {showImpact && postVoteRatings && (
-                    <DuelRevealPanel
+                {pair && (
+                  <div style={{ position: 'relative' }}>
+                    <DuelCardsRow
                       pair={pair}
-                      onMouseEnter={pauseAutoNext}
-                      onMouseLeave={resumeAutoNext}
-                      duelVotePct={duelVotePct}
+                      cardStyle={cardStyle}
+                      showPendingUi={showPendingUi}
+                      showReveal={showReveal}
                       lastWinner={lastWinner}
-                      nextDisabled={nextDisabled}
-                      nextIsHover={nextIsHover}
-                      setNextHover={setNextHover}
-                      goNext={goNext}
+                      glow={glow}
+                      handleVote={handleVote}
                       showImpact={showImpact}
                       postVoteRatings={postVoteRatings}
-                      glow={glow}
                       barPct={barPct}
                     />
-                  )}
+
+                    {showImpact && postVoteRatings && (
+                      <DuelRevealPanel
+                        pair={pair}
+                        onMouseEnter={pauseAutoNext}
+                        onMouseLeave={resumeAutoNext}
+                        duelVotePct={duelVotePct}
+                        lastWinner={lastWinner}
+                        nextDisabled={nextDisabled}
+                        nextIsHover={nextIsHover}
+                        setNextHover={setNextHover}
+                        goNext={goNext}
+                        showImpact={showImpact}
+                        postVoteRatings={postVoteRatings}
+                        glow={glow}
+                        barPct={barPct}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {showDelayedNextPending && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 15,
+                    display: 'grid',
+                    placeItems: 'center',
+                    pointerEvents: 'none',
+                  }}
+                  aria-hidden
+                >
+                  <ZLoader />
                 </div>
               )}
             </div>
-
-            {showDelayedNextPending && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  zIndex: 15,
-                  display: 'grid',
-                  placeItems: 'center',
-                  pointerEvents: 'none',
-                }}
-                aria-hidden
-              >
-                <ZLoader />
-              </div>
-            )}
           </div>
         </div>
-      </div>
 
-      {!showReveal && pair && (
-        <div
-          style={{
-            display: 'grid',
-            placeItems: 'center',
-            marginTop: 28,
-            pointerEvents: showOverlayLoader ? 'none' : 'auto',
-          }}
-        >
-          <button
-            type="button"
-            onClick={handleSkip}
-            disabled={skipDisabled}
+        {!showReveal && pair && (
+          <div
             style={{
-              minWidth: 190,
-              padding: '10px 22px',
-              borderRadius: 'var(--ui-radius-md)',
-              border: '1px solid var(--ui-border-accent)',
-              color: 'var(--ui-accent-primary)',
-              background: 'linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))',
-              boxShadow:
-                '0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)',
-              backdropFilter: 'blur(7px)',
-              WebkitBackdropFilter: 'blur(7px)',
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.28em',
-              textTransform: 'uppercase',
-              cursor: skipDisabled ? 'default' : 'pointer',
-              opacity: skipDisabled ? 0.45 : 1,
-              transition: 'transform 120ms ease, background 160ms ease, opacity 120ms ease',
-            }}
-            onMouseDown={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(1px)';
-            }}
-            onMouseUp={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
-            }}
-            onMouseEnter={(e) => {
-              if (skipDisabled) return;
-              (e.currentTarget as HTMLButtonElement).style.background =
-                'linear-gradient(180deg, rgba(34,34,34,0.78), rgba(12,12,12,0.44))';
+              display: 'grid',
+              placeItems: 'center',
+              marginTop: 28,
+              pointerEvents: showOverlayLoader ? 'none' : 'auto',
             }}
           >
-            Skip
-          </button>
-        </div>
-      )}
+            <button
+              type="button"
+              onClick={handleSkip}
+              disabled={skipDisabled}
+              style={{
+                minWidth: 190,
+                padding: '10px 22px',
+                borderRadius: 'var(--ui-radius-md)',
+                border: '1px solid var(--ui-border-accent)',
+                color: 'var(--ui-accent-primary)',
+                background: 'linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))',
+                boxShadow:
+                  '0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)',
+                backdropFilter: 'blur(7px)',
+                WebkitBackdropFilter: 'blur(7px)',
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                cursor: skipDisabled ? 'default' : 'pointer',
+                opacity: skipDisabled ? 0.45 : 1,
+                transition: 'transform 120ms ease, background 160ms ease, opacity 120ms ease',
+              }}
+              onMouseDown={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(1px)';
+              }}
+              onMouseUp={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
+              }}
+              onMouseEnter={(e) => {
+                if (skipDisabled) return;
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  'linear-gradient(180deg, rgba(34,34,34,0.78), rgba(12,12,12,0.44))';
+              }}
+            >
+              Skip
+            </button>
+          </div>
+        )}
 
-      {showOverlayLoader && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 80,
-            background: 'radial-gradient(circle at 50% 35%, rgba(0,0,0,0.45), rgba(0,0,0,0.82))',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
-            display: 'grid',
-            placeItems: 'center',
-          }}
-          aria-hidden
-        >
-          <ZLoader />
-        </div>
-      )}
-    </div>
+        {showOverlayLoader && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 80,
+              background: 'radial-gradient(circle at 50% 35%, rgba(0,0,0,0.45), rgba(0,0,0,0.82))',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              display: 'grid',
+              placeItems: 'center',
+            }}
+            aria-hidden
+          >
+            <ZLoader />
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        .duelStageOuter {
+          position: relative;
+          width: 100%;
+          max-width: 1600px;
+          margin: 0 auto;
+        }
+
+        .duelStageCenter {
+          --duel-widget-width: 318px;
+          --duel-widget-offset: 40px;
+          max-width: 996px;
+          margin: 0 auto;
+          position: relative;
+          overflow: visible;
+        }
+
+        @media (max-width: 1720px) {
+          .duelStageCenter {
+            --duel-widget-width: 280px;
+            --duel-widget-offset: 20px;
+            max-width: 840px;
+          }
+        }
+
+        @media (max-width: 1360px) {
+        .duelStageCenter {
+          --duel-widget-width: 240px;
+          --duel-widget-offset: 12px;
+          max-width: 700px;
+        }
+      }
+      `}</style>
+    </>
   );
 }

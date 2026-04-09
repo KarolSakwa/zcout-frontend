@@ -28,8 +28,8 @@ export default function RecentVotesWidget({
         position: 'absolute',
         top: 'clamp(210px, 20vh, 300px)',
         transform: 'none',
-        left: 'calc(100% + 40px)',
-        width: 318,
+        left: 'calc(100% + var(--duel-widget-offset, 40px))',
+        width: 'var(--duel-widget-width, 318px)',
         height: 'auto',
         borderRadius: '22px',
         border: '1px solid rgba(140, 170, 210, 0.16)',
@@ -148,7 +148,7 @@ export default function RecentVotesWidget({
                         lineHeight: 1,
                       }}
                     >
-                      ★
+                      â
                     </span>
                   )}
                   <span>{item.leftPlayer}</span>
@@ -187,7 +187,7 @@ export default function RecentVotesWidget({
                         lineHeight: 1,
                       }}
                     >
-                      ★
+                      â
                     </span>
                   )}
                   <span>{item.rightPlayer}</span>
@@ -225,7 +225,7 @@ export default function RecentVotesWidget({
           }
         }
 
-        @media (max-width: 1460px) {
+        @media (max-width: 1240px) {
           .recentVotesWidget {
             display: none;
           }

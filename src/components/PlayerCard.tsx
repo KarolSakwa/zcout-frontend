@@ -307,6 +307,40 @@ export default function PlayerCard({
           mix-blend-mode: overlay;
         }
 
+        @media (max-width: 1360px) {
+        .name {
+          font-size: 13px;
+          max-width: calc(100% - 76px);
+        }
+
+        .club {
+          font-size: 10px;
+        }
+
+        .number {
+          font-size: clamp(50px, 5vw, 78px);
+        }
+
+        .posBadge {
+          width: 34px;
+          height: 29px;
+        }
+
+        .posText {
+          font-size: 10px;
+        }
+
+        .flag {
+          left: 8px;
+          top: 10px;
+        }
+
+        .flagImg {
+          width: 20px;
+          height: 13px;
+        }
+      }
+
         @media (max-width: 900px) {
           .name {
             font-size: 14px;
