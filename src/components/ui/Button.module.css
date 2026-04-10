@@ -1,0 +1,109 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 120ms ease,
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease,
+    opacity 120ms ease;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 1px 1px auto 1px;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ui-accent-primary) 72%, white 10%);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.md {
+  min-height: 40px;
+  padding: 10px 16px;
+  font-size: 11px;
+}
+
+.lg {
+  min-height: 46px;
+  padding: 12px 18px;
+  font-size: 12px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.primary {
+  color: #dce8ff;
+  border-color: rgba(118, 154, 214, 0.34);
+  background:
+    linear-gradient(180deg, rgba(28, 43, 69, 0.96), rgba(16, 27, 46, 0.96));
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.primary:hover:not(:disabled) {
+  color: #edf4ff;
+  border-color: rgba(134, 174, 241, 0.48);
+  background:
+    linear-gradient(180deg, rgba(34, 52, 84, 0.98), rgba(18, 31, 54, 0.98));
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.36),
+    0 0 0 1px rgba(104, 156, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.secondary {
+  color: rgba(196, 212, 238, 0.9);
+  border-color: rgba(86, 108, 146, 0.34);
+  background:
+    linear-gradient(180deg, rgba(14, 21, 34, 0.96), rgba(9, 15, 26, 0.96));
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.secondary:hover:not(:disabled) {
+  color: #e3eeff;
+  border-color: rgba(110, 137, 184, 0.44);
+  background:
+    linear-gradient(180deg, rgba(18, 27, 43, 0.98), rgba(11, 18, 31, 0.98));
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}

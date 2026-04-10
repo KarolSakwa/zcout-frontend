@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from '@/components/ui/Button';
+import Link from 'next/link';
 
 type LaravelErrorPayload = {
   message?: string;
@@ -137,122 +139,155 @@ export default function LoginPage() {
     router.push('/duels');
   };
 
+  const pageStyle: React.CSSProperties = {
+    width: '100%',
+    display: 'grid',
+    placeItems: 'start center',
+    padding: 'clamp(44px, 10vh, 96px) 16px 40px',
+  };
+
   const shellStyle: React.CSSProperties = {
-    maxWidth: 360,
-    margin: '24px auto',
-    padding: 12,
+    width: 'min(100%, 448px)',
   };
 
   const cardStyle: React.CSSProperties = {
-    borderRadius: 'var(--ui-radius-lg)',
-    border: '1px solid var(--ui-border-subtle)',
-    background: 'var(--ui-surface-elevated)',
-    boxShadow: 'var(--ui-shadow-panel-soft)',
-    padding: 14,
+    borderRadius: '18px',
+    border: '1px solid rgba(94, 118, 156, 0.26)',
+    background: 'linear-gradient(180deg, rgba(18, 26, 40, 0.94) 0%, rgba(10, 16, 28, 0.96) 100%)',
+    boxShadow: '0 24px 56px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.03)',
+    padding: 24,
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: 18,
-    margin: '0 0 12px',
+    fontSize: 30,
+    lineHeight: 1,
+    margin: '0 0 18px',
     color: 'var(--ui-text-primary)',
+    fontWeight: 900,
+    letterSpacing: '-0.02em',
+    textAlign: 'center',
+  };
+
+  const formStyle: React.CSSProperties = {
+    display: 'grid',
+    gap: 14,
+    marginTop: 14,
+  };
+
+  const fieldWrapStyle: React.CSSProperties = {
+    display: 'grid',
+    gap: 6,
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: 10,
     fontWeight: 800,
-    letterSpacing: '0.01em',
+    letterSpacing: '0.14em',
+    textTransform: 'uppercase',
+    color: 'rgba(165, 183, 210, 0.72)',
   };
 
   const inputStyle: React.CSSProperties = {
-    padding: '8px 10px',
-    borderRadius: 'var(--ui-radius-md)',
-    border: '1px solid var(--ui-border-subtle)',
-    background: 'color-mix(in srgb, var(--ui-surface-panel-solid) 72%, transparent)',
+    minHeight: 46,
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '0 14px',
+    borderRadius: 10,
+    border: '1px solid rgba(82, 104, 140, 0.32)',
+    background: 'linear-gradient(180deg, rgba(9,15,26,0.96), rgba(7,12,22,0.96))',
     color: 'var(--ui-text-primary)',
     outline: 'none',
-    width: '100%',
-    fontSize: 13,
-  };
-
-  const primaryButtonStyle: React.CSSProperties = {
-    minHeight: 34,
-    padding: '0 12px',
-    borderRadius: 'var(--ui-radius-md)',
-    border: '1px solid var(--ui-action-primary-border)',
-    background: 'linear-gradient(180deg, var(--ui-action-primary-bg-1) 0%, var(--ui-action-primary-bg-2) 100%)',
-    color: 'var(--ui-action-primary-text)',
-    cursor: loading ? 'default' : 'pointer',
-    width: '100%',
-    fontWeight: 800,
-    fontSize: 13,
-    boxShadow: 'var(--ui-shadow-button)',
-  };
-
-  const secondaryButtonStyle: React.CSSProperties = {
-    minHeight: 34,
-    padding: '0 12px',
-    borderRadius: 'var(--ui-radius-md)',
-    border: '1px solid var(--ui-action-secondary-border)',
-    background: 'linear-gradient(180deg, var(--ui-action-secondary-bg-1) 0%, var(--ui-action-secondary-bg-2) 100%)',
-    color: 'var(--ui-action-secondary-text)',
-    cursor: loading ? 'default' : 'pointer',
-    width: '100%',
-    fontWeight: 800,
-    fontSize: 13,
-    boxShadow: 'var(--ui-shadow-button)',
-    marginBottom: 10,
+    fontSize: 14,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
   };
 
   const errorStyle: React.CSSProperties = {
-    marginTop: 4,
     color: 'var(--ui-danger)',
     fontSize: 11,
-    lineHeight: 1.2,
+    lineHeight: 1.35,
   };
 
   const formErrorStyle: React.CSSProperties = {
+    borderRadius: 10,
+    border: '1px solid color-mix(in srgb, var(--ui-danger) 28%, transparent)',
+    background: 'color-mix(in srgb, var(--ui-danger) 8%, transparent)',
+    padding: '10px 12px',
     color: 'var(--ui-danger)',
     fontSize: 12,
-    lineHeight: 1.3,
+    lineHeight: 1.4,
+  };
+
+  const footerStyle: React.CSSProperties = {
+    marginTop: 16,
+    textAlign: 'center',
+    fontSize: 13,
+    color: 'rgba(181, 197, 221, 0.72)',
+  };
+
+  const footerLinkStyle: React.CSSProperties = {
+    color: 'var(--ui-accent-primary)',
+    textDecoration: 'none',
+    fontWeight: 700,
   };
 
   return (
-    <div style={shellStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>Log in</h1>
+    <div style={pageStyle}>
+      <div style={shellStyle}>
+        <div style={cardStyle}>
+          <h1 style={titleStyle}>Log in</h1>
 
-        <button type="button" onClick={onGoogle} disabled={loading} style={secondaryButtonStyle}>
-          Zaloguj się przez Google
-        </button>
+          <Button type="button" variant="secondary" size="lg" fullWidth onClick={onGoogle} disabled={loading}>
+            Continue with Google
+          </Button>
 
-        <form onSubmit={onSubmit} style={{ display: 'grid', gap: 10 }}>
-          <div>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email"
-              autoComplete="email"
-              style={inputStyle}
-              disabled={loading}
-            />
-            {fieldMsg('email') && <div style={errorStyle}>{fieldMsg('email')}</div>}
+          <form onSubmit={onSubmit} style={formStyle}>
+            <div style={fieldWrapStyle}>
+              <label style={labelStyle} htmlFor="email">
+                Email
+              </label>
+              <input
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                autoComplete="email"
+                style={inputStyle}
+                disabled={loading}
+              />
+              {fieldMsg('email') && <div style={errorStyle}>{fieldMsg('email')}</div>}
+            </div>
+
+            <div style={fieldWrapStyle}>
+              <label style={labelStyle} htmlFor="password">
+                Password
+              </label>
+              <input
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Your password"
+                type="password"
+                autoComplete="current-password"
+                style={inputStyle}
+                disabled={loading}
+              />
+              {fieldMsg('password') && <div style={errorStyle}>{fieldMsg('password')}</div>}
+            </div>
+
+            <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
+              Log in
+            </Button>
+
+            {formError && <div style={formErrorStyle}>{formError}</div>}
+          </form>
+
+          <div style={footerStyle}>
+            No account?{' '}
+            <Link href="/register" style={footerLinkStyle}>
+              Create one
+            </Link>
           </div>
-
-          <div>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="password"
-              type="password"
-              autoComplete="current-password"
-              style={inputStyle}
-              disabled={loading}
-            />
-            {fieldMsg('password') && <div style={errorStyle}>{fieldMsg('password')}</div>}
-          </div>
-
-          <button disabled={loading} style={primaryButtonStyle}>
-            Log in
-          </button>
-
-          {formError && <div style={formErrorStyle}>{formError}</div>}
-        </form>
+        </div>
       </div>
     </div>
   );
