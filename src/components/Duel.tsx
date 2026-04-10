@@ -224,6 +224,11 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     setError(null);
     setSkipping(true);
 
+    if (pendingUiTimerRef.current) window.clearTimeout(pendingUiTimerRef.current);
+    pendingUiTimerRef.current = null;
+    setShowPendingUi(false);
+    setShowDelayedNextPending(true);
+
     try {
       const duelId = Number(pair.pair_id);
       if (!Number.isFinite(duelId) || duelId <= 0) {
@@ -243,6 +248,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
       goNext();
     } catch (e: unknown) {
+      setShowDelayedNextPending(false);
       const msg = e instanceof Error ? e.message : 'Błąd pomijania pojedynku';
       setError(msg);
     } finally {
@@ -623,7 +629,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
               {showDelayedNextPending && (
                 <div
                   style={{
-                    position: 'absolute',
+                    position: 'fixed',
                     inset: 0,
                     zIndex: 15,
                     display: 'grid',
