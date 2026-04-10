@@ -6,13 +6,13 @@ import Pusher from 'pusher-js'
 declare global {
   interface Window {
     Pusher?: typeof Pusher
-    Echo?: Echo
+    Echo?: Echo<any>
   }
 }
 
-let echoInstance: Echo | null = null
+let echoInstance: Echo<any> | null = null
 
-export function initEcho(): Echo | null {
+export function initEcho(): Echo<any> | null {
   if (typeof window === 'undefined') {
     return null
   }

@@ -3,15 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-};
-
-const KEY = 'zcout_user';
-const EVT = 'zcout-auth';
+import { useAuth } from './AuthProvider';
 
 const ANON_KEY = 'zcout_anon_id';
 
@@ -47,68 +39,27 @@ function ensureAnonId(): string | null {
   return id;
 }
 
-function readUser(): User | null {
-  if (typeof window === 'undefined') return null;
-  const raw = localStorage.getItem(KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as User;
-  } catch {
-    return null;
-  }
-}
-
-function writeUser(u: User | null) {
-  if (typeof window === 'undefined') return;
-  if (u) localStorage.setItem(KEY, JSON.stringify(u));
-  else localStorage.removeItem(KEY);
-  window.dispatchEvent(new Event(EVT));
-}
-
 export default function AuthStatus() {
   const pathname = usePathname();
-  const isAuthRoute = pathname?.startsWith('/auth/') ?? false;
+  const isAuthRoute =
+    pathname === '/login' ||
+    pathname === '/register' ||
+    (pathname?.startsWith('/auth/') ?? false);
 
-  const [user, setUser] = useState<User | null>(() => readUser());
+  const { user } = useAuth();
+
+  const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     ensureAnonId();
   }, []);
 
-  const refreshFromServer = async () => {
-    const res = await fetch('/api/auth/user', {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      cache: 'no-store',
-    });
-
-    if (res.ok) {
-      const data = (await res.json()) as User;
-      setUser(data);
-      writeUser(data);
-      return;
-    }
-
-    setUser(null);
-    writeUser(null);
-  };
-
   useEffect(() => {
-    if (isAuthRoute) return;
-
-    const onEvt = () => setUser(readUser());
-    window.addEventListener(EVT, onEvt);
-    refreshFromServer().catch(() => {});
-    return () => window.removeEventListener(EVT, onEvt);
-  }, [isAuthRoute]);
-
-  const logout = () => {
-    const next = encodeURIComponent(window.location.pathname + window.location.search);
-    window.dispatchEvent(new Event('zcout-route-loading:start'));
-    window.location.href = `/auth/logout?next=${next}`;
-  };
+    setMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -132,9 +83,15 @@ export default function AuthStatus() {
     };
   }, []);
 
+  const logout = () => {
+    const next = encodeURIComponent(window.location.pathname + window.location.search);
+    window.dispatchEvent(new Event('zcout-route-loading:start'));
+    window.location.href = `/auth/logout?next=${next}`;
+  };
+
   if (isAuthRoute) return null;
 
-  if (!user) {
+  if (!mounted || !user) {
     return <Link href="/login">Log in</Link>;
   }
 
@@ -218,7 +175,6 @@ export default function AuthStatus() {
               background: 'var(--ui-surface-soft)',
               color: 'var(--ui-accent-primary)',
               fontSize: 11,
-              letterSpacing: '1px',
               textTransform: 'uppercase',
               textAlign: 'left',
               cursor: 'pointer',

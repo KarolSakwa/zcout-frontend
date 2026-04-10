@@ -8,6 +8,8 @@ import PlayerRadarChart from './PlayerRadarChart';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import { formatOverall, getRatingColor } from '@/lib/ratings';
 import AttributeIcon from '@/components/AttributeIcon';
+import ScoutReportTrigger from './ScoutReportTrigger';
+import { headers } from 'next/headers';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -19,6 +21,8 @@ type PlayerProfileAttribute = {
   weight_sum: number;
   votes_count: number;
   last_vote_at: string | null;
+  your_rating: number | null;
+  trend_7d: number | null;
 };
 
 type PlayerRadarAxis = {
@@ -52,6 +56,7 @@ type PlayerProfileResponse = {
   radar_axes: PlayerRadarAxis[];
   attributes: PlayerProfileAttribute[];
   overall: number | null;
+  overall_trend_7d: number | null;
 };
 
 type AttributeSection = {
@@ -128,25 +133,7 @@ const GK_PHYSICAL_ORDER = [
   'agility',
 ] as const;
 
-const MOCK_USER_ATTRIBUTE_RATINGS: Record<string, number> = {
-  finishing: 81,
-  passing: 76,
-  interceptions: 68,
-  aggression: 72,
-  pace: 84,
-  stamina: 79,
-};
 
-const MOCK_ATTRIBUTE_DELTAS_7D: Record<string, number> = {
-  dribbling: 0.28,
-  finishing: 0.98,
-  passing: -0.41,
-  tackling: 0.63,
-  aggression: -1.12,
-  pace: 0.54,
-};
-
-const MOCK_OVERALL_DELTA_7D = 0.74;
 
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
@@ -324,11 +311,11 @@ function buildAttributeColumns(
 }
 
 function getUserAttributeRating(attribute: PlayerProfileAttribute): number | null {
-  return MOCK_USER_ATTRIBUTE_RATINGS[attribute.key] ?? null;
+  return attribute.your_rating;
 }
 
 function getAttributeDelta7d(attribute: PlayerProfileAttribute): number | null {
-  return MOCK_ATTRIBUTE_DELTAS_7D[attribute.key] ?? null;
+  return attribute.trend_7d;
 }
 
 function getDeltaToneClass(delta: number) {
@@ -455,11 +442,18 @@ export default async function PlayerPage({
 }) {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080';
   const { id } = await params;
+  const incomingHeaders = await headers();
+  const cookie = incomingHeaders.get('cookie') ?? '';
+  const origin = process.env.APP_ORIGIN || 'http://localhost:3000';
 
   const res = await fetch(`${API_BASE}/api/players/${encodeURIComponent(id)}`, {
     cache: 'no-store',
     headers: {
       Accept: 'application/json',
+      ...(cookie ? { Cookie: cookie } : {}),
+      Origin: origin,
+      Referer: `${origin}/`,
+      'X-Requested-With': 'XMLHttpRequest',
     },
   });
 
@@ -484,8 +478,8 @@ export default async function PlayerPage({
   const age = calcAge(data.date_of_birth);
   const overall = formatOverall(data.overall, 'rounded');
   const overallExact = formatOverall(data.overall, 'exact');
-  const overallDelta7d = MOCK_OVERALL_DELTA_7D;
-  const hasOverallDelta = Math.abs(overallDelta7d) > 0.001;
+  const overallDelta7d = data.overall_trend_7d;
+  const hasOverallDelta = overallDelta7d != null && Math.abs(overallDelta7d) > 0.001;
   const overallConfidencePct = pctFromConfidence(data.overall_confidence);
   const isGoalkeeper = data.position?.toUpperCase() === 'GK';
 
@@ -514,6 +508,12 @@ export default async function PlayerPage({
     isGoalkeeper ? 2 : 3
   );
 
+    const scoutReportAttributes = (
+    isGoalkeeper
+      ? [...goalkeeping, ...gkMental, ...gkPhysical]
+      : [...technical, ...mental, ...physical]
+  ).slice(0, 6);
+
   return (
     <main className={styles.pageShell}>
       <div className={styles.pageInner}>
@@ -533,9 +533,14 @@ export default async function PlayerPage({
                   ← Back
                 </Link>
 
-                <button type="button" className={styles.topCardReport}>
-                  Scout Report
-                </button>
+                <ScoutReportTrigger
+                  playerId={data.id}
+                  playerName={data.name}
+                  playerPosition={data.position}
+                  clubName={data.club?.name ?? null}
+                  attributes={scoutReportAttributes}
+                  className={styles.topCardReport}
+                />
               </div>
 
               <div className={styles.topCardMain}>

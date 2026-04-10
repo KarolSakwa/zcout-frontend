@@ -148,7 +148,7 @@ export default function RecentVotesWidget({
                         lineHeight: 1,
                       }}
                     >
-                      â
+                      ★
                     </span>
                   )}
                   <span>{item.leftPlayer}</span>
@@ -187,7 +187,7 @@ export default function RecentVotesWidget({
                         lineHeight: 1,
                       }}
                     >
-                      â
+                      ★
                     </span>
                   )}
                   <span>{item.rightPlayer}</span>

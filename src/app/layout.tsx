@@ -4,6 +4,7 @@ import { Inter, IBM_Plex_Sans_Condensed } from 'next/font/google';
 import './globals.css';
 import TopNav from '../components/TopNav';
 import RouteOverlayLoader from '@/components/RouteOverlayLoader';
+import AuthProvider from '@/components/AuthProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,11 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="cool-slate">
       <body className={`${inter.className} ${ratingFont.variable}`}>
-        <TopNav />
-        <Suspense fallback={null}>
-          <RouteOverlayLoader />
-        </Suspense>
-        {children}
+        <AuthProvider>
+          <TopNav />
+          <Suspense fallback={null}>
+            <RouteOverlayLoader />
+          </Suspense>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
