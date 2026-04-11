@@ -3,14 +3,15 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import AttributeIcon from '@/components/AttributeIcon';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
-import { getRatingColor } from '@/lib/ratings';
-import styles from './ScoutReportTrigger.module.css';
 import ZLoader from '@/components/ZLoader';
 import { useAuth } from '@/components/AuthProvider';
 import Button from '@/components/ui/Button';
 import buttonStyles from '@/components/ui/Button.module.css';
+import { getRatingColor } from '@/lib/ratings';
+import styles from './ScoutReportTrigger.module.css';
 
 type ScoutReportAttribute = {
   id: number;
@@ -55,7 +56,10 @@ export default function ScoutReportTrigger({
   const [requiresAuth, setRequiresAuth] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successToastMessage, setSuccessToastMessage] = useState('');
 
+  const router = useRouter();
   const { user, isAuthResolved } = useAuth();
 
   const storageKey = `scout-report-draft:${playerId}`;
@@ -270,6 +274,16 @@ export default function ScoutReportTrigger({
     return () => window.clearTimeout(timeout);
   }, [mounted, visible]);
 
+  useEffect(() => {
+    if (!showSuccessToast) return;
+
+    const timeout = window.setTimeout(() => {
+      setShowSuccessToast(false);
+    }, 5000);
+
+    return () => window.clearTimeout(timeout);
+  }, [showSuccessToast]);
+
   const openModal = () => {
     setMounted(true);
   };
@@ -277,6 +291,15 @@ export default function ScoutReportTrigger({
   const closeModal = () => {
     if (isSubmitting) return;
     setVisible(false);
+  };
+
+  const reopenForNextPack = () => {
+    setShowSuccessToast(false);
+    setSubmitError(null);
+    setAttributesError(null);
+    setRequiresAuth(false);
+    setServerAttributes([]);
+    setMounted(true);
   };
 
   const setVoteValue = (attributeId: number, nextValue: string) => {
@@ -394,7 +417,15 @@ export default function ScoutReportTrigger({
       window.localStorage.removeItem(storageKey);
       setDrafts(emptyDrafts);
       setSubmitError(null);
+      setAttributesError(null);
+      setRequiresAuth(false);
+      setServerAttributes([]);
+      setSuccessToastMessage('Scout Report saved.');
+      setShowSuccessToast(true);
       setVisible(false);
+      setMounted(false);
+      router.refresh();
+      return;
     } catch {
       setSubmitError('Failed to submit Scout Report.');
     } finally {
@@ -428,6 +459,7 @@ export default function ScoutReportTrigger({
                 </div>
               </div>
             ) : null}
+
             <div className={styles.header}>
               <div className={styles.headerCenter}>
                 <div className={styles.reportTitle}>Scout Report</div>
@@ -453,7 +485,12 @@ export default function ScoutReportTrigger({
                   <div className={styles.authGateActions}>
                     <Link
                       href={`/login?redirect=${encodeURIComponent(`/players/${playerId}`)}`}
-                      className={[buttonStyles.button, buttonStyles.primary, buttonStyles.md, styles.authGateButton].join(' ')}
+                      className={[
+                        buttonStyles.button,
+                        buttonStyles.primary,
+                        buttonStyles.md,
+                        styles.authGateButton,
+                      ].join(' ')}
                     >
                       Log in
                     </Link>
@@ -461,9 +498,9 @@ export default function ScoutReportTrigger({
                 </div>
               ) : isLoadingAttributes ? (
                 <div className={styles.loadingState}>
-                    <ZLoader/>
+                  <ZLoader />
                 </div>
-                ) : attributesError ? (
+              ) : attributesError ? (
                 <div>{attributesError}</div>
               ) : (
                 <>
@@ -589,6 +626,20 @@ export default function ScoutReportTrigger({
               )}
             </div>
           </div>
+        </div>
+      ) : null}
+
+      {showSuccessToast ? (
+        <div className={styles.successToast}>
+          <div className={styles.successToastText}>{successToastMessage}</div>
+
+          <button
+            type="button"
+            className={styles.successToastAction}
+            onClick={reopenForNextPack}
+          >
+            Rate next 6
+          </button>
         </div>
       ) : null}
     </>
