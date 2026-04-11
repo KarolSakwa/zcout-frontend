@@ -171,27 +171,29 @@ export default function DuelRevealPanel({
           onFocus={() => setNextHover(true)}
           onBlur={() => setNextHover(false)}
           style={{
-            height: 30,
-            padding: '0 12px',
-            fontSize: 11,
-            borderRadius: 'var(--ui-radius-pill)',
-            border: `1px solid ${nextIsHover ? 'var(--ui-accent-primary)' : 'var(--ui-border-accent)'}`,
-            background: nextIsHover
-              ? 'var(--ui-accent-primary-soft)'
-              : 'color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
-            color: 'var(--ui-accent-primary)',
-            fontWeight: 950,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            boxShadow: nextIsHover
-              ? '0 10px 22px rgba(0,0,0,0.36), 0 0 16px var(--ui-accent-primary-soft)'
-              : '0 8px 18px rgba(0,0,0,0.32), 0 0 12px color-mix(in srgb, var(--ui-accent-primary) 10%, transparent)',
-            opacity: nextDisabled ? 0.55 : 1,
-            cursor: nextDisabled ? 'not-allowed' : 'pointer',
-            userSelect: 'none',
-            transform: nextIsHover ? 'translateY(-1px)' : 'translateY(0px)',
-            transition: 'transform 140ms ease, background 140ms ease, box-shadow 140ms ease, border-color 140ms ease',
-          }}
+  height: 34,
+  padding: '0 14px',
+  textTransform: 'uppercase',
+  fontSize: 12,
+  borderRadius: 'var(--ui-radius-pill)',
+  border: nextIsHover
+    ? '1px solid rgba(156, 192, 248, 0.74)'
+    : '1px solid rgba(138, 176, 238, 0.62)',
+  background: nextIsHover
+    ? 'rgba(118, 160, 234, 0.96)'
+    : 'rgba(104, 146, 222, 0.92)',
+  color: '#f4f8ff',
+  fontWeight: 700,
+  letterSpacing: '0.01em',
+  boxShadow: nextIsHover
+    ? '0 10px 20px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14)'
+    : '0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10)',
+  opacity: nextDisabled ? 0.55 : 1,
+  cursor: nextDisabled ? 'not-allowed' : 'pointer',
+  userSelect: 'none',
+  transform: nextIsHover ? 'translateY(-1px)' : 'translateY(0px)',
+  transition: 'transform 140ms ease, background 140ms ease, box-shadow 140ms ease, border-color 140ms ease, opacity 140ms ease',
+}}
         >
           Next →
         </button>

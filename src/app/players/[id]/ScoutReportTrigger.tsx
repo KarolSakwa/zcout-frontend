@@ -457,13 +457,6 @@ export default function ScoutReportTrigger({
                     >
                       Log in
                     </Link>
-
-                    <Link
-                      href={`/register?redirect=${encodeURIComponent(`/players/${playerId}`)}`}
-                      className={[buttonStyles.button, buttonStyles.secondary, buttonStyles.md, styles.authGateButton].join(' ')}
-                    >
-                      Create account
-                    </Link>
                   </div>
                 </div>
               ) : isLoadingAttributes ? (

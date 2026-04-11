@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button';
 
 type LaravelErrorPayload = {
@@ -29,6 +29,9 @@ export default function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
+  const nextPath = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/duels';
 
   const fieldMsg = (key: string) => fieldErrors[key]?.[0] ?? null;
 
@@ -139,7 +142,7 @@ export default function RegisterPage() {
       cache: 'no-store',
     }).catch(() => null);
 
-    router.push('/duels');
+    router.push(nextPath);
   };
 
   const pageStyle: React.CSSProperties = {

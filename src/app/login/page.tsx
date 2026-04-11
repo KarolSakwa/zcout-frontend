@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
 
@@ -27,6 +27,9 @@ export default function LoginPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
+  const nextPath = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/duels';
 
   const fieldMsg = (key: string) => fieldErrors[key]?.[0] ?? null;
 
@@ -63,7 +66,14 @@ export default function LoginPage() {
     setFieldErrors({});
     setLoading(true);
     startGlobalLoader();
-    window.location.href = `${BACKEND}/auth/google/redirect`;
+
+    const url = new URL(`${BACKEND}/auth/google/redirect`);
+
+    if (redirectTo && redirectTo.startsWith('/')) {
+      url.searchParams.set('next', redirectTo);
+    }
+
+    window.location.href = url.toString();
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -136,7 +146,7 @@ export default function LoginPage() {
       cache: 'no-store',
     }).catch(() => null);
 
-    router.push('/duels');
+    router.push(nextPath);
   };
 
   const pageStyle: React.CSSProperties = {
