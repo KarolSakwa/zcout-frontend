@@ -1,15 +1,15 @@
 export const dynamic = 'force-dynamic';
 
-import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import Tooltip from '@/components/Tooltip';
 import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import { formatOverall, getRatingColor } from '@/lib/ratings';
-import AttributeIcon from '@/components/AttributeIcon';
 import ScoutReportTrigger from './ScoutReportTrigger';
 import { headers } from 'next/headers';
+import PlayerAttributesSection from './PlayerAttributesSection';
+import PlayerOverallRating from './PlayerOverallRating';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -133,8 +133,6 @@ const GK_PHYSICAL_ORDER = [
   'agility',
 ] as const;
 
-
-
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
 }
@@ -165,20 +163,6 @@ function calcAge(dobIso: string | null) {
   return age < 0 ? null : age;
 }
 
-function avgOverall(attrs: PlayerProfileAttribute[]) {
-  const nums = attrs.map((a) => normalizeRating(a.rating));
-  if (!nums.length) return 0;
-  const sum = nums.reduce((acc, n) => acc + n, 0);
-  return Math.round(sum / nums.length);
-}
-
-function exactOverall(attrs: PlayerProfileAttribute[]) {
-  const nums = attrs.map((a) => normalizeRating(a.rating));
-  if (!nums.length) return 0;
-  const sum = nums.reduce((acc, n) => acc + n, 0);
-  return sum / nums.length;
-}
-
 function orderAttrsByKeys(
   attrs: PlayerProfileAttribute[],
   orderedKeys: readonly string[]
@@ -198,42 +182,6 @@ function pickAttrsByKeys(
     attrs.filter((attr) => allowed.has(attr.key)),
     orderedKeys
   );
-}
-
-function metricColor(value: number) {
-  const rating = normalizeRating(value);
-
-  if (rating < 70) {
-    return 'var(--ui-text-primary)';
-  }
-
-  if (rating < 80) {
-    const t = (rating - 70) / 10;
-    const accentPct = Math.round(22 + t * 14);
-    return `color-mix(in srgb, var(--ui-accent-primary) ${accentPct}%, var(--ui-text-primary))`;
-  }
-
-  if (rating < 90) {
-    const t = (rating - 80) / 10;
-    const accentPct = Math.round(46 + t * 20);
-    return `color-mix(in srgb, var(--ui-accent-primary) ${accentPct}%, var(--ui-text-primary))`;
-  }
-
-  if (rating < 95) {
-    const t = (rating - 90) / 5;
-    const accentPct = Math.round(72 + t * 14);
-    return `color-mix(in srgb, var(--ui-accent-primary) ${accentPct}%, white)`;
-  }
-
-  const t = (rating - 95) / 4;
-  const darkPct = Math.round(10 + t * 18);
-  return `color-mix(in srgb, var(--ui-accent-primary) 92%, black ${darkPct}%)`;
-}
-
-function metricStyle(value: number): CSSProperties {
-  return {
-    color: metricColor(value),
-  };
 }
 
 function buildAttributeColumns(
@@ -310,14 +258,6 @@ function buildAttributeColumns(
   return columns;
 }
 
-function getUserAttributeRating(attribute: PlayerProfileAttribute): number | null {
-  return attribute.your_rating;
-}
-
-function getAttributeDelta7d(attribute: PlayerProfileAttribute): number | null {
-  return attribute.trend_7d;
-}
-
 function getDeltaToneClass(delta: number) {
   const absDelta = Math.abs(delta);
 
@@ -335,104 +275,6 @@ function getDeltaToneClass(delta: number) {
 function formatSignedTwoDecimals(value: number) {
   const sign = value > 0 ? '+' : value < 0 ? '−' : '';
   return `${sign}${Math.abs(value).toFixed(2)}`;
-}
-
-function formatTwoDecimals(value: number) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return '0.00';
-  return n.toFixed(2);
-}
-
-function AttributeColumn({ items }: { items: AttributeDisplayItem[] }) {
-  return (
-    <div className={styles.attributeColumn}>
-      {items.map((item) => {
-        if (item.type === 'header') {
-          return (
-            <div key={item.id} className={styles.attributePanelHeader}>
-              {item.title}
-            </div>
-          );
-        }
-
-        const attr = item.attribute;
-        const userRating = getUserAttributeRating(attr);
-        const delta7d = getAttributeDelta7d(attr);
-        const hasDelta = delta7d != null && Math.abs(delta7d) > 0.001;
-        const confidencePct = pctFromConfidence(attr.confidence);
-
-        return (
-          <div key={item.id} className={styles.attributeRow}>
-            <div className={styles.attributeLead}>
-              <AttributeIcon
-                attributeKey={attr.key}
-                label={attr.label}
-                size={18}
-                className={styles.attributeIcon}
-              />
-              <div className={styles.attributeName}>{attr.label}</div>
-            </div>
-
-            <div className={styles.attributeStatGroup}>
-              <div className={styles.attributeYouSlot}>
-                {userRating != null ? (
-                  <>
-                    <span className={styles.attributeYouValue}>
-                      <span className={styles.attributeYouLabel}>you:</span>{' '}
-                      <span className={styles.attributeYouRating}>{userRating}</span>
-                    </span>
-                    <div className={styles.attributeYouDivider} aria-hidden="true" />
-                  </>
-                ) : null}
-              </div>
-
-              <div className={styles.attributeMetricCluster}>
-                <div className={styles.attributeDeltaSlot}>
-                  {hasDelta ? (
-                    <Tooltip
-                      content={<>Last 7 days: <span className="ratingValue">{formatSignedTwoDecimals(delta7d)}</span></>}
-                      side="top"
-                      align="end"
-                    >
-                      <span
-                        className={[
-                          styles.attributeDelta,
-                          styles.infoHover,
-                          delta7d > 0
-                            ? styles.attributeDeltaUp
-                            : styles.attributeDeltaDown,
-                          getDeltaToneClass(delta7d),
-                        ].join(' ')}
-                        aria-label={`Last 7 days ${formatSignedTwoDecimals(delta7d)}`}
-                      >
-                        {delta7d > 0 ? '↑' : '↓'}
-                      </span>
-                    </Tooltip>
-                  ) : null}
-                </div>
-
-                <RatingWithConfidence
-                  rating={Math.round(normalizeRating(attr.rating))}
-                  confidence={attr.confidence}
-                  fontSize={15}
-                  scalePx={15}
-                  decimals={0}
-                  align="end"
-                  expand={false}
-                  ratingColor={getRatingColor(attr.rating)}
-                  ratingTooltipContent={
-                    <>
-                      Crowd rating: <span className="ratingValue">{formatTwoDecimals(attr.rating)}</span>
-                    </>
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
 }
 
 export default async function PlayerPage({
@@ -479,8 +321,8 @@ export default async function PlayerPage({
   const overall = formatOverall(data.overall, 'rounded');
   const overallExact = formatOverall(data.overall, 'exact');
   const overallDelta7d = data.overall_trend_7d;
-  const hasOverallDelta = overallDelta7d != null && Math.abs(overallDelta7d) > 0.001;
-  const overallConfidencePct = pctFromConfidence(data.overall_confidence);
+  const hasOverallDelta =
+    overallDelta7d != null && Math.abs(overallDelta7d) > 0.001;
   const isGoalkeeper = data.position?.toUpperCase() === 'GK';
 
   const goalkeeping = pickAttrsByKeys(data.attributes, GK_GOALKEEPING_ORDER);
@@ -508,7 +350,7 @@ export default async function PlayerPage({
     isGoalkeeper ? 2 : 3
   );
 
-    const scoutReportAttributes = (
+  const scoutReportAttributes = (
     isGoalkeeper
       ? [...goalkeeping, ...gkMental, ...gkPhysical]
       : [...technical, ...mental, ...physical]
@@ -549,7 +391,9 @@ export default async function PlayerPage({
                     <div className={styles.topCardIdentity}>
                       <h1 className={styles.playerName}>
                         {data.number != null ? (
-                          <span className={styles.playerNumberInline}>#{data.number}</span>
+                          <span className={styles.playerNumberInline}>
+                            #{data.number}
+                          </span>
                         ) : null}
                         <span>{data.name}</span>
                       </h1>
@@ -575,53 +419,21 @@ export default async function PlayerPage({
                       <div className={styles.overallLabel}>OVERALL</div>
 
                       <div className={styles.overallRow}>
-                        <div className={styles.overallMetricCluster}>
-                          <div className={styles.overallDeltaSlot}>
-                            {hasOverallDelta ? (
-                              <Tooltip
-                                content={<>Last 7 days: <span className="ratingValue">{formatSignedTwoDecimals(overallDelta7d)}</span></>}
-                                side="top"
-                                align="end"
-                              >
-                                <span
-                                  className={[
-                                    styles.attributeDelta,
-                                    styles.infoHover,
-                                    overallDelta7d > 0
-                                      ? styles.attributeDeltaUp
-                                      : styles.attributeDeltaDown,
-                                    getDeltaToneClass(overallDelta7d),
-                                  ].join(' ')}
-                                  aria-label={`Last 7 days ${formatSignedTwoDecimals(overallDelta7d)}`}
-                                >
-                                  {overallDelta7d > 0 ? '↑' : '↓'}
-                                </span>
-                              </Tooltip>
-                            ) : null}
-                          </div>
-
-                          <RatingWithConfidence
-                            rating={overall}
-                            confidence={data.overall_confidence}
-                            fontSize="clamp(3.3rem, 5.3vw, 4.85rem)"
-                            scalePx={62}
-                            decimals={0}
-                            align="end"
-                            expand={false}
-                            ratingColor={getRatingColor(data.overall)}
-                            ratingTooltipContent={
-                              <>
-                                Crowd rating: <span className="ratingValue">{overallExact}</span>
-                              </>
-                            }
-                          />
-                        </div>
+                        <PlayerOverallRating
+                          overall={overall}
+                          overallConfidence={data.overall_confidence}
+                          overallExact={overallExact}
+                          overallDelta7d={overallDelta7d}
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div className={styles.topCardRight}>
-                    <div className={styles.radarPlaceholder} aria-label="Player radar chart">
+                    <div
+                      className={styles.radarPlaceholder}
+                      aria-label="Player radar chart"
+                    >
                       <PlayerRadarChart data={radarData} />
                     </div>
                   </div>
@@ -629,20 +441,11 @@ export default async function PlayerPage({
               </div>
             </section>
 
-            <section className={styles.attributesCard}>
-              <div
-                className={styles.attributesColumns}
-                style={
-                  isGoalkeeper
-                    ? { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }
-                    : undefined
-                }
-              >
-                {attributeColumns.map((columnItems, index) => (
-                  <AttributeColumn key={`column-${index}`} items={columnItems} />
-                ))}
-              </div>
-            </section>
+            <PlayerAttributesSection
+              playerId={data.id}
+              attributeColumns={attributeColumns}
+              isGoalkeeper={isGoalkeeper}
+            />
           </div>
 
           <button

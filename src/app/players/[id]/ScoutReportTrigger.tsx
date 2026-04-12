@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AttributeIcon from '@/components/AttributeIcon';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
@@ -22,6 +22,13 @@ type ScoutReportAttribute = {
   description?: string;
 };
 
+type ScoutReportAttributesResponse = {
+  player_id: number;
+  items: ScoutReportAttribute[];
+  is_completed?: boolean;
+  remaining_attributes_count?: number;
+};
+
 type DraftState = 'untouched' | 'vote' | 'skip';
 
 type AttributeDraft = {
@@ -39,19 +46,58 @@ type ScoutReportTriggerProps = {
   className?: string;
 };
 
+const ANON_KEY = 'zcout_anon_id';
+
+function readCookie(name: string): string | null {
+  const parts = document.cookie.split(';').map((s) => s.trim());
+  const hit = parts.find((p) => p.startsWith(`${name}=`));
+  if (!hit) return null;
+  return decodeURIComponent(hit.substring(name.length + 1));
+}
+
+function writeCookie(name: string, value: string, maxAgeSeconds: number) {
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
+}
+
+function ensureAnonId(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  const fromLs = window.localStorage.getItem(ANON_KEY);
+  if (fromLs) {
+    writeCookie(ANON_KEY, fromLs, 31536000);
+    return fromLs;
+  }
+
+  const fromCookie = readCookie(ANON_KEY);
+  if (fromCookie) {
+    window.localStorage.setItem(ANON_KEY, fromCookie);
+    return fromCookie;
+  }
+
+  const id = crypto.randomUUID();
+  window.localStorage.setItem(ANON_KEY, id);
+  writeCookie(ANON_KEY, id, 31536000);
+  return id;
+}
+
 export default function ScoutReportTrigger({
   playerId,
   playerName,
   playerPosition,
   clubName,
-  attributes,
+  attributes: _attributes,
   className,
 }: ScoutReportTriggerProps) {
-  const [mounted, setMounted] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [isModalMounted, setIsModalMounted] = useState(false);
   const [visible, setVisible] = useState(false);
+
   const [drafts, setDrafts] = useState<Record<number, AttributeDraft>>({});
-  const [serverAttributes, setServerAttributes] = useState<ScoutReportAttribute[]>([]);
-  const [isLoadingAttributes, setIsLoadingAttributes] = useState(false);
+  const [serverAttributes, setServerAttributes] = useState<ScoutReportAttribute[] | null>(null);
+
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
+  const [isLoadingModalAttributes, setIsLoadingModalAttributes] = useState(false);
+
   const [attributesError, setAttributesError] = useState<string | null>(null);
   const [requiresAuth, setRequiresAuth] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,11 +105,16 @@ export default function ScoutReportTrigger({
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [successToastMessage, setSuccessToastMessage] = useState('');
 
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [remainingAttributesCount, setRemainingAttributesCount] = useState<number | null>(null);
+
   const router = useRouter();
   const { user, isAuthResolved } = useAuth();
 
   const storageKey = `scout-report-draft:${playerId}`;
-  const activeAttributes = serverAttributes.length > 0 ? serverAttributes : attributes;
+  const pendingStorageKey = `scout-report-pending:${playerId}`;
+
+  const activeAttributes = serverAttributes ?? [];
 
   const emptyDrafts = useMemo<Record<number, AttributeDraft>>(
     () =>
@@ -85,23 +136,30 @@ export default function ScoutReportTrigger({
     [drafts]
   );
 
-  useEffect(() => {
-    if (!mounted) return;
-    if (!isAuthResolved) return;
+  const loadScoutReportAvailability = useCallback(
+    async (options?: { modal?: boolean }) => {
+      const modal = options?.modal === true;
 
-    let cancelled = false;
+      if (!isAuthResolved) {
+        return null;
+      }
 
-    const loadScoutReport = async () => {
-      setIsLoadingAttributes(true);
+      if (modal) {
+        setIsLoadingModalAttributes(true);
+      } else {
+        setIsCheckingAvailability(true);
+      }
+
       setAttributesError(null);
       setRequiresAuth(false);
 
       try {
         if (!user) {
-          if (cancelled) return;
+          setServerAttributes(null);
+          setIsCompleted(false);
+          setRemainingAttributesCount(null);
           setRequiresAuth(true);
-          setServerAttributes([]);
-          return;
+          return null;
         }
 
         const res = await fetch(`/api/scout-report/attributes/${playerId}`, {
@@ -113,47 +171,66 @@ export default function ScoutReportTrigger({
         });
 
         if (res.status === 401) {
-          if (cancelled) return;
           setRequiresAuth(true);
-          setServerAttributes([]);
-          return;
+          setServerAttributes(null);
+          setIsCompleted(false);
+          setRemainingAttributesCount(null);
+          return null;
         }
 
         if (!res.ok) {
           throw new Error(`Failed to load Scout Report attributes: ${res.status}`);
         }
 
-        const data = (await res.json()) as {
-          player_id: number;
-          items: ScoutReportAttribute[];
-        };
+        const data = (await res.json()) as ScoutReportAttributesResponse;
+        const items = Array.isArray(data.items) ? data.items : [];
+        const remaining =
+          typeof data.remaining_attributes_count === 'number'
+            ? data.remaining_attributes_count
+            : items.length;
 
-        if (cancelled) return;
+        setServerAttributes(items);
+        setIsCompleted(Boolean(data.is_completed));
+        setRemainingAttributesCount(remaining);
+        setRequiresAuth(false);
 
-        setServerAttributes(data.items ?? []);
+        return data;
       } catch (error) {
-        if (cancelled) return;
-
         setAttributesError(
           error instanceof Error ? error.message : 'Failed to load Scout Report.'
         );
-        setServerAttributes([]);
+        setServerAttributes(null);
+        setIsCompleted(false);
+        setRemainingAttributesCount(null);
+        return null;
       } finally {
-        if (!cancelled) {
-          setIsLoadingAttributes(false);
+        if (modal) {
+          setIsLoadingModalAttributes(false);
+        } else {
+          setIsCheckingAvailability(false);
         }
       }
-    };
-
-    loadScoutReport();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [mounted, playerId, user, isAuthResolved]);
+    },
+    [isAuthResolved, playerId, user]
+  );
 
   useEffect(() => {
-    if (!mounted) return;
+    setIsHydrated(true);
+    ensureAnonId();
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    void loadScoutReportAvailability();
+  }, [isHydrated, loadScoutReportAvailability]);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    if (!activeAttributes.length) {
+      setDrafts({});
+      return;
+    }
 
     const raw = window.localStorage.getItem(storageKey);
 
@@ -164,6 +241,7 @@ export default function ScoutReportTrigger({
 
     try {
       const parsed = JSON.parse(raw) as Record<string, AttributeDraft>;
+
       const normalized = Object.fromEntries(
         activeAttributes.map((attribute) => {
           const draft =
@@ -226,10 +304,21 @@ export default function ScoutReportTrigger({
     } catch {
       setDrafts(emptyDrafts);
     }
-  }, [mounted, storageKey, emptyDrafts, activeAttributes]);
+  }, [isHydrated, storageKey, emptyDrafts, activeAttributes]);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!isHydrated) return;
+
+    if (!hasActions) {
+      window.localStorage.removeItem(storageKey);
+      return;
+    }
+
+    window.localStorage.setItem(storageKey, JSON.stringify(drafts));
+  }, [drafts, isHydrated, storageKey, hasActions]);
+
+  useEffect(() => {
+    if (!isModalMounted) return;
 
     document.body.style.overflow = 'hidden';
 
@@ -251,28 +340,17 @@ export default function ScoutReportTrigger({
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = '';
     };
-  }, [mounted, isSubmitting]);
+  }, [isModalMounted, isSubmitting]);
 
   useEffect(() => {
-    if (!mounted) return;
-
-    if (!hasActions) {
-      window.localStorage.removeItem(storageKey);
-      return;
-    }
-
-    window.localStorage.setItem(storageKey, JSON.stringify(drafts));
-  }, [drafts, mounted, storageKey, hasActions]);
-
-  useEffect(() => {
-    if (!mounted || visible) return;
+    if (!isModalMounted || visible) return;
 
     const timeout = window.setTimeout(() => {
-      setMounted(false);
+      setIsModalMounted(false);
     }, 180);
 
     return () => window.clearTimeout(timeout);
-  }, [mounted, visible]);
+  }, [isModalMounted, visible]);
 
   useEffect(() => {
     if (!showSuccessToast) return;
@@ -285,7 +363,13 @@ export default function ScoutReportTrigger({
   }, [showSuccessToast]);
 
   const openModal = () => {
-    setMounted(true);
+    if (isCompleted) return;
+
+    setSubmitError(null);
+    setAttributesError(null);
+    setRequiresAuth(false);
+    setIsModalMounted(true);
+    void loadScoutReportAvailability({ modal: true });
   };
 
   const closeModal = () => {
@@ -294,12 +378,17 @@ export default function ScoutReportTrigger({
   };
 
   const reopenForNextPack = () => {
+    if (isCompleted || remainingAttributesCount === 0) {
+      setShowSuccessToast(false);
+      return;
+    }
+
     setShowSuccessToast(false);
     setSubmitError(null);
     setAttributesError(null);
     setRequiresAuth(false);
-    setServerAttributes([]);
-    setMounted(true);
+    setIsModalMounted(true);
+    void loadScoutReportAvailability({ modal: true });
   };
 
   const setVoteValue = (attributeId: number, nextValue: string) => {
@@ -357,11 +446,10 @@ export default function ScoutReportTrigger({
 
         return {
           attribute_key: attribute.key,
-          player_id: playerId,
           value: Number(draft.value),
         };
       })
-      .filter(Boolean);
+      .filter((value): value is { attribute_key: string; value: number } => value != null);
 
     const skipped_attribute_ids = activeAttributes
       .map((attribute) => {
@@ -377,8 +465,45 @@ export default function ScoutReportTrigger({
     };
   };
 
+  const getJustSubmittedVotedAttributeIds = () => {
+    return activeAttributes
+      .filter((attribute) => {
+        const draft = drafts[attribute.id];
+        return draft?.state === 'vote' && draft.value !== '';
+      })
+      .map((attribute) => attribute.id);
+  };
+
+  const getJustSubmittedRatingsMap = () => {
+    return Object.fromEntries(
+      activeAttributes
+        .map((attribute) => {
+          const draft = drafts[attribute.id];
+
+          if (!draft || draft.state !== 'vote' || draft.value === '') {
+            return null;
+          }
+
+          return [attribute.id, Number(draft.value)] as const;
+        })
+        .filter((entry): entry is readonly [number, number] => entry != null)
+    );
+  };
+
   const handleSubmit = async () => {
     const payload = buildSubmitPayload();
+    const justSubmittedRatings = getJustSubmittedRatingsMap();
+
+    if (Object.keys(justSubmittedRatings).length > 0) {
+      window.dispatchEvent(
+        new CustomEvent('zcout:scout-report-saving', {
+          detail: {
+            playerId,
+            ratings: justSubmittedRatings,
+          },
+        })
+      );
+    }
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -395,8 +520,18 @@ export default function ScoutReportTrigger({
       });
 
       if (res.status === 401) {
+        if (Object.keys(justSubmittedRatings).length > 0) {
+          window.dispatchEvent(
+            new CustomEvent('zcout:scout-report-failed', {
+              detail: {
+                playerId,
+              },
+            })
+          );
+        }
+
         setRequiresAuth(true);
-        setServerAttributes([]);
+        setServerAttributes(null);
         return;
       }
 
@@ -410,23 +545,84 @@ export default function ScoutReportTrigger({
           data?.message ??
           `Submit failed: ${res.status}`;
 
+        if (Object.keys(justSubmittedRatings).length > 0) {
+          window.dispatchEvent(
+            new CustomEvent('zcout:scout-report-failed', {
+              detail: {
+                playerId,
+              },
+            })
+          );
+        }
+
         setSubmitError(validationMessage);
         return;
       }
 
       window.localStorage.removeItem(storageKey);
-      setDrafts(emptyDrafts);
+
+      const justSubmittedVotedAttributeIds = getJustSubmittedVotedAttributeIds();
+
+      if (justSubmittedVotedAttributeIds.length > 0) {
+        window.sessionStorage.setItem(
+          pendingStorageKey,
+          JSON.stringify({
+            attributeIds: justSubmittedVotedAttributeIds,
+            createdAt: Date.now(),
+          })
+        );
+      } else {
+        window.sessionStorage.removeItem(pendingStorageKey);
+      }
+
+      if (Object.keys(justSubmittedRatings).length > 0) {
+        window.dispatchEvent(
+          new CustomEvent('zcout:scout-report-saved', {
+            detail: {
+              playerId,
+              ratings: justSubmittedRatings,
+            },
+          })
+        );
+      }
+
+      setDrafts({});
       setSubmitError(null);
       setAttributesError(null);
       setRequiresAuth(false);
-      setServerAttributes([]);
+
+      const submittedVotesCount = payload.votes.length;
+      const shouldCompleteOptimistically =
+        remainingAttributesCount !== null &&
+        payload.skipped_attribute_ids.length === 0 &&
+        submittedVotesCount > 0 &&
+        submittedVotesCount === remainingAttributesCount;
+
+      if (shouldCompleteOptimistically) {
+        setServerAttributes([]);
+        setIsCompleted(true);
+        setRemainingAttributesCount(0);
+      } else {
+        void loadScoutReportAvailability();
+      }
+
+      setVisible(false);
+      setIsModalMounted(false);
       setSuccessToastMessage('Scout Report saved.');
       setShowSuccessToast(true);
-      setVisible(false);
-      setMounted(false);
       router.refresh();
       return;
     } catch {
+      if (Object.keys(justSubmittedRatings).length > 0) {
+        window.dispatchEvent(
+          new CustomEvent('zcout:scout-report-failed', {
+            detail: {
+              playerId,
+            },
+          })
+        );
+      }
+
       setSubmitError('Failed to submit Scout Report.');
     } finally {
       setIsSubmitting(false);
@@ -437,13 +633,44 @@ export default function ScoutReportTrigger({
     .filter(Boolean)
     .join(' • ');
 
+  const showCompletedBadge =
+    isAuthResolved &&
+    Boolean(user) &&
+    isCompleted &&
+    remainingAttributesCount === 0;
+
   return (
     <>
-      <Button type="button" variant="primary" size="md" className={className} onClick={openModal}>
-        Scout Report
-      </Button>
+      {showCompletedBadge ? (
+        <div
+          className={className}
+          style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: 34,
+          padding: '0 16px',
+          borderRadius: 12,
+          border: '1px solid rgba(107, 214, 160, 0.32)',
+          background: 'rgba(107, 214, 160, 0.12)',
+          color: '#9ae6b4',
+          fontSize: 12,
+          fontWeight: 800,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          boxShadow: '0 10px 22px rgba(0, 0, 0, 0.16)',
+          cursor: 'default',
+        }}
+        >
+          Scouted ✓
+        </div>
+      ) : (
+        <Button type="button" variant="primary" size="md" className={className} onClick={openModal}>
+          Scout Report
+        </Button>
+      )}
 
-      {mounted ? (
+      {isModalMounted ? (
         <div
           className={[styles.overlay, visible ? styles.overlayVisible : ''].join(' ')}
           onClick={closeModal}
@@ -496,7 +723,7 @@ export default function ScoutReportTrigger({
                     </Link>
                   </div>
                 </div>
-              ) : isLoadingAttributes ? (
+              ) : isLoadingModalAttributes ? (
                 <div className={styles.loadingState}>
                   <ZLoader />
                 </div>
@@ -633,13 +860,15 @@ export default function ScoutReportTrigger({
         <div className={styles.successToast}>
           <div className={styles.successToastText}>{successToastMessage}</div>
 
-          <button
-            type="button"
-            className={styles.successToastAction}
-            onClick={reopenForNextPack}
-          >
-            Rate next 6
-          </button>
+          {!isCompleted && remainingAttributesCount !== 0 ? (
+            <button
+              type="button"
+              className={styles.successToastAction}
+              onClick={reopenForNextPack}
+            >
+              Rate next 6
+            </button>
+          ) : null}
         </div>
       ) : null}
     </>
