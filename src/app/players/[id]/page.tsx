@@ -1,11 +1,9 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import Tooltip from '@/components/Tooltip';
 import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
-import RatingWithConfidence from '@/components/RatingWithConfidence';
-import { formatOverall, getRatingColor } from '@/lib/ratings';
+import { formatOverall } from '@/lib/ratings';
 import ScoutReportTrigger from './ScoutReportTrigger';
 import { headers } from 'next/headers';
 import PlayerAttributesSection from './PlayerAttributesSection';
@@ -16,13 +14,15 @@ type PlayerProfileAttribute = {
   id: number;
   key: string;
   label: string;
-  group: 'technical' | 'mental' | 'physical' | string;
+  group: string;
   rating: number;
   confidence: number;
-  weight_sum: number;
+  rating_weight_sum?: number;
+  confidence_weight_sum?: number;
   votes_count: number;
   last_vote_at: string | null;
   your_rating: number | null;
+  your_rating_updated_at?: string | null;
   trend_7d: number | null;
 };
 
@@ -77,75 +77,8 @@ type AttributeDisplayItem =
       attribute: PlayerProfileAttribute;
     };
 
-const LEFT_COLUMN_ORDER = [
-  'ball_control',
-  'dribbling',
-  'finishing',
-  'long_shots',
-  'attacking_movement',
-  'heading',
-  'passing',
-  'crossing',
-  'creativity',
-  'marking',
-  'tackling',
-  'interceptions',
-  'penalties',
-  'free_kicks',
-] as const;
-
-const MENTAL_ORDER = [
-  'leadership',
-  'concentration',
-  'aggression',
-  'composure',
-  'work_rate',
-] as const;
-
-const PHYSICAL_ORDER = [
-  'pace',
-  'acceleration',
-  'strength',
-  'agility',
-  'stamina',
-] as const;
-
-const GK_GOALKEEPING_ORDER = [
-  'gk_reflexes',
-  'gk_one_on_ones',
-  'gk_handling',
-  'gk_command_of_area',
-  'passing',
-  'gk_throwing',
-  'gk_rushing_out',
-  'gk_eccentricity',
-] as const;
-
-const GK_MENTAL_ORDER = [
-  'leadership',
-  'concentration',
-  'composure',
-] as const;
-
-const GK_PHYSICAL_ORDER = [
-  'pace',
-  'acceleration',
-  'strength',
-  'agility',
-] as const;
-
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
-}
-
-function normalizeRating(r: number) {
-  const v = Number(r);
-  if (!Number.isFinite(v)) return 0;
-  return clamp(v, 0, 99);
-}
-
-function pctFromConfidence(c: number) {
-  return clamp(Math.round(Number(c) || 0), 0, 100);
 }
 
 function calcAge(dobIso: string | null) {
@@ -165,25 +98,12 @@ function calcAge(dobIso: string | null) {
   return age < 0 ? null : age;
 }
 
-function orderAttrsByKeys(
+function pickAttrsByGroups(
   attrs: PlayerProfileAttribute[],
-  orderedKeys: readonly string[]
+  allowedGroups: readonly string[]
 ) {
-  const byKey = new Map(attrs.map((attr) => [attr.key, attr]));
-  return orderedKeys
-    .map((key) => byKey.get(key))
-    .filter((attr): attr is PlayerProfileAttribute => Boolean(attr));
-}
-
-function pickAttrsByKeys(
-  attrs: PlayerProfileAttribute[],
-  orderedKeys: readonly string[]
-) {
-  const allowed = new Set(orderedKeys);
-  return orderAttrsByKeys(
-    attrs.filter((attr) => allowed.has(attr.key)),
-    orderedKeys
-  );
+  const allowed = new Set(allowedGroups);
+  return attrs.filter((attr) => allowed.has(String(attr.group)));
 }
 
 function buildAttributeColumns(
@@ -262,25 +182,6 @@ function buildAttributeColumns(
   return columns;
 }
 
-function getDeltaToneClass(delta: number) {
-  const absDelta = Math.abs(delta);
-
-  if (absDelta >= 0.9) {
-    return styles.attributeDeltaStrong;
-  }
-
-  if (absDelta >= 0.45) {
-    return styles.attributeDeltaMedium;
-  }
-
-  return styles.attributeDeltaSoft;
-}
-
-function formatSignedTwoDecimals(value: number) {
-  const sign = value > 0 ? '+' : value < 0 ? '−' : '';
-  return `${sign}${Math.abs(value).toFixed(2)}`;
-}
-
 export default async function PlayerPage({
   params,
 }: {
@@ -325,17 +226,29 @@ export default async function PlayerPage({
   const overall = formatOverall(data.overall, 'rounded');
   const overallExact = formatOverall(data.overall, 'exact');
   const overallDelta7d = data.overall_trend_7d;
-  const hasOverallDelta =
-    overallDelta7d != null && Math.abs(overallDelta7d) > 0.001;
   const isGoalkeeper = data.position?.toUpperCase() === 'GK';
 
-  const goalkeeping = pickAttrsByKeys(data.attributes, GK_GOALKEEPING_ORDER);
-  const gkMental = pickAttrsByKeys(data.attributes, GK_MENTAL_ORDER);
-  const gkPhysical = pickAttrsByKeys(data.attributes, GK_PHYSICAL_ORDER);
+  const goalkeeping = pickAttrsByGroups(data.attributes, [
+    'SHOT_STOPPING',
+    'AERIAL',
+    'DISTRIBUTION',
+    'RUSHING_OUT',
+    'ECCENTRICITY',
+  ]);
 
-  const technical = pickAttrsByKeys(data.attributes, LEFT_COLUMN_ORDER);
-  const mental = pickAttrsByKeys(data.attributes, MENTAL_ORDER);
-  const physical = pickAttrsByKeys(data.attributes, PHYSICAL_ORDER);
+  const gkMental = pickAttrsByGroups(data.attributes, ['MENTALITY']);
+  const gkPhysical = pickAttrsByGroups(data.attributes, ['PACE', 'PHYSICALITY']);
+
+  const technical = pickAttrsByGroups(data.attributes, [
+    'TECHNIQUE',
+    'ATTACK',
+    'PASSING',
+    'DEFENCE',
+    'SET_PIECES',
+  ]);
+
+  const mental = pickAttrsByGroups(data.attributes, ['MENTALITY']);
+  const physical = pickAttrsByGroups(data.attributes, ['PACE', 'PHYSICALITY']);
 
   const attributeSections = isGoalkeeper
     ? [
@@ -354,11 +267,9 @@ export default async function PlayerPage({
     isGoalkeeper ? 2 : 3
   );
 
-  const scoutReportAttributes = (
-    isGoalkeeper
-      ? [...goalkeeping, ...gkMental, ...gkPhysical]
-      : [...technical, ...mental, ...physical]
-  ).slice(0, 6);
+  const scoutReportAttributes = attributeSections
+    .flatMap((section) => section.items)
+    .slice(0, 6);
 
   return (
     <main className={styles.pageShell}>
