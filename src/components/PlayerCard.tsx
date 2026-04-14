@@ -189,7 +189,7 @@ export default function PlayerCard({
         .name {
           font-weight: 900;
           letter-spacing: 0.03em;
-          font-size: 15px;
+          font-size: 18px;
           line-height: 1.05;
           color: var(--ui-text-primary);
           text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
