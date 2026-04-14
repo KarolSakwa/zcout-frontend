@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import { formatOverall } from '@/lib/ratings';
+import { logEvent } from '@/lib/telemetry';
 
 const MIN_QUERY_LENGTH = 3;
 const DEBOUNCE_MS = 150;
@@ -117,6 +118,12 @@ export default function GlobalSearch() {
         }
 
         const data = (await res.json()) as SearchResponse;
+
+        logEvent('search_used', {
+          query: trimmedQuery,
+          players_count: Array.isArray(data.players) ? data.players.length : 0,
+          clubs_count: Array.isArray(data.clubs) ? data.clubs.length : 0,
+        });
 
         setPlayers(Array.isArray(data.players) ? data.players : []);
         setClubs(Array.isArray(data.clubs) ? data.clubs : []);

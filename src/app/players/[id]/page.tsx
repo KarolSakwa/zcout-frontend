@@ -10,6 +10,7 @@ import ScoutReportTrigger from './ScoutReportTrigger';
 import { headers } from 'next/headers';
 import PlayerAttributesSection from './PlayerAttributesSection';
 import PlayerOverallRating from './PlayerOverallRating';
+import PlayerProfileTelemetry from './PlayerProfileTelemetry';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -149,6 +150,7 @@ function pctFromConfidence(c: number) {
 
 function calcAge(dobIso: string | null) {
   if (!dobIso) return null;
+
   const dob = new Date(dobIso);
   if (Number.isNaN(dob.getTime())) return null;
 
@@ -210,6 +212,7 @@ function buildAttributeColumns(
     (acc, section) => acc + section.items.length,
     0
   );
+
   const basePerColumn = Math.floor(totalAttributes / columnCount);
   const remainder = totalAttributes % columnCount;
 
@@ -221,6 +224,7 @@ function buildAttributeColumns(
     { length: columnCount },
     () => []
   );
+
   let pointer = 0;
 
   for (let columnIndex = 0; columnIndex < columnCount; columnIndex += 1) {
@@ -358,6 +362,8 @@ export default async function PlayerPage({
 
   return (
     <main className={styles.pageShell}>
+      <PlayerProfileTelemetry playerId={data.id} />
+
       <div className={styles.pageInner}>
         <div className={styles.profileFrame}>
           <button

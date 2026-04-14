@@ -12,6 +12,7 @@ import Button from '@/components/ui/Button';
 import buttonStyles from '@/components/ui/Button.module.css';
 import { getRatingColor } from '@/lib/ratings';
 import styles from './ScoutReportTrigger.module.css';
+import { logEvent } from '@/lib/telemetry';
 
 type ScoutReportAttribute = {
   id: number;
@@ -368,6 +369,11 @@ export default function ScoutReportTrigger({
     setSubmitError(null);
     setAttributesError(null);
     setRequiresAuth(false);
+
+    logEvent('scout_report_opened', {
+      player_id: playerId,
+    });
+
     setIsModalMounted(true);
     void loadScoutReportAvailability({ modal: true });
   };
@@ -558,6 +564,17 @@ export default function ScoutReportTrigger({
         setSubmitError(validationMessage);
         return;
       }
+
+      logEvent('scout_report_submitted', {
+        player_id: playerId,
+        voted_attribute_ids: payload.votes.map((vote) => {
+          const attribute = activeAttributes.find((item) => item.key === vote.attribute_key);
+          return attribute?.id ?? null;
+        }).filter((value): value is number => value !== null),
+        skipped_attribute_ids: payload.skipped_attribute_ids,
+        votes_count: payload.votes.length,
+        skips_count: payload.skipped_attribute_ids.length,
+      });
 
       window.localStorage.removeItem(storageKey);
 
@@ -859,16 +876,6 @@ export default function ScoutReportTrigger({
       {showSuccessToast ? (
         <div className={styles.successToast}>
           <div className={styles.successToastText}>{successToastMessage}</div>
-
-          {!isCompleted && remainingAttributesCount !== 0 ? (
-            <button
-              type="button"
-              className={styles.successToastAction}
-              onClick={reopenForNextPack}
-            >
-              Rate next 6
-            </button>
-          ) : null}
         </div>
       ) : null}
     </>

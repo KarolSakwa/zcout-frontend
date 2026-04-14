@@ -11,6 +11,7 @@ import DuelRevealPanel from './duels/DuelRevealPanel';
 import RecentVotesWidget from './duels/RecentVotesWidget';
 import TopRisersWidget from './duels/TopRisersWidget';
 import { useDuelSideWidgets } from './duels/useDuelSideWidgets';
+import { logEvent } from '@/lib/telemetry';
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -246,6 +247,14 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         throw new Error(`Skip failed: ${res.status} ${txt.slice(0, 160)}`);
       }
 
+      logEvent('skip_clicked', {
+        pair_id: pair.pair_id ?? null,
+        duel_id: duelId,
+        attribute_key: pair.attribute,
+        player_a_id: pair.left.id,
+        player_b_id: pair.right.id,
+      });
+
       goNext();
     } catch (e: unknown) {
       setShowDelayedNextPending(false);
@@ -417,6 +426,18 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
     return () => window.clearTimeout(timeout);
   }, [pair, loadingPair]);
 
+  useEffect(() => {
+  if (!pair?.pair_id) return;
+
+  logEvent('duel_loaded', {
+    pair_id: pair.pair_id,
+    attribute_key: pair.attribute,
+    attribute_label: pair.attributeLabel ?? null,
+    player_a_id: pair.left.id,
+    player_b_id: pair.right.id,
+  });
+}, [pair?.pair_id]);
+
   const handleVote = useCallback(
     async (winnerId: number) => {
       if (!pair || voting) return;
@@ -484,6 +505,15 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
           players?: VotePlayerResult[];
           popularity?: VotePopularity | null;
         };
+
+        logEvent('vote_submitted', {
+          duel_id: data.duel_id ?? null,
+          pair_id: pair.pair_id ?? null,
+          attribute_key: pair.attribute,
+          winner_id: winnerId,
+          player_a_id: pair.left.id,
+          player_b_id: pair.right.id,
+        });
 
         const map: RatingsMap = {};
         for (const pl of data.players ?? []) {

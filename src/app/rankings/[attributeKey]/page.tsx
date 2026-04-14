@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styles from '../rankings.module.css';
 import RankingsControls from '../RankingsControls';
 import RankingsSortLink from '../RankingsSortLink';
+import RankingsTelemetry from './RankingsTelemetry';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import ZLoader from '@/components/ZLoader';
 import { getRatingColor } from '@/lib/ratings';
@@ -195,6 +196,15 @@ export default async function RankingsPage({
   return (
     <main className={styles.page}>
       <div id="rankingsShell" className={styles.shell}>
+        <RankingsTelemetry
+          attributeKey={attributeKey}
+          position={data.filters.position}
+          sort={data.filters.sort ?? ''}
+          dir={data.filters.dir ?? ''}
+          page={data.filters.page}
+          search={search}
+        />
+
         <RankingsControls
           attributeKey={attributeKey}
           position={data.filters.position}
