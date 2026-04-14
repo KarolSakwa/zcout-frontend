@@ -180,8 +180,9 @@ export default function PlayerCard({
         .top {
           position: relative;
           padding: 9px 9px 6px;
+          min-height: 44px;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: center;
         }
 
@@ -189,12 +190,19 @@ export default function PlayerCard({
           font-weight: 900;
           letter-spacing: 0.03em;
           font-size: 15px;
+          line-height: 1.05;
           color: var(--ui-text-primary);
           text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
           max-width: calc(100% - 84px);
+          text-align: center;
+          white-space: normal;
           overflow: hidden;
           text-overflow: ellipsis;
-          white-space: nowrap;
+          word-break: normal;
+          overflow-wrap: break-word;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
         }
 
         .flag {
