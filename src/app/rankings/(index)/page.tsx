@@ -1,12 +1,14 @@
-import AttributeRankingPage from '../[attributeKey]/page';
+import AttributeRankingPage from '../[attributeKey]/page'
 
-export default function RankingsIndexPage({
+export default async function RankingsIndexPage({
   searchParams,
 }: {
-  searchParams?: { limit?: string; position?: string; search?: string };
+  searchParams?: Promise<{ limit?: string; position?: string; search?: string }>
 }) {
+  const resolvedSearchParams = (await searchParams) ?? {}
+
   return AttributeRankingPage({
     params: { attributeKey: 'overall' },
-    searchParams: searchParams ?? {},
-  });
+    searchParams: resolvedSearchParams,
+  })
 }
