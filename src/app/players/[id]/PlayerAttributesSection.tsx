@@ -14,7 +14,8 @@ type PlayerProfileAttribute = {
   group: 'technical' | 'mental' | 'physical' | string;
   rating: number;
   confidence: number;
-  weight_sum: number;
+  rating_weight_sum?: number;
+  confidence_weight_sum?: number;
   votes_count: number;
   last_vote_at: string | null;
   your_rating: number | null;

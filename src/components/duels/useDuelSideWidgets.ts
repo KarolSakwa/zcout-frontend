@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { initEcho } from '@/lib/echo';
+import Echo from 'laravel-echo'
 
 type RecentVoteItem = {
   id: string;
@@ -24,7 +25,7 @@ type EchoLike = {
 
 declare global {
   interface Window {
-    Echo?: EchoLike;
+    Echo?: Echo<'pusher'>
   }
 }
 

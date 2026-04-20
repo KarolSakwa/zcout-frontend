@@ -25,7 +25,7 @@ export default function DuelCardsRow({
   glow: string;
   handleVote: (winnerId: number) => void;
   showImpact: boolean;
-  postVoteRatings: RatingsMap;
+  postVoteRatings?: RatingsMap | null;
   barPct: Record<string, number>;
 }) {
   void showImpact;

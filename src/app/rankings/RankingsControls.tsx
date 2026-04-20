@@ -30,7 +30,7 @@ export default function RankingsControls(props: {
   const isSearchControlled =
     typeof props.localSearch === 'string' && typeof props.onLocalSearchChange === 'function';
 
-  const searchValue = isSearchControlled ? props.localSearch : internalSearchValue;
+  const searchValue = (isSearchControlled ? props.localSearch : internalSearchValue) ?? '';
   const isFilterPending = isPending && pendingKind === 'filter';
   const hasUnsyncedSearch = searchValue.trim() !== props.search.trim();
   const isSearchPending = isPending && pendingKind === 'search' && hasUnsyncedSearch;
