@@ -1,8 +1,10 @@
 export async function GET() {
-  const base = process.env.NEXT_PUBLIC_API_BASE!;
-  const r = await fetch(`${base}/`, { cache: "no-store" });
-  const json = await r.json();
-  return new Response(JSON.stringify({ ok: true, backend: json }), {
-    headers: { "Content-Type": "application/json" },
+  const backend = process.env.BACKEND_URL!;
+  const r = await fetch(`${backend}/api/ping`, { cache: 'no-store' });
+  const text = await r.text();
+
+  return new Response(text, {
+    status: r.status,
+    headers: { 'Content-Type': r.headers.get('content-type') ?? 'application/json' },
   });
 }
