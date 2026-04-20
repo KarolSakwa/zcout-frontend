@@ -33,7 +33,11 @@ function ensureAnonId(): string | null {
     return fromCookie;
   }
 
-  const id = crypto.randomUUID();
+  const id =
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    
   window.localStorage.setItem(ANON_KEY, id);
   writeCookie(ANON_KEY, id, 31536000);
   return id;
