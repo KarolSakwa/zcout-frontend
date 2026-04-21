@@ -224,7 +224,7 @@ export function useDuelSideWidgets(_pair: unknown) {
 
       channel.stopListening?.('.live.recent-vote.created');
       channel.stopListening?.('.live.top-movers.maybe-changed');
-      channel.unsubscribe?.();
+      window.Echo?.leaveChannel?.('live');
     };
   }, [refetchTopMoversSummary]);
 

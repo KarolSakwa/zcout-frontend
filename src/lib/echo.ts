@@ -23,14 +23,16 @@ export function initEcho(): Echo<'pusher'> | null {
 
   window.Pusher = Pusher
 
+  const isHttps = window.location.protocol === 'https:'
+
   echoInstance = new Echo<'pusher'>({
     broadcaster: 'pusher',
     key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
     wsHost: process.env.NEXT_PUBLIC_PUSHER_HOST!,
-    wsPort: Number(process.env.NEXT_PUBLIC_PUSHER_PORT!),
-    wssPort: Number(process.env.NEXT_PUBLIC_PUSHER_PORT!),
-    forceTLS: false,
-    enabledTransports: ['ws'],
+    wsPort: 80,
+    wssPort: 443,
+    forceTLS: isHttps,
+    enabledTransports: ['ws', 'wss'],
     cluster: process.env.NEXT_PUBLIC_PUSHER_APP_CLUSTER!,
   })
 
