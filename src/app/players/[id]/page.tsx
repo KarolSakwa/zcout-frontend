@@ -187,7 +187,7 @@ export default async function PlayerPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080';
+  const API_BASE = process.env.BACKEND_URL || process.env.API_BASE || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080';
   const { id } = await params;
   const incomingHeaders = await headers();
   const cookie = incomingHeaders.get('cookie') ?? '';
