@@ -88,7 +88,7 @@ export default function DuelCardsRow({
           align-items: start;
           gap: 36px;
           width: min(100%, 720px);
-          margin: 28px auto 0;
+          margin: 40px auto 0;
         }
 
         @media (max-width: 1720px) {

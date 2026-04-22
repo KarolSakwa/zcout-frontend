@@ -70,7 +70,7 @@ export default function DuelRevealPanel({
 
   return (
     <div
-      style={{ maxWidth: 720, margin: '16px auto 0', cursor: inspectHover ? 'help' : 'default' }}
+      style={{ maxWidth: 720, margin: '26px auto 0', cursor: inspectHover ? 'help' : 'default' }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >

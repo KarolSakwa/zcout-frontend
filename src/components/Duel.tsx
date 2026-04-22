@@ -73,7 +73,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const fetchSeqRef = useRef(0);
 
   const attribute = pair?.attribute ?? '';
-  const glow = 'var(--ui-accent-success)';
+  const glow = 'var(--ui-accent-primary)';
 
   const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } = useDuelSideWidgets(pair);
 
