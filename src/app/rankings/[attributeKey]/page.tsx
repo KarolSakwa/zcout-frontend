@@ -138,6 +138,12 @@ export default async function RankingsPage({
     dir?: string;
   };
 }) {
+  const API_BASE =
+    process.env.BACKEND_URL ||
+    process.env.API_BASE ||
+    process.env.NEXT_PUBLIC_API_BASE ||
+    'http://localhost:8080';
+
   const attributeKey = params.attributeKey;
   const limit = searchParams?.limit ?? '25';
   const page = searchParams?.page ?? '1';
@@ -146,7 +152,7 @@ export default async function RankingsPage({
   const sort = (searchParams?.sort ?? '').trim();
   const dir = (searchParams?.dir ?? '').trim();
 
-  const metaRes = await fetch('http://localhost:8080/api/rankings/meta', { cache: 'no-store' });
+  const metaRes = await fetch(`${API_BASE}/api/rankings/meta`, { cache: 'no-store' });
   const metaOk = metaRes.ok;
   const meta = metaOk ? ((await metaRes.json()) as RankingMetaResponse) : null;
 
@@ -154,17 +160,20 @@ export default async function RankingsPage({
   qs.set('limit', limit);
   qs.set('page', page);
   qs.set('position', position);
+
   if (search.length > 0) {
     qs.set('search', search);
   }
+
   if (sort.length > 0) {
     qs.set('sort', sort);
   }
+
   if (dir.length > 0) {
     qs.set('dir', dir);
   }
 
-  const url = `http://localhost:8080/api/rankings/${encodeURIComponent(attributeKey)}?${qs.toString()}`;
+  const url = `${API_BASE}/api/rankings/${encodeURIComponent(attributeKey)}?${qs.toString()}`;
   const res = await fetch(url, { cache: 'no-store' });
 
   if (!res.ok) {
