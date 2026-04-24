@@ -11,17 +11,35 @@ export default function AuthSuccessClient({ next }: { next: string }) {
   useEffect(() => {
     let cancelled = false;
 
-    const run = async () => {
-      for (let i = 0; i < 30; i++) {
-        const res = await fetch('/api/auth/user', {
+    const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const fetchUser = async () => {
+      try {
+        return await fetch('/api/auth/user', {
           method: 'GET',
           headers: { Accept: 'application/json' },
           cache: 'no-store',
-        }).catch(() => null);
+        });
+      } catch {
+        return null;
+      }
+    };
+
+    const run = async () => {
+      const delays = [0, 500, 1200];
+
+      for (const delay of delays) {
+        if (delay > 0) {
+          await wait(delay);
+        }
 
         if (cancelled) return;
 
-        if (res && res.ok) {
+        const res = await fetchUser();
+
+        if (cancelled) return;
+
+        if (res?.ok) {
           const u = (await res.json()) as User;
           localStorage.setItem('zcout_user', JSON.stringify(u));
           window.dispatchEvent(new Event('zcout-auth'));
@@ -35,11 +53,11 @@ export default function AuthSuccessClient({ next }: { next: string }) {
           window.location.replace(next);
           return;
         }
-
-        await new Promise((r) => setTimeout(r, 200));
       }
 
-      if (!cancelled) setFailed(true);
+      if (!cancelled) {
+        setFailed(true);
+      }
     };
 
     run();
