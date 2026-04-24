@@ -1,5 +1,7 @@
 .page {
   padding: 18px 18px 28px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--ui-bg-canvas-1) 0%, var(--ui-bg-canvas-2) 55%, var(--ui-bg-canvas-3) 100%);
 }
 
 .header {

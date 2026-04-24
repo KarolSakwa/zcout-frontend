@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './TopNav.module.css';
@@ -11,7 +10,7 @@ import GlobalSearch from './GlobalSearch';
 const ITEMS = [
   { href: '/duels', label: 'DUEL' },
   { href: '/rankings', label: 'RANKINGS' },
-  { href: '/database', label: 'DATABASE' },
+  { href: '/database', label: 'DATABASE', disabled: true, badge: 'SOON' },
 ];
 
 export default function TopNav() {
@@ -31,12 +30,17 @@ export default function TopNav() {
                 ? pathname === '/' || pathname.startsWith('/duels')
                 : pathname === it.href || pathname.startsWith(`${it.href}/`);
 
+            if (it.disabled) {
+              return (
+                <span key={it.href} className={`${styles.item} ${styles.disabledItem}`} aria-disabled="true">
+                  {it.label}
+                  <span className={styles.soonBadge}>{it.badge}</span>
+                </span>
+              );
+            }
+
             return (
-              <Link
-                key={it.href}
-                href={it.href}
-                className={`${styles.item} ${active ? styles.active : ''}`}
-              >
+              <Link key={it.href} href={it.href} className={`${styles.item} ${active ? styles.active : ''}`}>
                 {it.label}
               </Link>
             );

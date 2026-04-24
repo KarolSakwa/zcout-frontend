@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import styles from './database.module.css';
+import { redirect } from 'next/navigation';
 
 type ClubItem = {
   club: string;
@@ -44,6 +45,8 @@ function hexToRgba(hex: string, alpha: number) {
 }
 
 export default async function DatabasePage() {
+  redirect('/duels');
+
   const limit = '24';
 
   const url = `http://localhost:8080/api/database/clubs?limit=${encodeURIComponent(limit)}`;

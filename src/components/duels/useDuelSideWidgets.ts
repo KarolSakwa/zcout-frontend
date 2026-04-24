@@ -184,48 +184,48 @@ export function useDuelSideWidgets(_pair: unknown) {
     return () => controller.abort();
   }, []);
 
-  useEffect(() => {
-    initEcho();
+    useEffect(() => {
+      initEcho();
 
-    if (typeof window === 'undefined' || !window.Echo) {
-      return;
-    }
-
-    const channel = window.Echo.channel('live');
-
-    const handleRecentVote = (item: RecentVoteItem) => {
-      setRecentVotes(prev => {
-        const next = [item, ...prev.filter(existing => existing.id !== item.id)];
-        return next.slice(0, LIVE_ITEMS_LIMIT);
-      });
-
-      setLatestRecentVoteId(item.id);
-    };
-
-    const handleTopMoversMaybeChanged = () => {
-      if (topMoversDebounceRef.current) {
-        clearTimeout(topMoversDebounceRef.current);
+      if (typeof window === 'undefined' || !window.Echo) {
+        return;
       }
 
-      topMoversDebounceRef.current = setTimeout(() => {
-        void refetchTopMoversSummary();
-        topMoversDebounceRef.current = null;
-      }, TOP_MOVERS_REFETCH_DEBOUNCE_MS);
-    };
+      const channel = window.Echo.channel('live');
 
-    channel.listen<RecentVoteItem>('.live.recent-vote.created', handleRecentVote);
-    channel.listen('.live.top-movers.maybe-changed', handleTopMoversMaybeChanged);
+      const handleRecentVote = (item: RecentVoteItem) => {
+        setRecentVotes(prev => {
+          const next = [item, ...prev.filter(existing => existing.id !== item.id)];
+          return next.slice(0, LIVE_ITEMS_LIMIT);
+        });
 
-    return () => {
-      if (topMoversDebounceRef.current) {
-        clearTimeout(topMoversDebounceRef.current);
-        topMoversDebounceRef.current = null;
-      }
+        setLatestRecentVoteId(item.id);
+      };
 
-      channel.stopListening?.('.live.recent-vote.created');
-      channel.stopListening?.('.live.top-movers.maybe-changed');
-      window.Echo?.leaveChannel?.('live');
-    };
+      const handleTopMoversMaybeChanged = () => {
+        if (topMoversDebounceRef.current) {
+          clearTimeout(topMoversDebounceRef.current);
+        }
+
+        topMoversDebounceRef.current = setTimeout(() => {
+          void refetchTopMoversSummary();
+          topMoversDebounceRef.current = null;
+        }, TOP_MOVERS_REFETCH_DEBOUNCE_MS);
+      };
+
+      channel.listen<RecentVoteItem>('.live.recent-vote.created', handleRecentVote);
+      channel.listen('.live.top-movers.maybe-changed', handleTopMoversMaybeChanged);
+
+      return () => {
+        if (topMoversDebounceRef.current) {
+          clearTimeout(topMoversDebounceRef.current);
+          topMoversDebounceRef.current = null;
+        }
+
+        channel.stopListening?.('.live.recent-vote.created');
+        channel.stopListening?.('.live.top-movers.maybe-changed');
+        window.Echo?.leaveChannel?.('live');
+      };
   }, [refetchTopMoversSummary]);
 
   const topMoverItems = useMemo(
