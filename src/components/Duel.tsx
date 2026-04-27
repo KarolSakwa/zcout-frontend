@@ -63,6 +63,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const [nextHover, setNextHover] = useState(false);
   const [duelVotePct, setDuelVotePct] = useState<{ left: number; right: number } | null>(null);
   const [showDelayedNextPending, setShowDelayedNextPending] = useState(false);
+  const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
 
   const autoNextStartTimerRef = useRef<number | null>(null);
   const autoNextIntervalRef = useRef<number | null>(null);
@@ -76,6 +77,16 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   const glow = 'var(--ui-accent-primary)';
 
   const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } = useDuelSideWidgets(pair);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 700px)');
+    const update = () => setIsCompactDuelLayout(mq.matches);
+
+    update();
+    mq.addEventListener('change', update);
+
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   const clearAutoNext = useCallback((resetProgress: boolean) => {
     if (autoNextStartTimerRef.current) window.clearTimeout(autoNextStartTimerRef.current);
@@ -355,13 +366,15 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         pointerEvents: transition === 'idle' && !showReveal ? 'auto' : 'none',
       };
 
-      const INSET_X = 48;
-      const PENDING_X = 2;
+      const INSET_X = isCompactDuelLayout ? 0 : 48;
+      const PENDING_X = isCompactDuelLayout ? 0 : 2;
+      const EXIT_X = isCompactDuelLayout ? 40 : 90;
+      const ENTER_X = isCompactDuelLayout ? 24 : 50;
 
       if (transition === 'exit') {
         return {
           ...base,
-          transform: `translateX(${isLeft ? -90 : 90}px)`,
+          transform: `translateX(${isLeft ? -EXIT_X : EXIT_X}px)`,
           opacity: 0,
           filter: 'blur(6px)',
         };
@@ -370,7 +383,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
       if (transition === 'enter') {
         return {
           ...base,
-          transform: `translateX(${isLeft ? -50 : 50}px)`,
+          transform: `translateX(${isLeft ? -ENTER_X : ENTER_X}px)`,
           opacity: 0,
           filter: 'blur(6px)',
         };
@@ -380,7 +393,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
       return { ...base, transform: `translateX(${x}px)`, opacity: 1, filter: 'none' };
     },
-    [transition, showPendingUi, showReveal]
+    [transition, showPendingUi, showReveal, isCompactDuelLayout]
   );
 
   useEffect(() => {
@@ -427,16 +440,16 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   }, [pair, loadingPair]);
 
   useEffect(() => {
-  if (!pair?.pair_id) return;
+    if (!pair?.pair_id) return;
 
-  logEvent('duel_loaded', {
-    pair_id: pair.pair_id,
-    attribute_key: pair.attribute,
-    attribute_label: pair.attributeLabel ?? null,
-    player_a_id: pair.left.id,
-    player_b_id: pair.right.id,
-  });
-}, [pair?.pair_id]);
+    logEvent('duel_loaded', {
+      pair_id: pair.pair_id,
+      attribute_key: pair.attribute,
+      attribute_label: pair.attributeLabel ?? null,
+      player_a_id: pair.left.id,
+      player_b_id: pair.right.id,
+    });
+  }, [pair?.pair_id]);
 
   const handleVote = useCallback(
     async (winnerId: number) => {
@@ -573,12 +586,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
   return (
     <>
       <div className="flex flex-col gap-4">
-        <DuelCountdownBar
-          show={showCountdown}
-          progress={autoNextProgress}
-          paused={autoNextPaused}
-          height={COUNTDOWN_BAR_H}
-        />
+        <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
 
         <div
           style={{
@@ -659,13 +667,15 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
               {showDelayedNextPending && (
                 <div
                   style={{
-                    position: 'fixed',
-                    inset: 0,
-                    zIndex: 15,
-                    display: 'grid',
-                    placeItems: 'center',
-                    pointerEvents: 'none',
-                  }}
+  position: 'fixed',
+  left: '50vw',
+  top: '50dvh',
+  transform: 'translate(-50%, -50%)',
+  zIndex: 80,
+  display: 'grid',
+  placeItems: 'center',
+  pointerEvents: 'none',
+}}
                   aria-hidden
                 >
                   <ZLoader />
@@ -706,20 +716,6 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
                 cursor: skipDisabled ? 'default' : 'pointer',
                 opacity: skipDisabled ? 0.45 : 1,
                 transition: 'transform 120ms ease, background 160ms ease, opacity 120ms ease',
-              }}
-              onMouseDown={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(1px)';
-              }}
-              onMouseUp={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0px)';
-              }}
-              onMouseEnter={(e) => {
-                if (skipDisabled) return;
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  'linear-gradient(180deg, rgba(34,34,34,0.78), rgba(12,12,12,0.44))';
               }}
             >
               Skip
@@ -772,12 +768,24 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         }
 
         @media (max-width: 1360px) {
-        .duelStageCenter {
-          --duel-widget-width: 240px;
-          --duel-widget-offset: 12px;
-          max-width: 700px;
+          .duelStageCenter {
+            --duel-widget-width: 240px;
+            --duel-widget-offset: 12px;
+            max-width: 700px;
+          }
         }
-      }
+
+        @media (max-width: 700px) {
+          .duelStageOuter {
+            max-width: 100%;
+          }
+
+          .duelStageCenter {
+            max-width: 390px;
+            width: 100%;
+            overflow: visible;
+          }
+        }
       `}</style>
     </>
   );

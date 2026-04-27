@@ -11,6 +11,32 @@ export default function RouteOverlayLoader() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [active, setActive] = useState(false);
+  const [viewport, setViewport] = useState({ left: 0, top: 0, width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateViewport = () => {
+      const vv = window.visualViewport;
+
+      setViewport({
+        left: vv?.offsetLeft ?? 0,
+        top: vv?.offsetTop ?? 0,
+        width: vv?.width ?? window.innerWidth,
+        height: vv?.height ?? window.innerHeight,
+      });
+    };
+
+    updateViewport();
+
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, []);
 
   useEffect(() => {
     setActive(false);
@@ -37,6 +63,7 @@ export default function RouteOverlayLoader() {
       if (hrefAttr.startsWith('mailto:') || hrefAttr.startsWith('tel:')) return;
 
       let url: URL;
+
       try {
         url = new URL(a.href, window.location.href);
       } catch {
@@ -47,6 +74,7 @@ export default function RouteOverlayLoader() {
 
       const next = `${url.pathname}${url.search}${url.hash}`;
       const cur = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
       if (next === cur) return;
 
       setActive(true);
@@ -69,7 +97,10 @@ export default function RouteOverlayLoader() {
     <div
       style={{
         position: 'fixed',
-        inset: 0,
+        left: viewport.left,
+        top: viewport.top,
+        width: viewport.width,
+        height: viewport.height,
         display: 'grid',
         placeItems: 'center',
         background: 'rgba(0,0,0,0.55)',

@@ -74,6 +74,7 @@ function AnimatedOverallMetric({
 
   return (
     <div
+      className={styles.overallMetric}
       style={{
         opacity: phase === 'out' ? 0.12 : 1,
         transform:

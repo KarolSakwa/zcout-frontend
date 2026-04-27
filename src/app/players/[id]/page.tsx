@@ -288,9 +288,6 @@ export default async function PlayerPage({
           <div className={styles.profileContent}>
             <section className={styles.topCard}>
               <div className={styles.topCardHeader}>
-                <Link href="/database" className={styles.topCardBack}>
-                  ← Back
-                </Link>
 
                 <ScoutReportTrigger
                   playerId={data.id}

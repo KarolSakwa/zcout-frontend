@@ -29,9 +29,7 @@ const LABEL_GAP = 18;
 function toRgba(hex: string, alpha: number) {
   const normalized = hex.replace('#', '').trim();
 
-  if (normalized.length !== 6) {
-    return `rgba(137, 174, 251, ${alpha})`;
-  }
+  if (normalized.length !== 6) return `rgba(137, 174, 251, ${alpha})`;
 
   const r = parseInt(normalized.slice(0, 2), 16);
   const g = parseInt(normalized.slice(2, 4), 16);
@@ -41,13 +39,9 @@ function toRgba(hex: string, alpha: number) {
 }
 
 function getAccentColor() {
-  if (typeof window === 'undefined') {
-    return '#89aefb';
-  }
+  if (typeof window === 'undefined') return '#89aefb';
 
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue('--ui-accent-primary')
-    .trim();
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--ui-accent-primary').trim();
 
   return value || '#89aefb';
 }
@@ -55,13 +49,8 @@ function getAccentColor() {
 function getTextAnchor(angleDeg: number) {
   const normalized = ((angleDeg % 360) + 360) % 360;
 
-  if (normalized > 67.5 && normalized < 112.5) {
-    return 'center';
-  }
-
-  if (normalized > 247.5 && normalized < 292.5) {
-    return 'center';
-  }
+  if (normalized > 67.5 && normalized < 112.5) return 'center';
+  if (normalized > 247.5 && normalized < 292.5) return 'center';
 
   return normalized < 90 || normalized > 270 ? 'left' : 'right';
 }
@@ -72,16 +61,17 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
   const [hoveredAxis, setHoveredAxis] = useState<HoveredAxis | null>(null);
 
   const accentColor = useMemo(() => getAccentColor(), []);
+  const isCompact = typeof window !== 'undefined' && window.matchMedia('(max-width: 560px)').matches;
+  const radarCenterX = isCompact ? 0.5 : RADAR_CENTER_X;
 
   useEffect(() => {
-    if (!containerRef.current) {
-      return;
-    }
+    if (!containerRef.current) return;
 
     const node = containerRef.current;
 
     const updateSize = () => {
       const rect = node.getBoundingClientRect();
+
       setSize({
         width: rect.width,
         height: rect.height,
@@ -90,15 +80,10 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
 
     updateSize();
 
-    const observer = new ResizeObserver(() => {
-      updateSize();
-    });
-
+    const observer = new ResizeObserver(updateSize);
     observer.observe(node);
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   const option = useMemo(
@@ -108,7 +93,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
         show: false,
       },
       radar: {
-        center: [`${RADAR_CENTER_X * 100}%`, `${RADAR_CENTER_Y * 100}%`],
+        center: [`${radarCenterX * 100}%`, `${RADAR_CENTER_Y * 100}%`],
         radius: `${RADAR_RADIUS_RATIO * 100}%`,
         startAngle: 90,
         splitNumber: 4,
@@ -182,18 +167,16 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
         },
       ],
     }),
-    [accentColor, data],
+    [accentColor, data, radarCenterX],
   );
 
   const hotspots = useMemo(() => {
     const width = size.width;
     const height = size.height;
 
-    if (!width || !height || !data.length) {
-      return [];
-    }
+    if (!width || !height || !data.length) return [];
 
-    const centerX = width * RADAR_CENTER_X;
+    const centerX = width * radarCenterX;
     const centerY = height * RADAR_CENTER_Y;
     const radius = Math.min(width, height) * RADAR_RADIUS_RATIO * 0.5;
     const labelRadius = radius + LABEL_GAP;
@@ -219,31 +202,13 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
         textAnchor: getTextAnchor(angleDeg),
       };
     });
-  }, [data, size.height, size.width]);
+  }, [data, radarCenterX, size.height, size.width]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <ReactECharts
-        option={option}
-        style={{ width: '100%', height: '100%' }}
-        opts={{ renderer: 'svg' }}
-      />
+    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <ReactECharts option={option} style={{ width: '100%', height: '100%' }} opts={{ renderer: 'svg' }} />
 
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          zIndex: 2,
-        }}
-      >
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
         {hotspots.map((item) => {
           const labelWidth = item.label.length > 9 ? 88 : 70;
           const labelLeft =
@@ -258,18 +223,8 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
               <button
                 type="button"
                 aria-label={`${item.label} ${item.value.toFixed(1)}`}
-                onMouseEnter={() =>
-                  setHoveredAxis({
-                    key: item.key,
-                    label: item.label,
-                    value: item.value,
-                    x: item.labelX,
-                    y: item.labelY,
-                  })
-                }
-                onMouseLeave={() =>
-                  setHoveredAxis((current) => (current?.key === item.key ? null : current))
-                }
+                onMouseEnter={() => setHoveredAxis({ key: item.key, label: item.label, value: item.value, x: item.labelX, y: item.labelY })}
+                onMouseLeave={() => setHoveredAxis((current) => (current?.key === item.key ? null : current))}
                 style={{
                   position: 'absolute',
                   left: labelLeft,
@@ -288,18 +243,8 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
               <button
                 type="button"
                 aria-label={`${item.label} ${item.value.toFixed(1)}`}
-                onMouseEnter={() =>
-                  setHoveredAxis({
-                    key: item.key,
-                    label: item.label,
-                    value: item.value,
-                    x: item.pointX,
-                    y: item.pointY,
-                  })
-                }
-                onMouseLeave={() =>
-                  setHoveredAxis((current) => (current?.key === item.key ? null : current))
-                }
+                onMouseEnter={() => setHoveredAxis({ key: item.key, label: item.label, value: item.value, x: item.pointX, y: item.pointY })}
+                onMouseLeave={() => setHoveredAxis((current) => (current?.key === item.key ? null : current))}
                 style={{
                   position: 'absolute',
                   left: item.pointX - 11,
@@ -318,6 +263,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
             </div>
           );
         })}
+
         {hoveredAxis ? (
           <div
             style={{

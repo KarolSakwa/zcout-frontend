@@ -526,5 +526,17 @@
     font-size: 0.86rem;
     color: rgba(255, 120, 120, 0.92);
   }
+
+  .overlay {
+    align-items: start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px;
+  }
+
+  .panel {
+    max-height: none;
+    overflow: visible;
+  }
   
 }

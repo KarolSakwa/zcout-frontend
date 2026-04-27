@@ -168,3 +168,58 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
+
+@media (max-width: 700px) {
+  .inner {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "brand menu"
+      "tools tools";
+    gap: 10px 12px;
+    padding: 10px 14px 12px;
+  }
+
+  .brand {
+    grid-area: brand;
+  }
+
+  .menu {
+    grid-area: menu;
+    justify-self: end;
+    gap: 14px;
+  }
+
+  .rightTools {
+    grid-area: tools;
+    justify-self: stretch;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .search {
+    width: 100%;
+    flex: initial;
+  }
+
+  .auth {
+    min-width: max-content;
+  }
+
+  .item {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 6px 2px;
+  }
+
+  .brandLogo {
+    height: 22px;
+  }
+
+  .soonBadge {
+    left: 70%;
+    font-size: 7px;
+    padding: 1px 6px;
+  }
+}

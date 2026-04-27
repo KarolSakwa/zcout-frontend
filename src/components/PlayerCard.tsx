@@ -372,6 +372,47 @@ export default function PlayerCard({
           }
         }
 
+        @media (max-width: 700px) {
+        .top {
+          padding: 8px 7px 4px;
+          min-height: 48px;
+        }
+
+        .name {
+          font-size: 13px;
+          max-width: calc(100% - 58px);
+          line-height: 1.02;
+          -webkit-line-clamp: 2;
+        }
+
+        .posBadge {
+          right: 6px;
+          top: 7px;
+          width: 32px;
+          height: 28px;
+        }
+
+        .flag {
+          left: 7px;
+          top: 10px;
+        }
+
+        .flagImg {
+          width: 18px;
+          height: 12px;
+        }
+
+        .club {
+          font-size: 10px;
+          max-width: 96%;
+        }
+
+          .mid {
+            height: 58%;
+            transform: translateY(-8px);
+          }
+      }
+
         @media (prefers-reduced-motion: reduce) {
           .card {
             transition: none;

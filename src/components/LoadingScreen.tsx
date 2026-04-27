@@ -5,7 +5,11 @@ export default function LoadingScreen() {
     <div
       style={{
         position: 'fixed',
-        inset: 0,
+        left: 0,
+        top: 0,
+        width: '100dvw',
+        height: '100dvh',
+        maxWidth: '100vw',
         display: 'grid',
         placeItems: 'center',
         background: 'rgba(0,0,0,0.55)',

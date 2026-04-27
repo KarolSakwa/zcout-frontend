@@ -46,19 +46,7 @@ export default function DuelImpact({
   void barPct;
 
   return (
-    <div
-      style={{
-        width: '100%',
-        minWidth: 0,
-        minHeight: 42,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        padding: '0 14px',
-        boxSizing: 'border-box',
-      }}
-    >
+    <div className="impact">
       <div
         style={{
           display: 'flex',
@@ -132,6 +120,30 @@ export default function DuelImpact({
       >
         {formatDelta(delta)}
       </span>
+
+      <style jsx>{`
+        .impact {
+          width: 100%;
+          min-width: 0;
+          min-height: 42px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 0 14px;
+          box-sizing: border-box;
+        }
+
+        @media (max-width: 700px) {
+          .impact {
+            min-height: 58px;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            padding: 7px 6px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

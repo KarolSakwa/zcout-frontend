@@ -26,6 +26,7 @@ export default function RankingsControls(props: {
   const [internalSearchValue, setInternalSearchValue] = useState(props.search);
   const [pendingKind, setPendingKind] = useState<PendingKind>(null);
   const isFirstSearchEffect = useRef(true);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const isSearchControlled =
     typeof props.localSearch === 'string' && typeof props.onLocalSearchChange === 'function';
@@ -43,9 +44,7 @@ export default function RankingsControls(props: {
 
   useEffect(() => {
     const el = document.getElementById('rankingsShell');
-    if (!el) {
-      return;
-    }
+    if (!el) return;
 
     if (isFilterPending) {
       el.classList.add(styles.shellLoading);
@@ -84,21 +83,10 @@ export default function RankingsControls(props: {
 
     const qs = new URLSearchParams();
 
-    if (position && position !== 'ALL') {
-      qs.set('position', position);
-    }
-
-    if (normalizedSearch.length > 0) {
-      qs.set('search', normalizedSearch);
-    }
-
-    if (sort.length > 0) {
-      qs.set('sort', sort);
-    }
-
-    if (dir.length > 0) {
-      qs.set('dir', dir);
-    }
+    if (position && position !== 'ALL') qs.set('position', position);
+    if (normalizedSearch.length > 0) qs.set('search', normalizedSearch);
+    if (sort.length > 0) qs.set('sort', sort);
+    if (dir.length > 0) qs.set('dir', dir);
 
     const suffix = qs.toString() ? `?${qs.toString()}` : '';
 
@@ -145,9 +133,7 @@ export default function RankingsControls(props: {
   };
 
   useEffect(() => {
-    if (isSearchControlled) {
-      return;
-    }
+    if (isSearchControlled) return;
 
     if (isFirstSearchEffect.current) {
       isFirstSearchEffect.current = false;
@@ -173,6 +159,7 @@ export default function RankingsControls(props: {
           }}
         >
           <input
+            ref={searchInputRef}
             className={styles.searchInput}
             type="text"
             placeholder="Search player..."
@@ -205,6 +192,42 @@ export default function RankingsControls(props: {
                 pointerEvents: 'none',
               }}
             />
+          ) : searchValue.length > 0 ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              disabled={isFilterPending}
+              onClick={() => {
+                if (isSearchControlled) {
+                  props.onLocalSearchChange?.('');
+                } else {
+                  setInternalSearchValue('');
+                }
+
+                go({ search: '' }, 'search');
+
+                window.requestAnimationFrame(() => {
+                  searchInputRef.current?.focus();
+                });
+              }}
+              style={{
+                position: 'absolute',
+                right: '4px',
+                width: '22px',
+                height: '22px',
+                border: 0,
+                borderRadius: '999px',
+                background: 'transparent',
+                color: 'var(--ui-text-muted)',
+                fontSize: '16px',
+                lineHeight: 1,
+                cursor: 'pointer',
+                display: 'grid',
+                placeItems: 'center',
+              }}
+            >
+              ×
+            </button>
           ) : null}
         </div>
       </div>
