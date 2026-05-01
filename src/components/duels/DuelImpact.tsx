@@ -10,6 +10,8 @@ type Impact = {
   votes_count: number;
 };
 
+const roundToDisplay = (value: number) => Number(value.toFixed(2));
+
 const formatDelta = (value: number) => {
   if (!Number.isFinite(value) || value === 0) return '0.00';
   return `${value > 0 ? '+' : '-'}${Math.abs(value).toFixed(2)}`;
@@ -36,8 +38,10 @@ export default function DuelImpact({
 
   const before = Number(impact.rating_before);
   const after = Number(impact.rating_after);
-  const delta = Number(impact.delta);
-  const isPositive = delta >= 0;
+  const displayBefore = roundToDisplay(before);
+  const displayAfter = roundToDisplay(after);
+  const displayDelta = roundToDisplay(displayAfter - displayBefore);
+  const isPositive = displayDelta >= 0;
 
   void playerId;
   void winner;
@@ -58,13 +62,13 @@ export default function DuelImpact({
       >
         <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
           <RatingWithConfidence
-            rating={before}
+            rating={displayBefore}
             confidence={0}
             fontSize={13}
             decimals={2}
             align="start"
             expand={false}
-            ratingColor={getRatingColor(before)}
+            ratingColor={getRatingColor(displayBefore)}
             confidenceTooltipContent={false}
             showConfidence={false}
           />
@@ -83,13 +87,13 @@ export default function DuelImpact({
 
         <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
           <RatingWithConfidence
-            rating={after}
+            rating={displayAfter}
             confidence={0}
             fontSize={15}
             decimals={2}
             align="start"
             expand={false}
-            ratingColor={getRatingColor(after)}
+            ratingColor={getRatingColor(displayAfter)}
             confidenceTooltipContent={false}
             showConfidence={false}
           />
@@ -118,7 +122,7 @@ export default function DuelImpact({
           lineHeight: 1,
         }}
       >
-        {formatDelta(delta)}
+        {formatDelta(displayDelta)}
       </span>
 
       <style jsx>{`
