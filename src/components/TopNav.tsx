@@ -8,7 +8,7 @@ import AuthStatus from './AuthStatus';
 import GlobalSearch from './GlobalSearch';
 
 const ITEMS = [
-  { href: '/duels', label: 'DUEL' },
+  { href: '/duels', label: 'DUELS' },
   { href: '/rankings', label: 'RANKINGS' },
   { href: '/database', label: 'DATABASE', disabled: true, badge: 'SOON' },
 ];
