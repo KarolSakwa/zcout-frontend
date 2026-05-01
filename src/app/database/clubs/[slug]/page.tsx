@@ -101,7 +101,8 @@ export default async function ClubPage({
   const sortKey = normSortKey(resolvedSearchParams.sort);
   const dir = resolvedSearchParams.dir ? normDir(resolvedSearchParams.dir) : defaultDirForKey(sortKey);
 
-  const url = `http://localhost:8080/api/database/clubs/${encodeURIComponent(slug)}?limit=200`;
+  const API_BASE = process.env.BACKEND_URL || process.env.API_BASE || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080';
+  const url = `${API_BASE}/api/database/clubs/${encodeURIComponent(slug)}?limit=200`;
   const res = await fetch(url, { cache: 'no-store' });
 
   if (!res.ok) {

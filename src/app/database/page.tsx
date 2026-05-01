@@ -49,7 +49,8 @@ export default async function DatabasePage() {
 
   const limit = '24';
 
-  const url = `http://localhost:8080/api/database/clubs?limit=${encodeURIComponent(limit)}`;
+  const API_BASE = process.env.BACKEND_URL || process.env.API_BASE || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080';
+  const url = `${API_BASE}/api/database/clubs?limit=${encodeURIComponent(limit)}`;
   const res = await fetch(url, { cache: 'no-store' });
 
   if (!res.ok) {

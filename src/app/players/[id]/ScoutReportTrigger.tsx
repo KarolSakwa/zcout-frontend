@@ -112,6 +112,22 @@ export default function ScoutReportTrigger({
   const router = useRouter();
   const { user, isAuthResolved } = useAuth();
 
+  if (isAuthResolved && !user) {
+  return (
+    <Link
+      href={`/login?redirect=${encodeURIComponent(`/players/${playerId}`)}`}
+      className={[
+        buttonStyles.button,
+        buttonStyles.primary,
+        buttonStyles.md,
+        className ?? '',
+      ].join(' ')}
+    >
+      Scout Report
+    </Link>
+  );
+}
+
   const storageKey = `scout-report-draft:${playerId}`;
   const pendingStorageKey = `scout-report-pending:${playerId}`;
 
@@ -221,9 +237,19 @@ export default function ScoutReportTrigger({
   }, []);
 
   useEffect(() => {
-    if (!isHydrated) return;
+    if (!isHydrated || !isAuthResolved) return;
+
+    if (!user) {
+      setServerAttributes(null);
+      setIsCompleted(false);
+      setRemainingAttributesCount(null);
+      setRequiresAuth(true);
+      setIsCheckingAvailability(false);
+      return;
+    }
+
     void loadScoutReportAvailability();
-  }, [isHydrated, loadScoutReportAvailability]);
+  }, [isHydrated, isAuthResolved, user, loadScoutReportAvailability]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -368,13 +394,23 @@ export default function ScoutReportTrigger({
 
     setSubmitError(null);
     setAttributesError(null);
-    setRequiresAuth(false);
 
     logEvent('scout_report_opened', {
       player_id: playerId,
     });
 
     setIsModalMounted(true);
+
+    if (!isAuthResolved || !user) {
+      setRequiresAuth(true);
+      setServerAttributes(null);
+      setIsCompleted(false);
+      setRemainingAttributesCount(null);
+      setIsLoadingModalAttributes(false);
+      return;
+    }
+
+    setRequiresAuth(false);
     void loadScoutReportAvailability({ modal: true });
   };
 
