@@ -34,6 +34,9 @@ export default function PlayerCard({
 }: PlayerCardProps) {
   const state = reveal ? (isWinner ? 'winner' : 'loser') : 'idle';
 
+  const normalizedName = String(name ?? '').toUpperCase();
+  const nameLengthClass = normalizedName.length >= 24 ? 'nameVeryLong' : normalizedName.length >= 18 ? 'nameLong' : '';
+
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
   const flagSrc = iso ? `https://flagsapi.com/${iso}/shiny/64.png` : null;
 
@@ -58,7 +61,9 @@ export default function PlayerCard({
 
       <div className="inner">
         <div className="top">
-          <div className="name">{String(name ?? '').toUpperCase()}</div>
+          <div className={['name', nameLengthClass].filter(Boolean).join(' ')}>
+            {normalizedName}
+          </div>
 
           <div className="posBadge" aria-label="Pozycja">
             <span className="posText">{position ?? '--'}</span>
@@ -203,6 +208,16 @@ export default function PlayerCard({
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
+        }
+
+        .nameLong {
+          font-size: 15px;
+          letter-spacing: 0.02em;
+        }
+
+        .nameVeryLong {
+          font-size: 13px;
+          letter-spacing: 0.01em;
         }
 
         .flag {
