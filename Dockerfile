@@ -1,19 +1,16 @@
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
 
-RUN addgroup -S app && adduser -S app -G app
+RUN groupadd -r app && useradd -r -g app app
 
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-RUN apk add --no-cache dumb-init
-
 USER app
 
-ENTRYPOINT ["dumb-init", "--"]
 CMD ["npm", "start"]
