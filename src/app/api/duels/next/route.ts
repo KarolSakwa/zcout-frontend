@@ -16,7 +16,14 @@ export async function GET(req: NextRequest) {
   }
 
   let anon = req.headers.get('x-zcout-anon')?.trim() ?? '';
-  if (!anon) anon = req.cookies.get('zcout_anon')?.value ?? '';
+
+  if (!anon) {
+    anon = req.cookies.get('zcout_anon')?.value ?? '';
+  }
+
+  if (!anon) {
+    anon = crypto.randomUUID();
+  }
 
   const needSetCookie = !anon;
   if (!anon) anon = crypto.randomUUID();
