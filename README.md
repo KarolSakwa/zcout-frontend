@@ -9,19 +9,19 @@ Inspired by Football Manager-style scouting and designed around ultra-fast inter
 # Screenshots
 ## Duel Experience
 
-![Duel Screen](./public/screenshots/duel.png)
+![Duel Screen](./public/screenshots/duel.jpg)
 
 ## Crowd Reveal
 
-![Reveal Screen](./public/screenshots/reveal.png)
+![Reveal Screen](./public/screenshots/reveal.jpg)
 
 ## Rankings
 
-![Rankings Screen](./public/screenshots/rankings.png)
+![Rankings Screen](./public/screenshots/rankings.jpg)
 
 ## Player Profile
 
-![Player Profile](./public/screenshots/profile.png)
+![Player Profile](./public/screenshots/profile.jpg)
 
 ---
 
