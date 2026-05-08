@@ -112,22 +112,6 @@ export default function ScoutReportTrigger({
   const router = useRouter();
   const { user, isAuthResolved } = useAuth();
 
-  if (isAuthResolved && !user) {
-  return (
-    <Link
-      href={`/login?redirect=${encodeURIComponent(`/players/${playerId}`)}`}
-      className={[
-        buttonStyles.button,
-        buttonStyles.primary,
-        buttonStyles.md,
-        className ?? '',
-      ].join(' ')}
-    >
-      Scout Report
-    </Link>
-  );
-}
-
   const storageKey = `scout-report-draft:${playerId}`;
   const pendingStorageKey = `scout-report-pending:${playerId}`;
 

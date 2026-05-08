@@ -1,19 +1,12 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Inter, IBM_Plex_Sans_Condensed } from 'next/font/google';
+import '@fontsource/inter';
+import '@fontsource/ibm-plex-sans-condensed/600.css';
+import '@fontsource/ibm-plex-sans-condensed/700.css';
 import './globals.css';
 import TopNav from '../components/TopNav';
 import RouteOverlayLoader from '@/components/RouteOverlayLoader';
 import AuthProvider from '@/components/AuthProvider';
-
-const inter = Inter({ subsets: ['latin'] });
-
-const ratingFont = IBM_Plex_Sans_Condensed({
-  subsets: ['latin'],
-  weight: ['600', '700'],
-  variable: '--font-rating',
-  display: 'swap',
-});
 
 export const metadata = {
   title: 'Zcout',
@@ -35,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="cool-slate">
-      <body className={`${inter.className} ${ratingFont.variable}`}>
+      <body>
         <AuthProvider>
           <TopNav />
           <Suspense fallback={null}>
