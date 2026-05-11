@@ -5,10 +5,12 @@ import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
 import { formatOverall } from '@/lib/ratings';
 import ScoutReportTrigger from './ScoutReportTrigger';
+import GuestScoutReportTrigger from './GuestScoutReportTrigger';
 import { headers } from 'next/headers';
 import PlayerAttributesSection from './PlayerAttributesSection';
 import PlayerOverallRating from './PlayerOverallRating';
 import PlayerProfileTelemetry from './PlayerProfileTelemetry';
+import AuthAwareScoutReportTrigger from './AuthAwareScoutReportTrigger';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -289,7 +291,7 @@ export default async function PlayerPage({
             <section className={styles.topCard}>
               <div className={styles.topCardHeader}>
 
-                <ScoutReportTrigger
+                <AuthAwareScoutReportTrigger
                   playerId={data.id}
                   playerName={data.name}
                   playerPosition={data.position}
