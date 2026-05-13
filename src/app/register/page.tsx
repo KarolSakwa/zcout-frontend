@@ -70,7 +70,7 @@ export default function RegisterPage() {
     setLoading(true);
     startGlobalLoader();
 
-    const csrfRes = await fetch(`${BACKEND}/sanctum/csrf-cookie`, {
+    const csrfRes = await fetch('/api/auth/csrf', {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -90,7 +90,7 @@ export default function RegisterPage() {
 
     const xsrf = getXsrfToken();
 
-    const res = await fetch(`${BACKEND}/register`, {
+    const res = await fetch('/api/auth/register', {
       method: 'POST',
       credentials: 'include',
       headers: {
