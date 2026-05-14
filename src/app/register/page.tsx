@@ -10,7 +10,7 @@ type LaravelErrorPayload = {
   errors?: Record<string, string[]>;
 };
 
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080';
+const BACKEND = 'https://zcout.so/backend-auth';
 const ORIGIN = process.env.NEXT_PUBLIC_APP_ORIGIN ?? 'http://localhost:3000';
 
 function getXsrfToken() {
