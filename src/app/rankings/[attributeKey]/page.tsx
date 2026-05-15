@@ -349,13 +349,7 @@ export default async function RankingsPage({
                     </td>
 
                     <td className={styles.clubCell}>
-                      {it.player.club.slug ? (
-                        <Link className={styles.clubLink} href={`/database/clubs/${it.player.club.slug}`}>
-                          {it.player.club.name}
-                        </Link>
-                      ) : (
-                        <span className={styles.clubText}>{it.player.club.name}</span>
-                      )}
+                      <span className={styles.clubText}>{it.player.club.name}</span>
                     </td>
 
                     <td className={styles.posCell}>{it.pos}</td>

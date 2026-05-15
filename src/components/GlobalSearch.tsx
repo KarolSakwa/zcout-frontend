@@ -437,7 +437,7 @@ export default function GlobalSearch() {
             </div>
           )}
 
-          {hasMinLength && !loading && clubs.length > 0 && (
+          {/* {hasMinLength && !loading && clubs.length > 0 && (
             <div style={{ padding: players.length > 0 ? '6px 10px 10px' : '10px 10px 10px' }}>
               <div
                 style={{
@@ -486,7 +486,7 @@ export default function GlobalSearch() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
       )}
 
