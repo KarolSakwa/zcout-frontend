@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND = process.env.BACKEND_URL || 'http://localhost:8080';
+const BACKEND = process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080';
 const ORIGIN = process.env.APP_ORIGIN || 'http://localhost:3000';
 
 function getXsrfFromCookie(cookie: string) {
