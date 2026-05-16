@@ -3,13 +3,14 @@
 import { useAuth } from '@/components/AuthProvider';
 import ScoutReportTrigger from './ScoutReportTrigger';
 import GuestScoutReportTrigger from './GuestScoutReportTrigger';
+import type { ScoutReportAttribute } from './ScoutReportTrigger';
 
 type Props = {
   playerId: number;
   playerName: string;
   playerPosition: string | null;
   clubName: string | null;
-  attributes: any[];
+  attributes: ScoutReportAttribute[];
   className?: string;
 };
 

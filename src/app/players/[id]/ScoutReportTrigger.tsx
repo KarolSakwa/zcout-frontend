@@ -14,7 +14,7 @@ import { getRatingColor } from '@/lib/ratings';
 import styles from './ScoutReportTrigger.module.css';
 import { logEvent } from '@/lib/telemetry';
 
-type ScoutReportAttribute = {
+export type ScoutReportAttribute = {
   id: number;
   key: string;
   label: string;
@@ -111,23 +111,6 @@ export default function ScoutReportTrigger({
 
   const router = useRouter();
   const { user, isAuthResolved } = useAuth();
-
-  if (isAuthResolved && !user) {
-  return (
-    <Link
-      href={`/login?redirect=${encodeURIComponent(`/players/${playerId}`)}`}
-      className={[
-        buttonStyles.button,
-        buttonStyles.primary,
-        buttonStyles.md,
-        className ?? '',
-      ].join(' ')}
-    >
-      Scout Report
-    </Link>
-  );
-}
-
   const storageKey = `scout-report-draft:${playerId}`;
   const pendingStorageKey = `scout-report-pending:${playerId}`;
 
@@ -388,6 +371,22 @@ export default function ScoutReportTrigger({
 
     return () => window.clearTimeout(timeout);
   }, [showSuccessToast]);
+
+  if (isAuthResolved && !user) {
+    return (
+      <Link
+        href={`/login?redirect=${encodeURIComponent(`/players/${playerId}`)}`}
+        className={[
+          buttonStyles.button,
+          buttonStyles.primary,
+          buttonStyles.md,
+          className ?? '',
+        ].join(' ')}
+      >
+        Scout Report
+      </Link>
+    );
+  }
 
   const openModal = () => {
     if (isCompleted) return;
