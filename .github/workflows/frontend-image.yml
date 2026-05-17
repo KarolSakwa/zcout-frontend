@@ -31,7 +31,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ../zcout-infra/compose/frontend.Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ghcr.io/karolsakwa/zcout-frontend:latest
           build-args: |
