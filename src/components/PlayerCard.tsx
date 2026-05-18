@@ -38,7 +38,17 @@ export default function PlayerCard({
   const nameLengthClass = normalizedName.length >= 24 ? 'nameVeryLong' : normalizedName.length >= 18 ? 'nameLong' : '';
 
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
-  const flagSrc = iso ? `https://flagsapi.com/${iso}/shiny/64.png` : null;
+  console.log(name, iso);
+  const specialFlags: Record<string, string> = {
+  ENG: 'gb-eng',
+  SCO: 'gb-sct',
+  WAL: 'gb-wls',
+  NIR: 'gb-nir',
+};
+
+const flagCode = iso ? (specialFlags[iso] ?? iso.toLowerCase()) : null;
+
+const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
 
   const cardVars: CSSProperties & Record<'--primary' | '--secondary' | '--glow', string> = {
     '--primary': color,
