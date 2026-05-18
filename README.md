@@ -61,6 +61,20 @@ Frontend architecture focuses on:
 
 ---
 
+# Frontend Infrastructure
+
+The frontend is deployed as a prebuilt Docker image.
+
+Production flow includes:
+
+- GitHub Actions CI pipeline,
+- GitHub Container Registry (GHCR),
+- artifact-based deployments,
+- Dockerized runtime environment,
+- Nginx reverse proxy integration.
+
+The production VPS acts as a runtime-only environment without local frontend builds.
+
 # Product Philosophy
 
 Zcout is built around a simple interaction loop:
