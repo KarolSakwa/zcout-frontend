@@ -246,15 +246,12 @@ export default function LoginPage() {
         <div style={cardStyle}>
           <h1 style={titleStyle}>Log in</h1>
 
-          <Button type="button" variant="secondary" size="lg" fullWidth onClick={onGoogle} disabled={loading}>
-            Continue with Google
-          </Button>
-
           <form onSubmit={onSubmit} style={formStyle}>
             <div style={fieldWrapStyle}>
               <label style={labelStyle} htmlFor="email">
                 Email
               </label>
+
               <input
                 id="email"
                 value={email}
@@ -264,6 +261,7 @@ export default function LoginPage() {
                 style={inputStyle}
                 disabled={loading}
               />
+
               {fieldMsg('email') && <div style={errorStyle}>{fieldMsg('email')}</div>}
             </div>
 
@@ -271,6 +269,7 @@ export default function LoginPage() {
               <label style={labelStyle} htmlFor="password">
                 Password
               </label>
+
               <input
                 id="password"
                 value={password}
@@ -281,11 +280,33 @@ export default function LoginPage() {
                 style={inputStyle}
                 disabled={loading}
               />
+
               {fieldMsg('password') && <div style={errorStyle}>{fieldMsg('password')}</div>}
             </div>
 
             <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
               Log in
+            </Button>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                margin: '2px 0',
+                color: 'rgba(165, 183, 210, 0.42)',
+                fontSize: 11,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+              or
+              <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
+            </div>
+
+            <Button type="button" variant="secondary" size="lg" fullWidth onClick={onGoogle} disabled={loading}>
+              Continue with Google
             </Button>
 
             {formError && <div style={formErrorStyle}>{formError}</div>}
