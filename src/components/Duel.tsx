@@ -12,6 +12,7 @@ import RecentVotesWidget from './duels/RecentVotesWidget';
 import TopRisersWidget from './duels/TopRisersWidget';
 import { useDuelSideWidgets } from './duels/useDuelSideWidgets';
 import { logEvent } from '@/lib/telemetry';
+import { ensureCsrfToken } from '@/lib/ensureCsrfToken';
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -482,10 +483,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
       };
 
       try {
-        await fetch('/api/auth/csrf', { method: 'GET' });
-
-        const xsrfCookie = document.cookie.split('; ').find((c) => c.startsWith('XSRF-TOKEN='));
-        const xsrf = xsrfCookie ? decodeURIComponent(xsrfCookie.split('=')[1] ?? '') : '';
+        const xsrf = await ensureCsrfToken();
 
         const res = await fetch('/api/vote', {
           method: 'POST',
