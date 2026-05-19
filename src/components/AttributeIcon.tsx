@@ -40,7 +40,7 @@ export default function AttributeIcon({
 
   return (
     <Image
-        src={`/attribute-icons/${attributeKey}.svg`}
+        src={`/icons/attribute-icons/${attributeKey}.svg`}
         alt={label ? `${label} icon` : ''}
         width={size}
         height={size}

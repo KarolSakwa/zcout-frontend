@@ -11,6 +11,7 @@ const ITEMS = [
   { href: '/duels', label: 'DUELS' },
   { href: '/rankings', label: 'RANKINGS' },
   { href: '/database', label: 'DATABASE', disabled: true, badge: 'SOON' },
+  { href: '/about', label: 'HOW IT WORKS' },
 ];
 
 export default function TopNav() {
