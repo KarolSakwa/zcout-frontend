@@ -38,7 +38,6 @@ export default function PlayerCard({
   const nameLengthClass = normalizedName.length >= 24 ? 'nameVeryLong' : normalizedName.length >= 18 ? 'nameLong' : '';
 
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
-  console.log(name, iso);
   const specialFlags: Record<string, string> = {
   ENG: 'gb-eng',
   SCO: 'gb-sct',
