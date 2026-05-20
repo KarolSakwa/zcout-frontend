@@ -476,6 +476,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         ATTR_MAP[String(pair.attribute ?? 'DRI').toUpperCase()] ?? String(pair.attribute ?? 'dribbling').toLowerCase();
 
       const body = {
+        duel_id: pair.pair_id,
         attribute_key: attrKey,
         player_a_id: pair.left.id,
         player_b_id: pair.right.id,
