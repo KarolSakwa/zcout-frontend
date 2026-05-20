@@ -158,14 +158,14 @@ export default function GlobalSearch() {
       <div
         style={{
           position: 'relative',
-          borderRadius: showDropdown ? 'var(--ui-radius-xl) var(--ui-radius-xl) 0 0' : 'var(--ui-radius-xl)',
+          borderRadius: showDropdown ? '12px 12px 0 0' : '12px',
           border: focused
-            ? '1px solid var(--ui-border-accent)'
-            : '1px solid var(--ui-border-subtle)',
-          background: 'linear-gradient(180deg, rgba(19,29,41,0.92), rgba(15,23,33,0.96))',
+            ? '1px solid rgba(110, 145, 210, 0.42)'
+            : '1px solid rgba(76, 96, 132, 0.28)',
+          background: 'linear-gradient(180deg, rgba(15,22,32,0.96), rgba(11,17,26,0.985))',
           boxShadow: focused
-            ? '0 0 0 1px rgba(143,183,255,0.10), 0 10px 24px rgba(0,0,0,0.28)'
-            : 'var(--ui-shadow-panel-soft)',
+            ? '0 0 0 1px rgba(110,145,210,0.08), 0 8px 20px rgba(0,0,0,0.22)'
+            : '0 6px 16px rgba(0,0,0,0.16)',
           transition: 'border-color 140ms ease, box-shadow 140ms ease, border-radius 140ms ease',
           zIndex: 2,
         }}
@@ -173,10 +173,10 @@ export default function GlobalSearch() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '26px 1fr',
+            gridTemplateColumns: '18px 1fr',
             alignItems: 'center',
-            gap: 10,
-            padding: '10px 14px',
+            gap: 8,
+            padding: '7px 11px',
           }}
         >
           <div
@@ -184,12 +184,12 @@ export default function GlobalSearch() {
             style={{
               display: 'grid',
               placeItems: 'center',
-              color: 'var(--ui-text-dim)',
+              color: 'rgba(178,192,216,0.52)',
             }}
           >
             <svg
-              width="16"
-              height="16"
+              width="14"
+              height="14"
               viewBox="0 0 16 16"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +215,7 @@ export default function GlobalSearch() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setFocused(true)}
-            placeholder="Search..."
+            placeholder="Search players..."
             autoComplete="off"
             spellCheck={false}
             style={{
@@ -224,7 +224,7 @@ export default function GlobalSearch() {
               outline: 'none',
               background: 'transparent',
               color: 'var(--ui-text-primary)',
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: 600,
               letterSpacing: '0.01em',
               lineHeight: 1.2,
@@ -242,22 +242,22 @@ export default function GlobalSearch() {
             left: 0,
             right: 0,
             zIndex: 1,
-            borderRadius: '0 0 var(--ui-radius-xl) var(--ui-radius-xl)',
-            border: '1px solid var(--ui-border-subtle)',
+            borderRadius: '0 0 12px 12px',
+            border: '1px solid rgba(76,96,132,0.28)',
             borderTop: 'none',
-            background: 'linear-gradient(180deg, rgba(19,29,41,0.985), rgba(15,23,33,0.995))',
-            boxShadow: '0 18px 36px rgba(0,0,0,0.34)',
+            background: 'linear-gradient(180deg, rgba(15,22,32,0.992), rgba(11,17,26,0.998))',
+            boxShadow: '0 18px 34px rgba(0,0,0,0.26)',
             overflow: 'hidden',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
           }}
         >
           {!hasMinLength && (
             <div
               style={{
-                padding: '12px 14px',
+                padding: '10px 12px',
                 color: 'var(--ui-text-muted)',
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 600,
               }}
             >
@@ -268,7 +268,7 @@ export default function GlobalSearch() {
           {hasMinLength && loading && (
             <div
               style={{
-                padding: '10px 10px 10px',
+                padding: '8px',
               }}
             >
               <div
@@ -276,15 +276,16 @@ export default function GlobalSearch() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  padding: '10px 12px',
-                  borderRadius: 'var(--ui-radius-lg)',
-                  background: 'rgba(255,255,255,0.028)',
+                  padding: '8px 10px',
+                  borderRadius: '10px',
+                  background: 'rgba(255,255,255,0.02)',
                   color: 'var(--ui-text-muted)',
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 700,
                 }}
               >
                 <span>Searching</span>
+
                 <span
                   style={{
                     display: 'inline-flex',
@@ -302,6 +303,7 @@ export default function GlobalSearch() {
                       animation: 'zcoutSearchDot 1s ease-in-out infinite',
                     }}
                   />
+
                   <span
                     style={{
                       width: 4,
@@ -312,6 +314,7 @@ export default function GlobalSearch() {
                       animation: 'zcoutSearchDot 1s ease-in-out 0.18s infinite',
                     }}
                   />
+
                   <span
                     style={{
                       width: 4,
@@ -330,9 +333,9 @@ export default function GlobalSearch() {
           {hasMinLength && !loading && error && (
             <div
               style={{
-                padding: '12px 14px',
+                padding: '10px 12px',
                 color: 'var(--ui-danger)',
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 600,
               }}
             >
@@ -343,9 +346,9 @@ export default function GlobalSearch() {
           {hasMinLength && !loading && !error && !hasAnyResults && (
             <div
               style={{
-                padding: '12px 14px',
+                padding: '10px 12px',
                 color: 'var(--ui-text-muted)',
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 600,
               }}
             >
@@ -354,12 +357,12 @@ export default function GlobalSearch() {
           )}
 
           {hasMinLength && !loading && players.length > 0 && (
-            <div style={{ padding: '10px 10px 4px' }}>
+            <div style={{ padding: '8px 8px 4px' }}>
               <div
                 style={{
-                  padding: '0 8px 6px',
+                  padding: '0 6px 5px',
                   color: 'var(--ui-text-dim)',
-                  fontSize: 9,
+                  fontSize: 8,
                   fontWeight: 900,
                   letterSpacing: '0.16em',
                   textTransform: 'uppercase',
@@ -376,10 +379,10 @@ export default function GlobalSearch() {
                     onClick={() => setFocused(false)}
                     style={{
                       display: 'block',
-                      padding: '10px 12px',
-                      borderRadius: 'var(--ui-radius-lg)',
+                      padding: '9px 10px',
+                      borderRadius: '10px',
                       border: '1px solid transparent',
-                      background: 'rgba(255,255,255,0.028)',
+                      background: 'rgba(255,255,255,0.022)',
                       color: 'inherit',
                       textDecoration: 'none',
                     }}
@@ -388,9 +391,9 @@ export default function GlobalSearch() {
                       <div
                         style={{
                           color: 'var(--ui-text-primary)',
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight: 800,
-                          lineHeight: 1.15,
+                          lineHeight: 1.12,
                         }}
                       >
                         {highlightMatch(player.name, trimmedQuery)}
@@ -400,7 +403,7 @@ export default function GlobalSearch() {
                         style={{
                           marginTop: 3,
                           color: 'var(--ui-text-muted)',
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: 600,
                           lineHeight: 1.15,
                           whiteSpace: 'nowrap',
@@ -410,6 +413,7 @@ export default function GlobalSearch() {
                       >
                         {player.position ? `${player.position} • ` : null}
                         {player.club ? `${player.club}` : null}
+
                         {formatOverall(player.overall, 'rounded') != null ? (
                           <>
                             {' • '}
@@ -418,9 +422,9 @@ export default function GlobalSearch() {
                                 fontFamily: 'var(--font-rating), "Segoe UI", system-ui, sans-serif',
                                 fontVariantNumeric: 'tabular-nums lining-nums',
                                 fontFeatureSettings: '"tnum" 1, "lnum" 1',
-                                fontSize: '1.08em',
+                                fontSize: '1.05em',
                                 fontWeight: 700,
-                                letterSpacing: '-0.055em',
+                                letterSpacing: '-0.05em',
                                 lineHeight: 1,
                                 color: 'var(--ui-text-primary)',
                               }}
@@ -436,57 +440,6 @@ export default function GlobalSearch() {
               </div>
             </div>
           )}
-
-          {/* {hasMinLength && !loading && clubs.length > 0 && (
-            <div style={{ padding: players.length > 0 ? '6px 10px 10px' : '10px 10px 10px' }}>
-              <div
-                style={{
-                  padding: '0 8px 6px',
-                  color: 'var(--ui-text-dim)',
-                  fontSize: 9,
-                  fontWeight: 900,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Clubs
-              </div>
-
-              <div style={{ display: 'grid', gap: 4 }}>
-                {clubs.map((club) => (
-                  <Link
-                    key={club.id}
-                    href={`/database/clubs/${encodeURIComponent(club.slug)}`}
-                    onClick={() => setFocused(false)}
-                    style={{
-                      display: 'block',
-                      padding: '10px 12px',
-                      borderRadius: 'var(--ui-radius-lg)',
-                      border: '1px solid transparent',
-                      background: 'rgba(255,255,255,0.028)',
-                      color: 'inherit',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <div
-                      style={{
-                        minWidth: 0,
-                        color: 'var(--ui-text-primary)',
-                        fontSize: 13,
-                        fontWeight: 800,
-                        lineHeight: 1.15,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {highlightMatch(club.name, trimmedQuery)}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )} */}
         </div>
       )}
 
@@ -498,6 +451,7 @@ export default function GlobalSearch() {
             opacity: 0.25;
             transform: scale(1);
           }
+
           40% {
             opacity: 1;
             transform: scale(1.35);
