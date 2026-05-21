@@ -37,10 +37,14 @@ export default function RankingsControls(props: {
   const isSearchPending = isPending && pendingKind === 'search' && hasUnsyncedSearch;
 
   useEffect(() => {
-    if (!isSearchControlled) {
+    if (isSearchControlled) return;
+
+    if (isSearchPending) return;
+
+    if (props.search !== internalSearchValue) {
       setInternalSearchValue(props.search);
     }
-  }, [props.search, isSearchControlled]);
+  }, [props.search, isSearchControlled, isSearchPending, internalSearchValue]);
 
   useEffect(() => {
     const el = document.getElementById('rankingsShell');
@@ -142,7 +146,7 @@ export default function RankingsControls(props: {
 
     const timer = window.setTimeout(() => {
       go({ search: internalSearchValue }, 'search');
-    }, 200);
+    }, 400);
 
     return () => window.clearTimeout(timer);
   }, [internalSearchValue, isSearchControlled]);
