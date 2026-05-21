@@ -126,20 +126,27 @@ export default function RankingsControls(props: {
     });
   };
 
-  useEffect(() => {
-    if (isSearchControlled) return;
+useEffect(() => {
+  if (isSearchControlled) return;
 
-    if (isFirstSearchEffect.current) {
-      isFirstSearchEffect.current = false;
-      return;
-    }
+  if (isFirstSearchEffect.current) {
+    isFirstSearchEffect.current = false;
+    return;
+  }
 
-    const timer = window.setTimeout(() => {
-      go({ search: internalSearchValue }, 'search');
-    }, 400);
+  const normalizedInternal = internalSearchValue.trim();
+  const normalizedProps = props.search.trim();
 
-    return () => window.clearTimeout(timer);
-  }, [internalSearchValue, isSearchControlled]);
+  if (normalizedInternal === normalizedProps) {
+    return;
+  }
+
+  const timer = window.setTimeout(() => {
+    go({ search: internalSearchValue }, 'search');
+  }, 400);
+
+  return () => window.clearTimeout(timer);
+}, [internalSearchValue, isSearchControlled, props.search]);
 
   return (
     <div className={styles.controlsRow}>
