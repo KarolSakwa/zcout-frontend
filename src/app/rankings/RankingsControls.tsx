@@ -37,16 +37,6 @@ export default function RankingsControls(props: {
   const isSearchPending = isPending && pendingKind === 'search' && hasUnsyncedSearch;
 
   useEffect(() => {
-    if (isSearchControlled) return;
-
-    if (isSearchPending) return;
-
-    if (props.search !== internalSearchValue) {
-      setInternalSearchValue(props.search);
-    }
-  }, [props.search, isSearchControlled, isSearchPending, internalSearchValue]);
-
-  useEffect(() => {
     const el = document.getElementById('rankingsShell');
     if (!el) return;
 
