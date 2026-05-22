@@ -90,7 +90,7 @@ export default function RegisterPage() {
 
     const xsrf = getXsrfToken();
 
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch(`${BACKEND}/register`, {
       method: 'POST',
       credentials: 'include',
       headers: {
