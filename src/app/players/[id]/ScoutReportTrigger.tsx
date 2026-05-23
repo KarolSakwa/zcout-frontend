@@ -13,6 +13,8 @@ import buttonStyles from '@/components/ui/Button.module.css';
 import { getRatingColor } from '@/lib/ratings';
 import styles from './ScoutReportTrigger.module.css';
 import { logEvent } from '@/lib/telemetry';
+import Tooltip from '@/components/Tooltip';
+import { attributeDescriptions } from '@/lib/attributeDescriptions';
 
 export type ScoutReportAttribute = {
   id: number;
@@ -812,17 +814,24 @@ export default function ScoutReportTrigger({
                           ].join(' ')}
                         >
                           <div className={styles.attributeRow}>
-                            <div className={styles.attributeLead}>
-                              <AttributeIcon
-                                attributeKey={attribute.key}
-                                label={attribute.label}
-                                size={18}
-                                className={styles.attributeIcon}
-                              />
-                              <div className={styles.attributeLabel}>
-                                {attribute.label}
+                            <Tooltip
+                              content={attributeDescriptions[attribute.key] ?? ''}
+                            >
+                              <div
+                                className={styles.attributeLead}
+                                style={{ cursor: 'help' }}
+                              >
+                                <AttributeIcon
+                                  attributeKey={attribute.key}
+                                  label={attribute.label}
+                                  size={18}
+                                  className={styles.attributeIcon}
+                                />
+                                <div className={styles.attributeLabel}>
+                                  {attribute.label}
+                                </div>
                               </div>
-                            </div>
+                            </Tooltip>
 
                             <div className={styles.attributeSliderWrap}>
                               <input

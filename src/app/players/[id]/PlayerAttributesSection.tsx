@@ -5,6 +5,7 @@ import Tooltip from '@/components/Tooltip';
 import AttributeIcon from '@/components/AttributeIcon';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import { getRatingColor } from '@/lib/ratings';
+import { attributeDescriptions } from '@/lib/attributeDescriptions';
 import styles from './page.module.css';
 
 type PlayerProfileAttribute = {
@@ -58,7 +59,9 @@ function clamp(n: number, a: number, b: number) {
 
 function normalizeRating(r: number) {
   const v = Number(r);
+
   if (!Number.isFinite(v)) return 0;
+
   return clamp(v, 0, 99);
 }
 
@@ -86,12 +89,15 @@ function getDeltaToneClass(delta: number) {
 
 function formatSignedTwoDecimals(value: number) {
   const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+
   return `${sign}${Math.abs(value).toFixed(2)}`;
 }
 
 function formatTwoDecimals(value: number) {
   const n = Number(value);
+
   if (!Number.isFinite(n)) return '0.00';
+
   return n.toFixed(2);
 }
 
@@ -155,7 +161,9 @@ function AnimatedCrowdRating({
         ratingTooltipContent={
           <>
             Crowd rating:{' '}
-            <span className="ratingValue">{formatTwoDecimals(displayRating)}</span>
+            <span className="ratingValue">
+              {formatTwoDecimals(displayRating)}
+            </span>
           </>
         }
       />
@@ -177,47 +185,77 @@ function AttributeColumn({
       {items.map((item) => {
         if (item.type === 'header') {
           return (
-            <div key={item.id} className={styles.attributePanelHeader}>
+            <div
+              key={item.id}
+              className={styles.attributePanelHeader}
+            >
               {item.title}
             </div>
           );
         }
 
         const attr = item.attribute;
+
         const hasOptimisticRating = Object.prototype.hasOwnProperty.call(
           optimisticRatings,
           attr.id
         );
+
         const userRating = hasOptimisticRating
           ? optimisticRatings[attr.id]
           : getUserAttributeRating(attr);
-        const isSaving = Object.prototype.hasOwnProperty.call(savingRatings, attr.id);
+
+        const isSaving = Object.prototype.hasOwnProperty.call(
+          savingRatings,
+          attr.id
+        );
+
         const delta7d = getAttributeDelta7d(attr);
-        const hasDelta = delta7d != null && Math.abs(delta7d) > 0.001;
+
+        const hasDelta =
+          delta7d != null && Math.abs(delta7d) > 0.001;
 
         return (
-          <div key={item.id} className={styles.attributeRow}>
-            <div className={styles.attributeLead}>
-              <AttributeIcon
-                attributeKey={attr.key}
-                label={attr.label}
-                size={18}
-                className={styles.attributeIcon}
-              />
-              <div className={styles.attributeName}>{attr.label}</div>
-            </div>
+          <div
+            key={item.id}
+            className={styles.attributeRow}
+          >
+            <Tooltip
+              content={attributeDescriptions[attr.key] ?? ''}
+            >
+              <div
+                className={styles.attributeLead}
+                style={{ cursor: 'help' }}
+              >
+                <AttributeIcon
+                  attributeKey={attr.key}
+                  label={attr.label}
+                  size={18}
+                  className={styles.attributeIcon}
+                />
+
+                <div className={styles.attributeName}>
+                  {attr.label}
+                </div>
+              </div>
+            </Tooltip>
 
             <div className={styles.attributeStatGroup}>
               <div className={styles.attributeYouSlot}>
                 {isSaving || userRating != null ? (
                   <>
                     <span className={styles.attributeYouValue}>
-                      <span className={styles.attributeYouLabel}>you:</span>{' '}
+                      <span className={styles.attributeYouLabel}>
+                        you:
+                      </span>{' '}
+
                       <span
                         className={styles.attributeYouRating}
                         style={
                           !isSaving && userRating != null
-                            ? { color: getRatingColor(userRating) }
+                            ? {
+                                color: getRatingColor(userRating),
+                              }
                             : undefined
                         }
                       >
@@ -235,29 +273,37 @@ function AttributeColumn({
                                 width: 4,
                                 height: 4,
                                 borderRadius: '999px',
-                                background: 'var(--ui-accent-primary)',
+                                background:
+                                  'var(--ui-accent-primary)',
                                 opacity: 0.35,
-                                animation: 'zcoutSearchDot 1s ease-in-out infinite',
+                                animation:
+                                  'zcoutSearchDot 1s ease-in-out infinite',
                               }}
                             />
+
                             <span
                               style={{
                                 width: 4,
                                 height: 4,
                                 borderRadius: '999px',
-                                background: 'var(--ui-accent-primary)',
+                                background:
+                                  'var(--ui-accent-primary)',
                                 opacity: 0.35,
-                                animation: 'zcoutSearchDot 1s ease-in-out 0.18s infinite',
+                                animation:
+                                  'zcoutSearchDot 1s ease-in-out 0.18s infinite',
                               }}
                             />
+
                             <span
                               style={{
                                 width: 4,
                                 height: 4,
                                 borderRadius: '999px',
-                                background: 'var(--ui-accent-primary)',
+                                background:
+                                  'var(--ui-accent-primary)',
                                 opacity: 0.35,
-                                animation: 'zcoutSearchDot 1s ease-in-out 0.36s infinite',
+                                animation:
+                                  'zcoutSearchDot 1s ease-in-out 0.36s infinite',
                               }}
                             />
                           </span>
@@ -266,7 +312,11 @@ function AttributeColumn({
                         )}
                       </span>
                     </span>
-                    <div className={styles.attributeYouDivider} aria-hidden="true" />
+
+                    <div
+                      className={styles.attributeYouDivider}
+                      aria-hidden="true"
+                    />
                   </>
                 ) : null}
               </div>
@@ -295,7 +345,9 @@ function AttributeColumn({
                             : styles.attributeDeltaDown,
                           getDeltaToneClass(delta7d),
                         ].join(' ')}
-                        aria-label={`Last 7 days ${formatSignedTwoDecimals(delta7d)}`}
+                        aria-label={`Last 7 days ${formatSignedTwoDecimals(
+                          delta7d
+                        )}`}
                       >
                         {delta7d > 0 ? '↑' : '↓'}
                       </span>
@@ -327,8 +379,11 @@ export default function PlayerAttributesSection({
   attributeColumns,
   isGoalkeeper,
 }: PlayerAttributesSectionProps) {
-  const [savingRatings, setSavingRatings] = useState<PendingRatingsMap>({});
-  const [optimisticRatings, setOptimisticRatings] = useState<PendingRatingsMap>({});
+  const [savingRatings, setSavingRatings] =
+    useState<PendingRatingsMap>({});
+
+  const [optimisticRatings, setOptimisticRatings] =
+    useState<PendingRatingsMap>({});
 
   useEffect(() => {
     setSavingRatings({});
@@ -337,7 +392,8 @@ export default function PlayerAttributesSection({
 
   useEffect(() => {
     const handleSaving = (event: Event) => {
-      const detail = (event as CustomEvent<ScoutReportSavingDetail>).detail;
+      const detail =
+        (event as CustomEvent<ScoutReportSavingDetail>).detail;
 
       if (!detail || detail.playerId !== playerId) {
         return;
@@ -347,7 +403,8 @@ export default function PlayerAttributesSection({
     };
 
     const handleSaved = (event: Event) => {
-      const detail = (event as CustomEvent<ScoutReportSavedDetail>).detail;
+      const detail =
+        (event as CustomEvent<ScoutReportSavedDetail>).detail;
 
       if (!detail || detail.playerId !== playerId) {
         return;
@@ -355,6 +412,7 @@ export default function PlayerAttributesSection({
 
       window.setTimeout(() => {
         setSavingRatings({});
+
         setOptimisticRatings((prev) => ({
           ...prev,
           ...(detail.ratings ?? {}),
@@ -363,7 +421,8 @@ export default function PlayerAttributesSection({
     };
 
     const handleFailed = (event: Event) => {
-      const detail = (event as CustomEvent<ScoutReportFailedDetail>).detail;
+      const detail =
+        (event as CustomEvent<ScoutReportFailedDetail>).detail;
 
       if (!detail || detail.playerId !== playerId) {
         return;
@@ -372,19 +431,32 @@ export default function PlayerAttributesSection({
       setSavingRatings({});
     };
 
-    window.addEventListener('zcout:scout-report-saving', handleSaving as EventListener);
-    window.addEventListener('zcout:scout-report-saved', handleSaved as EventListener);
-    window.addEventListener('zcout:scout-report-failed', handleFailed as EventListener);
+    window.addEventListener(
+      'zcout:scout-report-saving',
+      handleSaving as EventListener
+    );
+
+    window.addEventListener(
+      'zcout:scout-report-saved',
+      handleSaved as EventListener
+    );
+
+    window.addEventListener(
+      'zcout:scout-report-failed',
+      handleFailed as EventListener
+    );
 
     return () => {
       window.removeEventListener(
         'zcout:scout-report-saving',
         handleSaving as EventListener
       );
+
       window.removeEventListener(
         'zcout:scout-report-saved',
         handleSaved as EventListener
       );
+
       window.removeEventListener(
         'zcout:scout-report-failed',
         handleFailed as EventListener
@@ -398,7 +470,10 @@ export default function PlayerAttributesSection({
         className={styles.attributesColumns}
         style={
           isGoalkeeper
-            ? { gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }
+            ? {
+                gridTemplateColumns:
+                  'repeat(2, minmax(0, 1fr))',
+              }
             : undefined
         }
       >
