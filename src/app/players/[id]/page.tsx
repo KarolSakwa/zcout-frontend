@@ -11,6 +11,8 @@ import PlayerAttributesSection from './PlayerAttributesSection';
 import PlayerOverallRating from './PlayerOverallRating';
 import PlayerProfileTelemetry from './PlayerProfileTelemetry';
 import AuthAwareScoutReportTrigger from './AuthAwareScoutReportTrigger';
+import AnimatedProfileContent from './AnimatedProfileContent';
+import PlayerProfileContent from './PlayerProfileContent';
 
 type PlayerProfileAttribute = {
   id: number;
@@ -59,6 +61,8 @@ type PlayerProfileResponse = {
   radar_axes: PlayerRadarAxis[];
   attributes: PlayerProfileAttribute[];
   overall: number | null;
+  previous_player_id: number | null;
+  next_player_id: number | null;
   overall_trend_7d: number | null;
 };
 
@@ -274,23 +278,26 @@ export default async function PlayerPage({
     .slice(0, 6);
 
   return (
-    <main className={styles.pageShell}>
-      <PlayerProfileTelemetry playerId={data.id} />
+  <main className={styles.pageShell}>
+    <PlayerProfileTelemetry playerId={data.id} />
 
-      <div className={styles.pageInner}>
-        <div className={styles.profileFrame}>
-          <button
-            type="button"
+    <div className={styles.pageInner}>
+      <div className={styles.profileFrame}>
+        {data.previous_player_id ? (
+          <Link
+            href={`/players/${data.previous_player_id}`}
+            data-no-route-loader
             className={`${styles.profileNav} ${styles.profileNavLeft}`}
             aria-label="Previous player"
           >
             ‹
-          </button>
+          </Link>
+        ) : null}
 
+        <AnimatedProfileContent profileKey={data.slug}>
           <div className={styles.profileContent}>
             <section className={styles.topCard}>
               <div className={styles.topCardHeader}>
-
                 <AuthAwareScoutReportTrigger
                   playerId={data.id}
                   playerName={data.name}
@@ -311,15 +318,23 @@ export default async function PlayerPage({
                             #{data.number}
                           </span>
                         ) : null}
+
                         <span>{data.name}</span>
                       </h1>
 
                       <div className={styles.playerMeta}>
                         <span>{data.club?.name ?? 'No club'}</span>
+
                         <span className={styles.metaDot}>•</span>
+
                         <span>{data.position ?? 'Unknown position'}</span>
+
                         <span className={styles.metaDot}>•</span>
-                        <span>{data.country?.name ?? 'Unknown nationality'}</span>
+
+                        <span>
+                          {data.country?.name ?? 'Unknown nationality'}
+                        </span>
+
                         {age != null ? (
                           <>
                             <span className={styles.metaDot}>•</span>
@@ -363,16 +378,20 @@ export default async function PlayerPage({
               isGoalkeeper={isGoalkeeper}
             />
           </div>
+        </AnimatedProfileContent>
 
-          <button
-            type="button"
+        {data.next_player_id ? (
+          <Link
+            href={`/players/${data.next_player_id}`}
+            data-no-route-loader
             className={`${styles.profileNav} ${styles.profileNavRight}`}
             aria-label="Next player"
           >
             ›
-          </button>
-        </div>
+          </Link>
+        ) : null}
       </div>
-    </main>
-  );
+    </div>
+  </main>
+);
 }

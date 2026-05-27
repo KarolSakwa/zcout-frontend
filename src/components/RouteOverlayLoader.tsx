@@ -54,6 +54,8 @@ export default function RouteOverlayLoader() {
       const a = el?.closest('a') as HTMLAnchorElement | null;
       if (!a) return;
 
+      if (a.hasAttribute('data-no-route-loader')) return;
+
       if (a.target && a.target !== '_self') return;
       if (a.hasAttribute('download')) return;
 
