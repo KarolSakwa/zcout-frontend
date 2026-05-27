@@ -501,6 +501,21 @@
   border-bottom: 0;
 }
 
+.carouselTrack {
+  display: flex;
+  width: 100%;
+  transform: translateX(var(--track-offset));
+}
+
+.carouselSlide {
+  flex: 0 0 100%;
+}
+
+.carouselViewport {
+  overflow: hidden;
+  width: 100%;
+}
+
 @media (max-width: 1420px) {
   .profileNavLeft {
     left: -44px;

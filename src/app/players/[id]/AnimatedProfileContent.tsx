@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
 export default function AnimatedProfileContent({
@@ -11,7 +11,10 @@ export default function AnimatedProfileContent({
   children: ReactNode;
 }) {
   const isFirstRender = useRef(true);
-  const [direction, setDirection] = useState<'next' | 'previous'>('next');
+
+  const [direction, setDirection] = useState<
+    'next' | 'previous'
+  >('next');
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -20,10 +23,16 @@ export default function AnimatedProfileContent({
       setDirection(customEvent.detail?.direction ?? 'next');
     };
 
-    window.addEventListener('zcout-profile-navigation', handler);
+    window.addEventListener(
+      'zcout-profile-navigation',
+      handler
+    );
 
     return () => {
-      window.removeEventListener('zcout-profile-navigation', handler);
+      window.removeEventListener(
+        'zcout-profile-navigation',
+        handler
+      );
     };
   }, []);
 
@@ -32,29 +41,30 @@ export default function AnimatedProfileContent({
   }, []);
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={profileKey}
-        initial={
-          isFirstRender.current
-            ? false
-            : {
-                x: direction === 'next' ? 120 : -120,
-              }
-        }
-        animate={{
-          x: 0,
-        }}
-        exit={{
-          x: direction === 'next' ? -120 : 120,
-        }}
-        transition={{
-          duration: 0.24,
-          ease: 'easeOut',
-        }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={profileKey}
+      initial={
+        isFirstRender.current
+          ? false
+          : {
+              x:
+                direction === 'next'
+                  ? '100%'
+                  : '-100%',
+            }
+      }
+      animate={{
+        x: 0,
+      }}
+      transition={{
+        duration: 0.32,
+        ease: 'easeOut',
+      }}
+      style={{
+        width: '100%',
+      }}
+    >
+      {children}
+    </motion.div>
   );
 }

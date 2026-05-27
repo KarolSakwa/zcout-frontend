@@ -11,17 +11,17 @@ export default function PlayerProfileNavigation({
   previousPlayerId,
   nextPlayerId,
 }: Props) {
-  const goToPlayer = (playerId: number) => {
+  const goToPlayer = (
+    playerId: number,
+    direction: 'next' | 'previous'
+  ) => {
     window.history.pushState({}, '', `/players/${playerId}`);
 
     window.dispatchEvent(
       new CustomEvent('zcout-profile-navigation', {
         detail: {
           playerId,
-          direction:
-            nextPlayerId === playerId
-              ? 'next'
-              : 'previous',
+          direction,
         },
       })
     );
@@ -31,7 +31,9 @@ export default function PlayerProfileNavigation({
     <>
       {previousPlayerId ? (
         <button
-          onClick={() => goToPlayer(previousPlayerId)}
+          onClick={() =>
+            goToPlayer(previousPlayerId, 'previous')
+          }
           type="button"
           className={`${styles.profileNav} ${styles.profileNavLeft}`}
           aria-label="Previous player"
@@ -42,7 +44,9 @@ export default function PlayerProfileNavigation({
 
       {nextPlayerId ? (
         <button
-          onClick={() => goToPlayer(nextPlayerId)}
+          onClick={() =>
+            goToPlayer(nextPlayerId, 'next')
+          }
           type="button"
           className={`${styles.profileNav} ${styles.profileNavRight}`}
           aria-label="Next player"
