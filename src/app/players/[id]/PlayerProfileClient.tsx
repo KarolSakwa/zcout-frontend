@@ -25,8 +25,15 @@ export default function PlayerProfileClient({
   const [direction, setDirection] =
     useState<'next' | 'previous'>('next');
 
+    const [isAnimating, setIsAnimating] =
+  useState(false);
+
   useEffect(() => {
     const handler = async (event: Event) => {
+        if (isAnimating) {
+            return;
+            }
+        console.count('profile-navigation');
       const customEvent = event as CustomEvent;
 
       const playerId = customEvent.detail?.playerId;
@@ -39,6 +46,8 @@ export default function PlayerProfileClient({
       if (!playerId) {
         return;
       }
+
+        setIsAnimating(true);
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${playerId}`
@@ -73,6 +82,7 @@ export default function PlayerProfileClient({
         setIncomingData(null);
 
         setTrackOffset(0);
+        setIsAnimating(false);
       }, 700);
     };
 
