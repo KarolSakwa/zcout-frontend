@@ -11,6 +11,7 @@ type PlayerOverallRatingProps = {
   overallConfidence: number;
   overallExact: string;
   overallDelta7d: number | null;
+  shouldAnimate?: boolean;
 };
 
 function formatSignedTwoDecimals(value: number) {
@@ -41,16 +42,23 @@ function AnimatedOverallMetric({
   overall,
   overallConfidence,
   overallExact,
+  shouldAnimate = false,
 }: {
   overall: number | string;
   overallConfidence: number;
   overallExact: string;
+  shouldAnimate?: boolean;
 }) {
   const numericOverall = toNumericOverall(overall);
   const [phase, setPhase] = useState<'idle' | 'out' | 'in'>('idle');
   const [displayOverall, setDisplayOverall] = useState(numericOverall);
 
   useEffect(() => {
+    if (!shouldAnimate) {
+      setDisplayOverall(numericOverall);
+      return;
+    }
+
     if (displayOverall === numericOverall) {
       return;
     }
@@ -151,6 +159,7 @@ export default function PlayerOverallRating({
         overall={overall}
         overallConfidence={overallConfidence}
         overallExact={overallExact}
+        shouldAnimate={false}
       />
     </div>
   );

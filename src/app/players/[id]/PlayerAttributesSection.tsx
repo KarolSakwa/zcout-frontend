@@ -104,14 +104,21 @@ function formatTwoDecimals(value: number) {
 function AnimatedCrowdRating({
   rating,
   confidence,
+  shouldAnimate = false,
 }: {
   rating: number;
   confidence: number;
+  shouldAnimate?: boolean;
 }) {
   const [phase, setPhase] = useState<'idle' | 'out' | 'in'>('idle');
   const [displayRating, setDisplayRating] = useState(rating);
 
   useEffect(() => {
+    if (!shouldAnimate) {
+      setDisplayRating(rating);
+      return;
+    }
+
     if (displayRating === rating) {
       return;
     }
@@ -358,6 +365,7 @@ function AttributeColumn({
                 <AnimatedCrowdRating
                   rating={attr.rating}
                   confidence={attr.confidence}
+                  shouldAnimate={false}
                 />
               </div>
             </div>
