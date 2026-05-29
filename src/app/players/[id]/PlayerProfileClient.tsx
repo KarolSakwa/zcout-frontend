@@ -52,7 +52,10 @@ export default function PlayerProfileClient({
         setIsAnimating(true);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${playerId}`
+        `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${playerId}`,
+        {
+          credentials: 'include',
+        }
       );
 
       const nextData = await res.json();
@@ -91,7 +94,10 @@ export default function PlayerProfileClient({
 
         setShouldAnimateRatings(true);
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${data.id}`
+          `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${data.id}`,
+          {
+            credentials: 'include',
+          }
         );
 
         console.log(await res.clone().json());
