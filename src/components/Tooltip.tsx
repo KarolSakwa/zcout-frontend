@@ -1,6 +1,12 @@
 'use client';
 
-import { useId, useState, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 
 type TooltipProps = {
   content: ReactNode;
@@ -18,12 +24,33 @@ export default function Tooltip({
   maxWidth = 240,
 }: TooltipProps) {
   const [open, setOpen] = useState(false);
-  const id = useId();
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const [effectiveAlign, setEffectiveAlign] = useState<'start' | 'center' | 'end'>(align);
+  useEffect(() => {
+    if (!open || !triggerRef.current) {
+      return;
+    }
 
+    const rect = triggerRef.current.getBoundingClientRect();
+
+    if (window.innerWidth - rect.right < 220) {
+      setEffectiveAlign('end');
+      return;
+    }
+
+    if (rect.left < 220) {
+      setEffectiveAlign('start');
+      return;
+    }
+
+    setEffectiveAlign(align);
+  }, [open, align]);
+
+  const id = useId();
   const horizontalStyle =
-    align === 'start'
+    effectiveAlign === 'start'
       ? { left: 0, transform: 'translateX(0)' }
-      : align === 'end'
+      : effectiveAlign === 'end'
         ? { right: 0, transform: 'translateX(0)' }
         : { left: '50%', transform: 'translateX(-50%)' };
 
@@ -49,6 +76,7 @@ export default function Tooltip({
 
   return (
     <span
+      ref={triggerRef}
       style={{
         position: 'relative',
         display: 'inline-flex',
@@ -94,9 +122,9 @@ export default function Tooltip({
               width: 0,
               height: 0,
               ...arrowStyle,
-              ...(align === 'start'
+              ...(effectiveAlign === 'start'
                 ? { left: 12 }
-                : align === 'end'
+                : effectiveAlign === 'end'
                   ? { right: 12 }
                   : { left: '50%', transform: 'translateX(-50%)' }),
             }}
