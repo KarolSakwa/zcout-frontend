@@ -237,34 +237,57 @@ export default function ScoutReportTrigger({
   }, [isHydrated, isAuthResolved, user, loadScoutReportAvailability]);
 
   useEffect(() => {
-    if (!isHydrated) return;
+  if (!isHydrated) {
+    return;
+  }
 
-    if (!activeAttributes.length) {
-      setDrafts({});
-      return;
-    }
+  if (!activeAttributes.length) {
+    return;
+  }
 
-    const raw = window.localStorage.getItem(storageKey);
+  const raw = window.localStorage.getItem(storageKey);
 
-    if (!raw) {
-      setDrafts(emptyDrafts);
-      return;
-    }
+  if (!raw) {
+    setDrafts((prev) => {
+      const next = emptyDrafts;
 
-    try {
-      const parsed = JSON.parse(raw) as Record<string, AttributeDraft>;
+      const prevJson = JSON.stringify(prev);
+      const nextJson = JSON.stringify(next);
 
-      const normalized = Object.fromEntries(
-        activeAttributes.map((attribute) => {
-          const draft =
-            parsed[String(attribute.id)] ??
-            parsed[attribute.id as unknown as string];
+      return prevJson === nextJson ? prev : next;
+    });
 
-          if (
-            !draft ||
-            draft.attributeId !== attribute.id ||
-            !['untouched', 'vote', 'skip'].includes(draft.state)
-          ) {
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Record<string, AttributeDraft>;
+
+    const normalized = Object.fromEntries(
+      activeAttributes.map((attribute) => {
+        const draft =
+          parsed[String(attribute.id)] ??
+          parsed[attribute.id as unknown as string];
+
+        if (
+          !draft ||
+          draft.attributeId !== attribute.id ||
+          !['untouched', 'vote', 'skip'].includes(draft.state)
+        ) {
+          return [
+            attribute.id,
+            {
+              attributeId: attribute.id,
+              state: 'untouched' as DraftState,
+              value: '',
+            },
+          ];
+        }
+
+        if (draft.state === 'vote') {
+          const numeric = Number(draft.value);
+
+          if (!Number.isFinite(numeric)) {
             return [
               attribute.id,
               {
@@ -275,48 +298,46 @@ export default function ScoutReportTrigger({
             ];
           }
 
-          if (draft.state === 'vote') {
-            const numeric = Number(draft.value);
-
-            if (!Number.isFinite(numeric)) {
-              return [
-                attribute.id,
-                {
-                  attributeId: attribute.id,
-                  state: 'untouched' as DraftState,
-                  value: '',
-                },
-              ];
-            }
-
-            const clamped = Math.max(1, Math.min(99, numeric));
-
-            return [
-              attribute.id,
-              {
-                attributeId: attribute.id,
-                state: 'vote' as DraftState,
-                value: String(clamped),
-              },
-            ];
-          }
+          const clamped = Math.max(1, Math.min(99, numeric));
 
           return [
             attribute.id,
             {
               attributeId: attribute.id,
-              state: draft.state,
-              value: '',
+              state: 'vote' as DraftState,
+              value: String(clamped),
             },
           ];
-        })
-      ) as Record<number, AttributeDraft>;
+        }
 
-      setDrafts(normalized);
-    } catch {
-      setDrafts(emptyDrafts);
-    }
-  }, [isHydrated, storageKey, emptyDrafts, activeAttributes]);
+        return [
+          attribute.id,
+          {
+            attributeId: attribute.id,
+            state: draft.state,
+            value: '',
+          },
+        ];
+      })
+    ) as Record<number, AttributeDraft>;
+
+    setDrafts((prev) => {
+      const prevJson = JSON.stringify(prev);
+      const nextJson = JSON.stringify(normalized);
+
+      return prevJson === nextJson ? prev : normalized;
+    });
+  } catch {
+    setDrafts((prev) => {
+      const next = emptyDrafts;
+
+      const prevJson = JSON.stringify(prev);
+      const nextJson = JSON.stringify(next);
+
+      return prevJson === nextJson ? prev : next;
+    });
+  }
+}, [isHydrated, activeAttributes, storageKey, emptyDrafts]);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -640,7 +661,7 @@ export default function ScoutReportTrigger({
         );
       }
 
-      setDrafts({});
+      setDrafts(emptyDrafts);
       setSubmitError(null);
       setAttributesError(null);
       setRequiresAuth(false);

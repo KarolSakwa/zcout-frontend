@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 import PlayerRadarChart from './PlayerRadarChart';
 import PlayerAttributesSection from './PlayerAttributesSection';
@@ -152,9 +153,12 @@ function buildAttributeColumns(
 
 export default function PlayerProfileCard({
   data,
+  shouldAnimateRatings = false,
 }: {
   data: any;
+  shouldAnimateRatings?: boolean;
 }) {
+
   const radarData = data.radar_axes.map((axis: any) => ({
     key: axis.key,
     label: axis.label,
@@ -313,11 +317,12 @@ export default function PlayerProfileCard({
                   <PlayerOverallRating
                     overall={overall}
                     overallConfidence={
-                      data.overall_confidence
+                        data.overall_confidence
                     }
                     overallExact={overallExact}
                     overallDelta7d={overallDelta7d}
-                  />
+                    shouldAnimate={shouldAnimateRatings}
+                    />
                 </div>
               </div>
             </div>
@@ -338,6 +343,7 @@ export default function PlayerProfileCard({
         playerId={data.id}
         attributeColumns={attributeColumns}
         isGoalkeeper={isGoalkeeper}
+        shouldAnimateRatings={shouldAnimateRatings}
       />
     </div>
   );

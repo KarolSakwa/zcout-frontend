@@ -121,6 +121,7 @@ export default function PlayerOverallRating({
   overallConfidence,
   overallExact,
   overallDelta7d,
+  shouldAnimate = false,
 }: PlayerOverallRatingProps) {
   const hasOverallDelta = overallDelta7d != null && Math.abs(overallDelta7d) > 0.001;
 
@@ -159,7 +160,7 @@ export default function PlayerOverallRating({
         overall={overall}
         overallConfidence={overallConfidence}
         overallExact={overallExact}
-        shouldAnimate={false}
+        shouldAnimate={shouldAnimate}
       />
     </div>
   );

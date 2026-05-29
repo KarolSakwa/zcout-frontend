@@ -28,12 +28,14 @@ export default function PlayerProfileClient({
     const [isAnimating, setIsAnimating] =
   useState(false);
 
+  const [shouldAnimateRatings, setShouldAnimateRatings] =
+  useState(false);
+
   useEffect(() => {
     const handler = async (event: Event) => {
         if (isAnimating) {
             return;
             }
-        console.count('profile-navigation');
       const customEvent = event as CustomEvent;
 
       const playerId = customEvent.detail?.playerId;
@@ -78,7 +80,6 @@ export default function PlayerProfileClient({
         setIsTransitionEnabled(false);
 
         setData(nextData);
-
         setIncomingData(null);
 
         setTrackOffset(0);
@@ -86,17 +87,44 @@ export default function PlayerProfileClient({
       }, 700);
     };
 
-    window.addEventListener(
-      'zcout-profile-navigation',
-      handler
-    );
+    const handleScoutReportSaved = async () => {
 
-    return () => {
-      window.removeEventListener(
+        setShouldAnimateRatings(true);
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${data.id}`
+        );
+
+        console.log(await res.clone().json());
+
+        const refreshedData = await res.json();
+
+        setData(refreshedData);
+        window.setTimeout(() => {
+        setShouldAnimateRatings(false);
+        }, 1200);
+
+        };
+
+        window.addEventListener(
         'zcout-profile-navigation',
         handler
-      );
-    };
+        );
+
+        window.addEventListener(
+            'zcout:scout-report-saved',
+            handleScoutReportSaved
+            );
+
+        return () => {
+        window.removeEventListener(
+            'zcout-profile-navigation',
+            handler
+        );
+        window.removeEventListener(
+            'zcout:scout-report-saved',
+            handleScoutReportSaved
+            );
+        };
   }, []);
 
   return (
@@ -119,7 +147,10 @@ export default function PlayerProfileClient({
           {direction === 'previous' && incomingData ? (
             <>
               <div className={styles.carouselSlide}>
-                <PlayerProfileCard data={incomingData} />
+                <PlayerProfileCard
+                data={incomingData}
+                shouldAnimateRatings={shouldAnimateRatings}
+                />
               </div>
 
               <div className={styles.carouselSlide}>
@@ -129,7 +160,10 @@ export default function PlayerProfileClient({
           ) : (
             <>
               <div className={styles.carouselSlide}>
-                <PlayerProfileCard data={data} />
+                <PlayerProfileCard
+                    data={data}
+                    shouldAnimateRatings={shouldAnimateRatings}
+                    />
               </div>
 
               <div className={styles.carouselSlide}>

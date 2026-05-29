@@ -138,7 +138,7 @@ function AnimatedCrowdRating({
       window.clearTimeout(swapTimeoutId);
       window.clearTimeout(resetTimeoutId);
     };
-  }, [rating, displayRating]);
+  }, [rating, displayRating, shouldAnimate]);
 
   return (
     <div
@@ -181,11 +181,11 @@ function AnimatedCrowdRating({
 function AttributeColumn({
   items,
   savingRatings,
-  optimisticRatings,
+  shouldAnimateRatings,
 }: {
   items: AttributeDisplayItem[];
   savingRatings: PendingRatingsMap;
-  optimisticRatings: PendingRatingsMap;
+  shouldAnimateRatings: boolean;
 }) {
   return (
     <div className={styles.attributeColumn}>
@@ -203,14 +203,9 @@ function AttributeColumn({
 
         const attr = item.attribute;
 
-        const hasOptimisticRating = Object.prototype.hasOwnProperty.call(
-          optimisticRatings,
-          attr.id
-        );
+        const pendingUserRating = savingRatings[attr.id];
 
-        const userRating = hasOptimisticRating
-          ? optimisticRatings[attr.id]
-          : getUserAttributeRating(attr);
+        const userRating = pendingUserRating ?? getUserAttributeRating(attr);
 
         const isSaving = Object.prototype.hasOwnProperty.call(
           savingRatings,
@@ -249,7 +244,7 @@ function AttributeColumn({
 
             <div className={styles.attributeStatGroup}>
               <div className={styles.attributeYouSlot}>
-                {isSaving || userRating != null ? (
+                {userRating != null ? (
                   <>
                     <span className={styles.attributeYouValue}>
                       <span className={styles.attributeYouLabel}>
@@ -365,7 +360,7 @@ function AttributeColumn({
                 <AnimatedCrowdRating
                   rating={attr.rating}
                   confidence={attr.confidence}
-                  shouldAnimate={false}
+                  shouldAnimate={shouldAnimateRatings}
                 />
               </div>
             </div>
@@ -380,22 +375,20 @@ type PlayerAttributesSectionProps = {
   playerId: number;
   attributeColumns: AttributeDisplayItem[][];
   isGoalkeeper: boolean;
+  shouldAnimateRatings?: boolean;
 };
 
 export default function PlayerAttributesSection({
   playerId,
   attributeColumns,
   isGoalkeeper,
+  shouldAnimateRatings = false,
 }: PlayerAttributesSectionProps) {
   const [savingRatings, setSavingRatings] =
     useState<PendingRatingsMap>({});
 
-  const [optimisticRatings, setOptimisticRatings] =
-    useState<PendingRatingsMap>({});
-
   useEffect(() => {
     setSavingRatings({});
-    setOptimisticRatings({});
   }, [playerId]);
 
   useEffect(() => {
@@ -420,11 +413,6 @@ export default function PlayerAttributesSection({
 
       window.setTimeout(() => {
         setSavingRatings({});
-
-        setOptimisticRatings((prev) => ({
-          ...prev,
-          ...(detail.ratings ?? {}),
-        }));
       }, SAVE_REVEAL_DELAY_MS);
     };
 
@@ -490,7 +478,7 @@ export default function PlayerAttributesSection({
             key={`column-${index}`}
             items={columnItems}
             savingRatings={savingRatings}
-            optimisticRatings={optimisticRatings}
+            shouldAnimateRatings={shouldAnimateRatings}
           />
         ))}
       </div>
