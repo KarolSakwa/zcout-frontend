@@ -6,7 +6,7 @@ import PlayerOverallRating from './PlayerOverallRating';
 import AuthAwareScoutReportTrigger from './AuthAwareScoutReportTrigger';
 import { formatOverall } from '@/lib/ratings';
 
-type PlayerProfileAttribute = {
+export type PlayerProfileAttribute = {
   id: number;
   key: string;
   label: string;
@@ -20,6 +20,33 @@ type PlayerProfileAttribute = {
   your_rating: number | null;
   your_rating_updated_at?: string | null;
   trend_7d: number | null;
+};
+
+export type PlayerRadarAxis = {
+  key: string;
+  label: string;
+  value: number;
+};
+
+export type PlayerProfileData = {
+  id: number;
+  name: string;
+  date_of_birth: string | null;
+  position: string | null;
+  overall: number | null;
+  overall_confidence: number;
+  overall_trend_7d: number | null;
+  previous_player_id: number | null;
+  next_player_id: number | null;
+  radar_axes: PlayerRadarAxis[];
+  attributes: PlayerProfileAttribute[];
+  number: number | null;
+  club: {
+    name: string;
+  } | null;
+  country: {
+    name: string;
+  } | null;
 };
 
 type AttributeSection = {
@@ -155,11 +182,11 @@ export default function PlayerProfileCard({
   data,
   shouldAnimateRatings = false,
 }: {
-  data: any;
+  data: PlayerProfileData;
   shouldAnimateRatings?: boolean;
 }) {
 
-  const radarData = data.radar_axes.map((axis: any) => ({
+  const radarData = data.radar_axes.map((axis: PlayerRadarAxis) => ({
     key: axis.key,
     label: axis.label,
     value: axis.value,

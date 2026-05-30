@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import styles from './page.module.css';
 import PlayerProfileNavigation from './PlayerProfileNavigation';
 import PlayerProfileCard from './PlayerProfileCard';
+import type { PlayerProfileData } from './PlayerProfileCard';
 
 type Props = {
-  initialData: any;
+  initialData: PlayerProfileData;
 };
 
 export default function PlayerProfileClient({
@@ -15,7 +16,7 @@ export default function PlayerProfileClient({
   const [data, setData] = useState(initialData);
 
   const [incomingData, setIncomingData] =
-    useState<any | null>(null);
+  useState<PlayerProfileData | null>(null);
 
   const [trackOffset, setTrackOffset] = useState(0);
 
@@ -30,6 +31,51 @@ export default function PlayerProfileClient({
 
   const [shouldAnimateRatings, setShouldAnimateRatings] =
   useState(false);
+
+  const cacheRef = useRef(new Map<number, PlayerProfileData>());
+  const pendingFetchesRef = useRef(new Map<number, Promise<PlayerProfileData>>());
+
+  const prefetchPlayer = async (playerId: number | null | undefined) => {
+    if (!playerId) {
+      return;
+    }
+
+    if (cacheRef.current.has(playerId)) {
+      return;
+    }
+
+    if (pendingFetchesRef.current.has(playerId)) {
+      return;
+    }
+
+    const promise = fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${playerId}`,
+      {
+        credentials: 'include',
+      }
+    )
+      .then((res) => res.json())
+      .then((playerData) => {
+        cacheRef.current.set(playerId, playerData);
+
+        if (cacheRef.current.size > 5) {
+          const oldestKey = cacheRef.current.keys().next().value;
+
+          if (oldestKey !== undefined) {
+            cacheRef.current.delete(oldestKey);
+          }
+        }
+
+        return playerData;
+      })
+      .finally(() => {
+        pendingFetchesRef.current.delete(playerId);
+      });
+
+    pendingFetchesRef.current.set(playerId, promise);
+
+    return promise;
+  };
 
   useEffect(() => {
     const handler = async (event: Event) => {
@@ -51,16 +97,33 @@ export default function PlayerProfileClient({
 
         setIsAnimating(true);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${playerId}`,
-        {
-          credentials: 'include',
+      let nextData = cacheRef.current.get(playerId);
+
+        if (!nextData) {
+          const pendingPromise =
+            pendingFetchesRef.current.get(playerId);
+
+          if (pendingPromise) {
+            nextData = await pendingPromise;
+          } else {
+            const res = await fetch(
+              `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${playerId}`,
+              {
+                credentials: 'include',
+              }
+            );
+
+            nextData = (await res.json()) as PlayerProfileData;
+
+            cacheRef.current.set(playerId, nextData);
+          }
         }
-      );
 
-      const nextData = await res.json();
+        if (!nextData) {
+          return;
+        }
 
-      setIncomingData(nextData);
+        setIncomingData(nextData);
 
       if (nextDirection === 'previous') {
         setIsTransitionEnabled(false);
@@ -83,6 +146,8 @@ export default function PlayerProfileClient({
         setIsTransitionEnabled(false);
 
         setData(nextData);
+        prefetchPlayer(nextData.previous_player_id);
+        prefetchPlayer(nextData.next_player_id);
         setIncomingData(null);
 
         setTrackOffset(0);
@@ -133,6 +198,20 @@ export default function PlayerProfileClient({
         };
   }, []);
 
+  useEffect(() => {
+    prefetchPlayer(data.previous_player_id);
+    prefetchPlayer(data.next_player_id);
+  }, [data.id]);
+
+  const trackStyle: CSSProperties & {
+  '--track-offset': string;
+    } = {
+      '--track-offset': `${trackOffset}%`,
+      transition: isTransitionEnabled
+        ? 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)'
+        : 'none',
+    };
+
   return (
     <>
       <PlayerProfileNavigation
@@ -143,12 +222,7 @@ export default function PlayerProfileClient({
       <div className={styles.carouselViewport}>
         <div
           className={styles.carouselTrack}
-          style={{
-            ['--track-offset' as any]: `${trackOffset}%`,
-            transition: isTransitionEnabled
-              ? 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)'
-              : 'none',
-          }}
+          style={trackStyle}
         >
           {direction === 'previous' && incomingData ? (
             <>
