@@ -5,12 +5,19 @@ import styles from './page.module.css';
 type Props = {
   previousPlayerId: number | null;
   nextPlayerId: number | null;
+  isHidden?: boolean;
 };
 
 export default function PlayerProfileNavigation({
   previousPlayerId,
   nextPlayerId,
+  isHidden,
 }: Props) {
+
+  if (isHidden) {
+    return null;
+  }
+
   const goToPlayer = (
     playerId: number,
     direction: 'next' | 'previous'

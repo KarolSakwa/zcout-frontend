@@ -32,6 +32,7 @@ export default function PlayerProfileClient({
   const [shouldAnimateRatings, setShouldAnimateRatings] =
   useState(false);
 
+  const [isScoutReportOpen, setIsScoutReportOpen] = useState(false);
   const cacheRef = useRef(new Map<number, PlayerProfileData>());
   const pendingFetchesRef = useRef(new Map<number, Promise<PlayerProfileData>>());
 
@@ -156,46 +157,73 @@ export default function PlayerProfileClient({
     };
 
     const handleScoutReportSaved = async () => {
+      setShouldAnimateRatings(true);
 
-        setShouldAnimateRatings(true);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${data.id}`,
-          {
-            credentials: 'include',
-          }
-        );
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE}/api/players/${data.id}`,
+        {
+          credentials: 'include',
+        }
+      );
 
-        console.log(await res.clone().json());
+      const refreshedData = await res.json();
 
-        const refreshedData = await res.json();
+      setData(refreshedData);
 
-        setData(refreshedData);
-        window.setTimeout(() => {
+      window.setTimeout(() => {
         setShouldAnimateRatings(false);
-        }, 1200);
+      }, 1200);
+    };
 
-        };
+    const handleScoutReportOpened = () => {
+      setIsScoutReportOpen(true);
+    };
 
-        window.addEventListener(
+    const handleScoutReportClosed = () => {
+      setIsScoutReportOpen(false);
+    };
+
+    window.addEventListener(
+      'zcout-profile-navigation',
+      handler
+    );
+
+    window.addEventListener(
+      'zcout:scout-report-saved',
+      handleScoutReportSaved
+    );
+
+    window.addEventListener(
+      'zcout:scout-report-opened',
+      handleScoutReportOpened
+    );
+
+    window.addEventListener(
+      'zcout:scout-report-closed',
+      handleScoutReportClosed
+    );
+
+    return () => {
+      window.removeEventListener(
         'zcout-profile-navigation',
         handler
-        );
+      );
 
-        window.addEventListener(
-            'zcout:scout-report-saved',
-            handleScoutReportSaved
-            );
+      window.removeEventListener(
+        'zcout:scout-report-saved',
+        handleScoutReportSaved
+      );
 
-        return () => {
-        window.removeEventListener(
-            'zcout-profile-navigation',
-            handler
-        );
-        window.removeEventListener(
-            'zcout:scout-report-saved',
-            handleScoutReportSaved
-            );
-        };
+      window.removeEventListener(
+        'zcout:scout-report-opened',
+        handleScoutReportOpened
+      );
+
+      window.removeEventListener(
+        'zcout:scout-report-closed',
+        handleScoutReportClosed
+      );
+    };
   }, []);
 
   useEffect(() => {
@@ -217,6 +245,7 @@ export default function PlayerProfileClient({
       <PlayerProfileNavigation
         previousPlayerId={data.previous_player_id}
         nextPlayerId={data.next_player_id}
+        isHidden={isScoutReportOpen}
       />
 
       <div className={styles.carouselViewport}>

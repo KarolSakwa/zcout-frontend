@@ -434,10 +434,21 @@ export default function ScoutReportTrigger({
 
     setRequiresAuth(false);
     void loadScoutReportAvailability({ modal: true });
+
+    setIsModalMounted(true);
+
+    window.dispatchEvent(
+      new CustomEvent('zcout:scout-report-opened')
+    );
   };
 
   const closeModal = () => {
     if (isSubmitting) return;
+
+    window.dispatchEvent(
+      new CustomEvent('zcout:scout-report-closed')
+    );
+
     setVisible(false);
   };
 
