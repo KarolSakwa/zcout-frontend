@@ -1,3 +1,3 @@
-import DuelsPageView from './duels/DuelsPageView';
+import HomePageView from './HomePageView';
 
-export default DuelsPageView;
+export default HomePageView;
