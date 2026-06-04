@@ -11,6 +11,7 @@ type PlayerRadarDatum = {
 
 type PlayerRadarChartProps = {
   data: PlayerRadarDatum[];
+  variant?: 'profile' | 'homepage';
 };
 
 type HoveredAxis = {
@@ -21,9 +22,11 @@ type HoveredAxis = {
   y: number;
 };
 
-const RADAR_CENTER_X = 0.63;
+const PROFILE_RADAR_CENTER_X = 0.63;
+const HOMEPAGE_RADAR_CENTER_X = 0.5;
 const RADAR_CENTER_Y = 0.48;
-const RADAR_RADIUS_RATIO = 0.72;
+const PROFILE_RADAR_RADIUS_RATIO = 0.72;
+const HOMEPAGE_RADAR_RADIUS_RATIO = 0.72;
 const LABEL_GAP = 18;
 
 function toRgba(hex: string, alpha: number) {
@@ -55,14 +58,27 @@ function getTextAnchor(angleDeg: number) {
   return normalized < 90 || normalized > 270 ? 'left' : 'right';
 }
 
-export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
+export default function PlayerRadarChart({
+  data,
+  variant = 'profile',
+}: PlayerRadarChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [hoveredAxis, setHoveredAxis] = useState<HoveredAxis | null>(null);
 
   const accentColor = useMemo(() => getAccentColor(), []);
   const isCompact = typeof window !== 'undefined' && window.matchMedia('(max-width: 560px)').matches;
-  const radarCenterX = isCompact ? 0.5 : RADAR_CENTER_X;
+  const radarCenterX = isCompact
+  ? 0.5
+  : variant === 'homepage'
+    ? HOMEPAGE_RADAR_CENTER_X
+    : PROFILE_RADAR_CENTER_X;
+
+const radarRadiusRatio =
+  variant === 'homepage'
+    ? HOMEPAGE_RADAR_RADIUS_RATIO
+    : PROFILE_RADAR_RADIUS_RATIO;
+    console.log('RADAR VARIANT', variant, radarRadiusRatio);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -94,7 +110,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
       },
       radar: {
         center: [`${radarCenterX * 100}%`, `${RADAR_CENTER_Y * 100}%`],
-        radius: `${RADAR_RADIUS_RATIO * 100}%`,
+        radius: `${radarRadiusRatio * 100}%`,
         startAngle: 90,
         splitNumber: 4,
         shape: 'polygon',
@@ -102,6 +118,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
           color: 'rgba(233, 237, 241, 0.84)',
           fontSize: 10,
           fontWeight: 600,
+          margin: 24,
         },
         axisLine: {
           lineStyle: {
@@ -167,7 +184,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
         },
       ],
     }),
-    [accentColor, data, radarCenterX],
+    [accentColor, data, radarCenterX, radarRadiusRatio]
   );
 
   const hotspots = useMemo(() => {
@@ -178,7 +195,7 @@ export default function PlayerRadarChart({ data }: PlayerRadarChartProps) {
 
     const centerX = width * radarCenterX;
     const centerY = height * RADAR_CENTER_Y;
-    const radius = Math.min(width, height) * RADAR_RADIUS_RATIO * 0.5;
+    const radius = Math.min(width, height) * radarRadiusRatio * 0.5;
     const labelRadius = radius + LABEL_GAP;
     const step = 360 / data.length;
 

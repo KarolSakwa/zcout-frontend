@@ -1,0 +1,74 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.rowHero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.rowMain {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-rows: auto auto;
+  gap: 24px;
+}
+
+.leftStack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rowRankings {
+  width: 100%;
+}
+
+.duel {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  display: flex;
+}
+
+.playerCard {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.playerRadar {
+  height: 260px;
+}
+
+.playerMeta {
+  color: var(--ui-text-muted);
+}
+
+.playerOverall {
+  margin-top: 24px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .playerCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .rowHero,
+  .rowMain {
+    grid-template-columns: 1fr;
+  }
+}
