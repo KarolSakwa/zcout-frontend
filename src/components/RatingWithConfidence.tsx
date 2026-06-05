@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Tooltip from './Tooltip';
+import { getRatingColor } from '@/lib/ratings';
 
 type RatingWithConfidenceProps = {
   rating: number | string | null | undefined;
@@ -11,7 +12,6 @@ type RatingWithConfidenceProps = {
   decimals?: number;
   align?: 'start' | 'center' | 'end';
   expand?: boolean;
-  ratingColor?: string;
   ratingTooltipContent?: ReactNode;
   confidenceTooltipContent?: ReactNode | false;
   showConfidence?: boolean;
@@ -31,7 +31,6 @@ export default function RatingWithConfidence({
   decimals = 2,
   align = 'end',
   expand = true,
-  ratingColor = 'var(--ui-text-primary)',
   ratingTooltipContent,
   confidenceTooltipContent,
   showConfidence = true,
@@ -72,7 +71,9 @@ export default function RatingWithConfidence({
         letterSpacing: '-0.04em',
         fontVariantNumeric: 'tabular-nums lining-nums',
         fontFeatureSettings: '"tnum" 1, "lnum" 1',
-        color: ratingColor,
+        color: getRatingColor(
+          typeof rating === 'number' ? rating : Number(rating)
+        ),
         cursor: ratingTooltipContent ? 'help' : 'default',
       }}
     >
@@ -85,6 +86,7 @@ export default function RatingWithConfidence({
       style={{
         display: 'inline-flex',
         alignItems: 'center',
+        paddingTop: 0,
       }}
     >
       <span
@@ -116,7 +118,7 @@ export default function RatingWithConfidence({
     </span>
   );
 
-  return (
+return (
     <div
       style={{
         display: 'flex',

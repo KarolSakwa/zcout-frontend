@@ -23,10 +23,10 @@ type HoveredAxis = {
 };
 
 const PROFILE_RADAR_CENTER_X = 0.63;
-const HOMEPAGE_RADAR_CENTER_X = 0.5;
+const HOMEPAGE_RADAR_CENTER_X = 0.42;
 const RADAR_CENTER_Y = 0.48;
 const PROFILE_RADAR_RADIUS_RATIO = 0.72;
-const HOMEPAGE_RADAR_RADIUS_RATIO = 0.72;
+const HOMEPAGE_RADAR_RADIUS_RATIO = 0.5;
 const LABEL_GAP = 18;
 
 function toRgba(hex: string, alpha: number) {

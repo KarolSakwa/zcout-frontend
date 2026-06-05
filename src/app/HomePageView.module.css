@@ -7,7 +7,7 @@
 
 .rowHero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 24px;
   align-items: stretch;
 }

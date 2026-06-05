@@ -1,5 +1,7 @@
 import styles from './HomepageSection.module.css';
 import PlayerRadarChart from '@/app/players/[id]/PlayerRadarChart';
+import RatingWithConfidence from '@/components/RatingWithConfidence';
+import FeaturedOverallBlock from '../FeaturedOverallBlock';
 
 export default function FeaturedPlayerSection() {
   const radarData = [
@@ -12,30 +14,44 @@ export default function FeaturedPlayerSection() {
   ];
 
   return (
-    <div className={styles.card}>
-      <div className={styles.playerCard}>
-        <div>
-          <div>#12</div>
+  <div className={styles.card}>
+    <div className={styles.rankBadge}>
+      Rank <span>#12</span>
+    </div>
 
-          <h2 className={styles.cardTitle}>Bukayo Saka</h2>
+    <div className={styles.playerContent}>
+      <div className={styles.playerLeftColumn}>
+        <div className={styles.playerHeader}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 32,
+              fontWeight: 800,
+              lineHeight: 1,
+            }}
+          >
+            Bukayo Saka
+          </h2>
 
-          <div className={styles.playerMeta}>
+          <div
+            className={styles.playerMeta}
+            style={{
+              marginTop: 12,
+              fontSize: 14,
+            }}
+          >
             Arsenal FC • RW • England • 23
-          </div>
-
-          <div className={styles.playerOverall}>
-            Overall: 87
-          </div>
-
-          <div style={{ marginTop: 12 }}>
-            Confidence Bar
-          </div>
-
-          <div style={{ marginTop: 24 }}>
-            View Profile
           </div>
         </div>
 
+        <FeaturedOverallBlock
+          rating={87}
+          confidence={82}
+          scalePx={60}
+        />
+      </div>
+
+      <div className={styles.playerRightColumn}>
         <div className={styles.playerRadar}>
           <PlayerRadarChart
             data={radarData}
@@ -44,5 +60,6 @@ export default function FeaturedPlayerSection() {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

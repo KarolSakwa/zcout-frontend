@@ -4,7 +4,7 @@ export default function HeroSection() {
   return (
     <section
       style={{
-        padding: '48px',
+        padding: '36px',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: '16px',
       }}

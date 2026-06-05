@@ -1,0 +1,45 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.content {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.label {
+  color: var(--ui-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.rating {
+  font-weight: 800;
+  line-height: 0.85;
+}
+
+.ratingColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.confidenceTrack {
+  width: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: flex-end;
+  padding: 2px;
+}
+
+.confidenceFill {
+  width: 100%;
+  border-radius: 999px;
+  background: var(--ui-accent-primary);
+}
