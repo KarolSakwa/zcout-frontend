@@ -12,6 +12,7 @@ type PlayerRadarDatum = {
 type PlayerRadarChartProps = {
   data: PlayerRadarDatum[];
   variant?: 'profile' | 'homepage';
+  shortenLabels?: boolean;
 };
 
 type HoveredAxis = {
@@ -61,6 +62,7 @@ function getTextAnchor(angleDeg: number) {
 export default function PlayerRadarChart({
   data,
   variant = 'profile',
+  shortenLabels = false,
 }: PlayerRadarChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -147,9 +149,11 @@ const radarRadiusRatio =
           },
         },
         indicator: data.map((item) => ({
-          name: item.label,
-          max: 99,
-        })),
+        name: shortenLabels
+          ? item.label.slice(0, 3).toUpperCase()
+          : item.label,
+        max: 99,
+      })),
       },
       series: [
         {

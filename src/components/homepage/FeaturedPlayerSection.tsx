@@ -2,21 +2,46 @@ import styles from './HomepageSection.module.css';
 import PlayerRadarChart from '@/app/players/[id]/PlayerRadarChart';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
 import FeaturedOverallBlock from '../FeaturedOverallBlock';
+import { calcAge } from '@/lib/playerAge';
 
-export default function FeaturedPlayerSection() {
-  const radarData = [
-    { key: 'technical', label: 'Technical', value: 88 },
-    { key: 'mental', label: 'Mental', value: 86 },
-    { key: 'physical', label: 'Physical', value: 82 },
-    { key: 'attacking', label: 'Attacking', value: 90 },
-    { key: 'defending', label: 'Defending', value: 61 },
-    { key: 'pace', label: 'Pace', value: 89 },
-  ];
+type RadarAxis = {
+  key: string;
+  label: string;
+  value: number;
+};
+
+type FeaturedPlayer = {
+  name: string;
+  rank: number | null;
+  position: string | null;
+  overall: number | null;
+  overall_confidence: number;
+  radar_axes: RadarAxis[];
+  club: {
+    name: string;
+  } | null;
+  country: {
+    name: string;
+  } | null;
+  date_of_birth: string | null;
+};
+
+type Props = {
+  player: FeaturedPlayer;
+};
+
+
+
+export default function FeaturedPlayerSection({
+  player,
+}: Props) {
+  const radarData = player.radar_axes;
+  const age = calcAge(player.date_of_birth);
 
   return (
   <div className={styles.card}>
     <div className={styles.rankBadge}>
-      Rank <span>#12</span>
+      Rank <span>#{player.rank}</span>
     </div>
 
     <div className={styles.playerContent}>
@@ -25,12 +50,12 @@ export default function FeaturedPlayerSection() {
           <h2
             style={{
               margin: 0,
-              fontSize: 32,
+              fontSize: player.name.length > 18 ? 24 : 28,
               fontWeight: 800,
               lineHeight: 1,
             }}
           >
-            Bukayo Saka
+            {player.name}
           </h2>
 
           <div
@@ -40,13 +65,14 @@ export default function FeaturedPlayerSection() {
               fontSize: 14,
             }}
           >
-            Arsenal FC • RW • England • 23
+            {player.club?.name} • {player.position} • {player.country?.name} {age != null ? ` • ${age}` : ''}
           </div>
         </div>
 
         <FeaturedOverallBlock
-          rating={87}
-          confidence={82}
+          rating={Math.round(player.overall ?? 0)}
+          exactRating={player.overall}
+          confidence={player.overall_confidence ?? 0}
           scalePx={60}
         />
       </div>
@@ -56,6 +82,7 @@ export default function FeaturedPlayerSection() {
           <PlayerRadarChart
             data={radarData}
             variant="homepage"
+            shortenLabels
           />
         </div>
       </div>

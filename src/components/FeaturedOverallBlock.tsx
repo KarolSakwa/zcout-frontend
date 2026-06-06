@@ -5,12 +5,14 @@ import { getRatingColor } from '@/lib/ratings';
 type Props = {
   rating: number;
   confidence: number;
+  exactRating?: number | null;
   scalePx?: number;
 };
 
 export default function FeaturedOverallBlock({
   rating,
   confidence,
+  exactRating,
   scalePx = 96,
 }: Props) {
   const barWidth = Math.max(6, Math.round(scalePx * 0.24));
@@ -20,6 +22,8 @@ export default function FeaturedOverallBlock({
     0,
     Math.min(100, Number(confidence ?? 0))
   );
+
+  const tooltipRating = exactRating ?? rating;
 
   const roundedFill = Math.round(normalizedConfidence);
 
@@ -47,7 +51,7 @@ export default function FeaturedOverallBlock({
             OVERALL
             </div>
 
-          <Tooltip content={rating.toFixed(2)}>
+          <Tooltip content={tooltipRating.toFixed(2)}>
             <div
               className={styles.rating}
               style={{

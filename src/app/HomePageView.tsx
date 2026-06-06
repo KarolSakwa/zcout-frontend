@@ -8,13 +8,28 @@ import NeedsMoreRatingsSection from '@/components/homepage/NeedsMoreRatingsSecti
 import FeaturedRankingsSection from '@/components/homepage/FeaturedRankingsSection';
 import styles from './HomePageView.module.css';
 
-export default function HomePageView() {
+export default async function HomePageView() {
+  const API_BASE =
+    process.env.BACKEND_URL ||
+    process.env.API_BASE ||
+    process.env.NEXT_PUBLIC_API_BASE ||
+    'http://localhost:8080';
+
+  const featuredPlayerRes = await fetch(
+    `${API_BASE}/api/players/featured`,
+    {
+      cache: 'no-store',
+    }
+  );
+
+  const featuredPlayer = await featuredPlayerRes.json();
+
   return (
     <main className={styles.page}>
   <div className={styles.container}>
     <section className={styles.rowHero}>
       <HeroSection />
-      <FeaturedPlayerSection />
+      <FeaturedPlayerSection player={featuredPlayer} />
     </section>
 
     <section className={styles.rowMain}>
