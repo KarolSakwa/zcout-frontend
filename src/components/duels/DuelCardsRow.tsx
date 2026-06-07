@@ -16,6 +16,7 @@ export default function DuelCardsRow({
   showImpact,
   postVoteRatings,
   barPct,
+  homepageMode = false,
 }: {
   pair: PairResponse;
   cardStyle: (side: 'left' | 'right') => React.CSSProperties;
@@ -27,6 +28,7 @@ export default function DuelCardsRow({
   showImpact: boolean;
   postVoteRatings?: RatingsMap | null;
   barPct: Record<string, number>;
+  homepageMode?: boolean;
 }) {
   void showImpact;
   void postVoteRatings;
@@ -35,7 +37,7 @@ export default function DuelCardsRow({
   return (
     <>
       <div className="duelCardsRow">
-        <div className="flex flex-col gap-2" style={cardStyle('left')}>
+        <div           className="flex flex-col gap-2"           style={cardStyle('left')}        >
           <PlayerCard
             name={pair.left.name}
             position={pair.left.position}
@@ -49,6 +51,7 @@ export default function DuelCardsRow({
             reveal={showReveal}
             isWinner={lastWinner === pair.left.id}
             glowColor={glow}
+            compact={homepageMode}
           />
         </div>
 
@@ -77,6 +80,7 @@ export default function DuelCardsRow({
             reveal={showReveal}
             isWinner={lastWinner === pair.right.id}
             glowColor={glow}
+            compact={homepageMode}
           />
         </div>
       </div>
@@ -87,7 +91,7 @@ export default function DuelCardsRow({
           grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr);
           align-items: start;
           gap: 36px;
-          width: min(100%, 720px);
+          width: min(100%, ${homepageMode ? 500 : 720}px);
           margin: 40px auto 0;
           position: relative;
         }

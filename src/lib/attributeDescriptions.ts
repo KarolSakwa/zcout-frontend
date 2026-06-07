@@ -32,3 +32,11 @@ export const attributeDescriptions: Record<string, string> = {
   gk_rushing_out: 'Judgement and effectiveness when leaving the line aggressively.',
   gk_eccentricity: 'Tendency to attempt unusual, risky or adventurous actions.',
 };
+
+export function formatAttributeLabel(attribute: string) {
+  return attribute
+    .replace(/^gk_/, '')
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}

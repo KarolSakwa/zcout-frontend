@@ -16,6 +16,7 @@ type PlayerCardProps = {
   isWinner?: boolean;
   glowColor?: string;
   revealFooter?: React.ReactNode;
+  compact?: boolean;
 };
 
 export default function PlayerCard({
@@ -31,6 +32,7 @@ export default function PlayerCard({
   isWinner,
   glowColor,
   revealFooter,
+  compact = false,
 }: PlayerCardProps) {
   const state = reveal ? (isWinner ? 'winner' : 'loser') : 'idle';
 
@@ -70,7 +72,15 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
 
       <div className="inner">
         <div className="top">
-          <div className={['name', nameLengthClass].filter(Boolean).join(' ')}>
+          <div
+            className={[
+              'name',
+              compact ? 'nameCompact' : '',
+              nameLengthClass,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
             {normalizedName}
           </div>
 
@@ -94,11 +104,15 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         </div>
 
         <div className="mid">
-          <div className="number">{number ?? '--'}</div>
+          <div className={compact ? 'number numberCompact' : 'number'}>
+            {number ?? '--'}
+          </div>
         </div>
 
         <div className="bottom">
-          <div className="club">{String(club ?? '—').toUpperCase()}</div>
+          <div className={compact ? 'club clubCompact' : 'club'}>
+            {String(club ?? '—').toUpperCase()}
+          </div>
         </div>
 
         {revealFooter ? <div className="revealFooter">{revealFooter}</div> : null}
@@ -219,6 +233,10 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           -webkit-box-orient: vertical;
         }
 
+        .name.nameCompact {
+          font-size: 12px;
+        }
+
         .nameLong {
           font-size: 15px;
           letter-spacing: 0.02em;
@@ -283,6 +301,10 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           paint-order: stroke fill;
         }
 
+        .number.numberCompact {
+          font-size: clamp(42px, 4vw, 62px);
+        }
+
         .bottom {
           position: absolute;
           left: 0;
@@ -305,6 +327,11 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+
+        .club.clubCompact {
+          font-size: 9px;
+          letter-spacing: 0.03em;
         }
 
         .revealFooter {

@@ -13,6 +13,9 @@ import TopRisersWidget from './duels/TopRisersWidget';
 import { useDuelSideWidgets } from './duels/useDuelSideWidgets';
 import { logEvent } from '@/lib/telemetry';
 import { ensureCsrfToken } from '@/lib/ensureCsrfToken';
+import Tooltip from '@/components/Tooltip';
+import AttributeIcon from '@/components/AttributeIcon';
+import { attributeDescriptions, formatAttributeLabel } from '@/lib/attributeDescriptions';
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -33,7 +36,15 @@ type VotePopularity = {
   votes_b?: number | null;
 };
 
-export default function Duel({ initialPair }: { initialPair?: unknown }) {
+type DuelProps = {
+  initialPair?: unknown;
+  homepageMode?: boolean;
+};
+
+export default function Duel({
+  initialPair,
+  homepageMode = false,
+}: DuelProps) {
   const [pair, setPair] = useState<PairResponse | null>(() => {
     try {
       return initialPair ? normalizePair(initialPair) : null;
@@ -584,7 +595,12 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
+ <div
+  className="flex flex-col gap-4"
+  style={{
+    width: '100%',
+  }}
+>
         <DuelCountdownBar show={showCountdown} progress={autoNextProgress} paused={autoNextPaused} height={COUNTDOWN_BAR_H} />
 
         <div
@@ -597,8 +613,12 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
         >
           <div className="duelStageOuter">
             <div className="duelStageCenter">
-              <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
-              <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
+              {!homepageMode && (
+                <>
+                  <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
+                  <RecentVotesWidget items={recentVotes} latestItemId={latestRecentVoteId} />
+                </>
+              )}
 
               <div
                 style={{
@@ -607,7 +627,68 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
                   transition: 'filter 180ms ease, opacity 180ms ease',
                 }}
               >
-                <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
+                {homepageMode ? (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: 12,
+        }}
+      >
+        <Tooltip content={attributeDescriptions[attribute] ?? ''}>
+          <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        gap: 8,
+        marginBottom: 12,
+        cursor: 'help',
+        color: 'var(--ui-text-muted)',
+        fontSize: 15,
+        fontWeight: 800,
+        letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+      }}
+    >
+      <>
+        <span
+          style={{
+            color: 'var(--ui-text-muted)',
+            fontSize: 11,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+          }}
+        >
+          WHO&apos;S BETTER AT
+        </span>
+
+        <span
+          style={{
+            color: 'var(--ui-text-primary)',
+            fontSize: 20,
+            fontWeight: 900,
+            letterSpacing: '0.08em',
+          }}
+        >
+          {formatAttributeLabel(
+  String(pair?.attribute ?? attribute)
+).toUpperCase()}
+        </span>
+      </>
+
+      <AttributeIcon
+        attributeKey={attribute}
+        label={attribute}
+        size={22}
+      />
+        </div>
+  </Tooltip>
+</div>
+) : (
+  <DuelAttributeHeader attribute={String(pair?.attribute ?? attribute)} />
+)}
 
                 {error && (
                   <div
@@ -640,6 +721,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
                       showImpact={showImpact}
                       postVoteRatings={postVoteRatings}
                       barPct={barPct}
+                      homepageMode={homepageMode}
                     />
 
                     {showImpact && postVoteRatings && (
@@ -657,6 +739,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
                         postVoteRatings={postVoteRatings}
                         glow={glow}
                         barPct={barPct}
+                        homepageMode={homepageMode}
                       />
                     )}
                   </div>
@@ -684,7 +767,7 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
           </div>
         </div>
 
-        {!showReveal && pair && (
+        {!homepageMode && !showReveal && pair && (
           <div
             style={{
               display: 'grid',

@@ -44,6 +44,7 @@ export default async function HomePageView() {
       <NeedsMoreRatingsSection />
     </section>
 
+
     <section className={styles.rowRankings}>
       <FeaturedRankingsSection />
     </section>

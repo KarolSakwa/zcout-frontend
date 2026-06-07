@@ -3,15 +3,7 @@
 import React from 'react';
 import AttributeIcon from '@/components/AttributeIcon';
 import Tooltip from '@/components/Tooltip';
-import { attributeDescriptions } from '@/lib/attributeDescriptions';
-
-function formatAttributeLabel(attribute: string) {
-  return attribute
-    .replace(/^gk_/, '')
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
+import { attributeDescriptions, formatAttributeLabel } from '@/lib/attributeDescriptions';
 
 export default function DuelAttributeHeader({ attribute }: { attribute: string }) {
   if (!attribute) return null;

@@ -17,6 +17,7 @@ export default function DuelRevealPanel({
   postVoteRatings,
   glow = 'var(--ui-accent-primary)',
   barPct = {},
+  homepageMode = false,
 }: {
   pair: PairResponse;
   onMouseEnter?: () => void;
@@ -31,6 +32,7 @@ export default function DuelRevealPanel({
   postVoteRatings?: RatingsMap;
   glow?: string;
   barPct?: Record<string, number>;
+  homepageMode?: boolean;
 }) {
   const [inspectHover, setInspectHover] = useState(false);
 
@@ -156,7 +158,13 @@ export default function DuelRevealPanel({
         ) : null}
       </div>
 
-      <div style={{ display: 'grid', placeItems: 'center', marginTop: 14 }}>
+      <div
+        style={{
+          display: 'grid',
+          placeItems: 'center',
+          marginTop: homepageMode ? 8 : 14,
+        }}
+      >
         <button
           type="button"
           onClick={goNext}
@@ -195,8 +203,8 @@ export default function DuelRevealPanel({
 
       <style jsx>{`
         .revealPanel {
-          max-width: 720px;
-          margin: 26px auto 0;
+          max-width: ${homepageMode ? 520 : 720}px;
+          margin: ${homepageMode ? 18 : 26}px auto 0;
         }
 
         .revealPanelInner {
