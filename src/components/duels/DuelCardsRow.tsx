@@ -92,7 +92,7 @@ export default function DuelCardsRow({
           align-items: start;
           gap: 36px;
           width: min(100%, ${homepageMode ? 500 : 720}px);
-          margin: 40px auto 0;
+          margin: 20px auto 0;
           position: relative;
         }
 

@@ -33,6 +33,18 @@
   grid-column: 3;
   grid-row: 1 / span 2;
   display: flex;
+
+  border: 1px solid var(--ui-border-subtle);
+  border-radius: var(--ui-radius-xl);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(14, 24, 42, 0.35),
+      rgba(6, 12, 22, 0.25)
+    );
+
+  min-height: 470px;
+  padding: 20px;
 }
 
 .playerCard {

@@ -767,7 +767,7 @@ export default function Duel({
           </div>
         </div>
 
-        {!homepageMode && !showReveal && pair && (
+        {!showReveal && pair && (
           <div
             style={{
               display: 'grid',
