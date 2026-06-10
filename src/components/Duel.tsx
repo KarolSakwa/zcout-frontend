@@ -746,23 +746,38 @@ export default function Duel({
                 )}
               </div>
 
-              {showDelayedNextPending && (
-                <div
-                  style={{
-  position: 'fixed',
-  left: '50vw',
-  top: '50dvh',
-  transform: 'translate(-50%, -50%)',
-  zIndex: 80,
-  display: 'grid',
-  placeItems: 'center',
-  pointerEvents: 'none',
-}}
-                  aria-hidden
-                >
-                  <ZLoader />
-                </div>
-              )}
+              {showDelayedNextPending &&
+  (homepageMode ? (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 80,
+        display: 'grid',
+        placeItems: 'center',
+        pointerEvents: 'none',
+      }}
+      aria-hidden
+    >
+      <ZLoader />
+    </div>
+  ) : (
+    <div
+      style={{
+        position: 'fixed',
+        left: '50vw',
+        top: '50dvh',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 80,
+        display: 'grid',
+        placeItems: 'center',
+        pointerEvents: 'none',
+      }}
+      aria-hidden
+    >
+      <ZLoader />
+    </div>
+  ))}
             </div>
           </div>
         </div>
@@ -835,7 +850,7 @@ export default function Duel({
         .duelStageCenter {
           --duel-widget-width: 318px;
           --duel-widget-offset: 40px;
-          max-width: 996px;
+          max-width: ${homepageMode ? 620 : 996}px;
           margin: 0 auto;
           position: relative;
           overflow: visible;
