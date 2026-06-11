@@ -535,6 +535,8 @@ export default function Duel({ initialPair }: { initialPair?: unknown }) {
             rating_after: pl.rating_after,
             delta: pl.delta,
             votes_count: pl.votes_count,
+            attribute_rank: pl.attribute_rank,
+            is_top_ten: pl.is_top_ten,
           };
         }
 

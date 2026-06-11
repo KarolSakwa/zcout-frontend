@@ -8,6 +8,8 @@ type Impact = {
   delta: number;
   rating: number;
   votes_count: number;
+  attribute_rank: number | null;
+  is_top_ten: boolean;
 };
 
 const roundToDisplay = (value: number) => Number(value.toFixed(2));
@@ -42,6 +44,7 @@ export default function DuelImpact({
   const displayAfter = roundToDisplay(after);
   const displayDelta = roundToDisplay(displayAfter - displayBefore);
   const isPositive = displayDelta >= 0;
+  const showBadge = impact.is_top_ten && impact.attribute_rank !== null;
 
   void playerId;
   void winner;
@@ -50,104 +53,124 @@ export default function DuelImpact({
   void barPct;
 
   return (
-    <div className="impact">
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: 7,
-          minWidth: 0,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
-          <RatingWithConfidence
-            rating={displayBefore}
-            confidence={0}
-            fontSize={13}
-            decimals={2}
-            align="start"
-            expand={false}
-            ratingColor={getRatingColor(displayBefore)}
-            confidenceTooltipContent={false}
-            showConfidence={false}
-          />
-        </div>
-
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: 'var(--ui-text-dim)',
-            transform: 'translateY(-1px)',
-          }}
-        >
-          →
-        </span>
-
-        <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
-          <RatingWithConfidence
-            rating={displayAfter}
-            confidence={0}
-            fontSize={15}
-            decimals={2}
-            align="start"
-            expand={false}
-            ratingColor={getRatingColor(displayAfter)}
-            confidenceTooltipContent={false}
-            showConfidence={false}
-          />
-        </div>
+  <div className="impact">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: 7,
+        minWidth: 0,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+        <RatingWithConfidence
+          rating={displayBefore}
+          confidence={0}
+          fontSize={13}
+          decimals={2}
+          align="start"
+          expand={false}
+          ratingColor={getRatingColor(displayBefore)}
+          confidenceTooltipContent={false}
+          showConfidence={false}
+        />
       </div>
 
       <span
         style={{
-          flexShrink: 0,
-          minWidth: 58,
-          padding: '4px 9px',
-          borderRadius: '999px',
-          textAlign: 'center',
-          border: isPositive
-            ? '1px solid color-mix(in srgb, var(--ui-accent-success) 32%, transparent)'
-            : '1px solid color-mix(in srgb, var(--ui-danger) 34%, transparent)',
-          background: isPositive
-            ? 'color-mix(in srgb, var(--ui-accent-success) 9%, transparent)'
-            : 'color-mix(in srgb, var(--ui-danger) 9%, transparent)',
-          color: isPositive
-            ? 'color-mix(in srgb, var(--ui-accent-success) 82%, white)'
-            : 'color-mix(in srgb, var(--ui-danger) 82%, white)',
           fontSize: 11,
-          fontWeight: 900,
-          letterSpacing: '0.03em',
-          lineHeight: 1,
+          fontWeight: 700,
+          color: 'var(--ui-text-dim)',
+          transform: 'translateY(-1px)',
         }}
       >
-        {formatDelta(displayDelta)}
+        →
       </span>
 
-      <style jsx>{`
-        .impact {
-          width: 100%;
-          min-width: 0;
-          min-height: 42px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 0 14px;
-          box-sizing: border-box;
-        }
+      <div style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+        <RatingWithConfidence
+          rating={displayAfter}
+          confidence={0}
+          fontSize={15}
+          decimals={2}
+          align="start"
+          expand={false}
+          ratingColor={getRatingColor(displayAfter)}
+          confidenceTooltipContent={false}
+          showConfidence={false}
+        />
+      </div>
 
-        @media (max-width: 700px) {
-          .impact {
-            min-height: 58px;
-            flex-direction: column;
-            justify-content: center;
-            gap: 5px;
-            padding: 7px 6px;
-          }
-        }
-      `}</style>
+      {showBadge && (
+        <span
+          style={{
+  padding: '3px 8px',
+  borderRadius: '999px',
+  border: '1px solid color-mix(in srgb, var(--ui-accent-primary) 55%, transparent)',
+  background:
+    'color-mix(in srgb, var(--ui-accent-primary) 18%, transparent)',
+  color: 'var(--ui-accent-primary)',
+  fontSize: 10,
+  fontWeight: 900,
+  letterSpacing: '0.04em',
+  lineHeight: 1,
+  transform: 'translateY(-1px)',
+}}
+        >
+          RANK #{impact.attribute_rank}
+        </span>
+      )}
     </div>
-  );
+
+    <span
+      style={{
+        flexShrink: 0,
+        minWidth: 58,
+        padding: '4px 9px',
+        borderRadius: '999px',
+        textAlign: 'center',
+        border: isPositive
+          ? '1px solid color-mix(in srgb, var(--ui-accent-success) 32%, transparent)'
+          : '1px solid color-mix(in srgb, var(--ui-danger) 34%, transparent)',
+        background: isPositive
+          ? 'color-mix(in srgb, var(--ui-accent-success) 9%, transparent)'
+          : 'color-mix(in srgb, var(--ui-danger) 9%, transparent)',
+        color: isPositive
+          ? 'color-mix(in srgb, var(--ui-accent-success) 82%, white)'
+          : 'color-mix(in srgb, var(--ui-danger) 82%, white)',
+        fontSize: 11,
+        fontWeight: 900,
+        letterSpacing: '0.03em',
+        lineHeight: 1,
+      }}
+    >
+      {formatDelta(displayDelta)}
+    </span>
+
+    <style jsx>{`
+      .impact {
+        width: 100%;
+        min-width: 0;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 14px;
+        box-sizing: border-box;
+      }
+
+      @media (max-width: 700px) {
+        .impact {
+          min-height: 58px;
+          flex-direction: column;
+          justify-content: center;
+          gap: 5px;
+          padding: 7px 6px;
+        }
+      }
+    `}</style>
+  </div>
+);
 }
