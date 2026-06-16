@@ -30,6 +30,8 @@ export type VoteApiResponse = {
     rating_after: number;
     delta: number;
     votes_count: number;
+    attribute_rank: number | null;
+    is_top_ten: boolean;
   }>;
 };
 
@@ -39,6 +41,8 @@ export type RatingImpact = {
   rating_after: number;
   delta: number;
   votes_count: number;
+  attribute_rank: number | null;
+  is_top_ten: boolean;
 };
 
 export type RatingsMap = Record<string, RatingImpact>;

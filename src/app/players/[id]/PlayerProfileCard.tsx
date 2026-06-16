@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
-import styles from './page.module.css';
-import PlayerRadarChart from './PlayerRadarChart';
-import PlayerAttributesSection from './PlayerAttributesSection';
-import PlayerOverallRating from './PlayerOverallRating';
-import AuthAwareScoutReportTrigger from './AuthAwareScoutReportTrigger';
-import { formatOverall } from '@/lib/ratings';
-import { calcAge } from '@/lib/playerAge';
+import { useEffect, useState } from "react";
+import styles from "./page.module.css";
+import PlayerRadarChart from "./PlayerRadarChart";
+import PlayerAttributesSection from "./PlayerAttributesSection";
+import PlayerOverallRating from "./PlayerOverallRating";
+import AuthAwareScoutReportTrigger from "./AuthAwareScoutReportTrigger";
+import { formatOverall } from "@/lib/ratings";
+import { calcAge } from "@/lib/playerAge";
+import Image from "next/image";
+import Tooltip from "@/components/Tooltip";
 
 export type PlayerProfileAttribute = {
   id: number;
@@ -17,7 +19,7 @@ export type PlayerProfileAttribute = {
   rating_weight_sum?: number;
   confidence_weight_sum?: number;
   votes_count: number;
- last_vote_at: string | null;
+  last_vote_at: string | null;
   your_rating: number | null;
   your_rating_updated_at?: string | null;
   trend_7d: number | null;
@@ -32,6 +34,9 @@ export type PlayerRadarAxis = {
 export type PlayerProfileData = {
   id: number;
   name: string;
+  archetype: {
+    label: string;
+  } | null;
   date_of_birth: string | null;
   position: string | null;
   overall: number | null;
@@ -57,19 +62,19 @@ type AttributeSection = {
 
 type AttributeDisplayItem =
   | {
-      type: 'header';
+      type: "header";
       id: string;
       title: string;
     }
   | {
-      type: 'attribute';
+      type: "attribute";
       id: string;
       attribute: PlayerProfileAttribute;
     };
 
 function pickAttrsByGroups(
   attrs: PlayerProfileAttribute[],
-  allowedGroups: readonly string[]
+  allowedGroups: readonly string[],
 ) {
   const allowed = new Set(allowedGroups);
 
@@ -78,20 +83,20 @@ function pickAttrsByGroups(
 
 function buildAttributeColumns(
   sections: AttributeSection[],
-  columnCount: number
+  columnCount: number,
 ): AttributeDisplayItem[][] {
   const flatItems: AttributeDisplayItem[] = [];
 
   for (const section of sections) {
     flatItems.push({
-      type: 'header',
+      type: "header",
       id: `header-${section.title}`,
       title: section.title,
     });
 
     for (const attribute of section.items) {
       flatItems.push({
-        type: 'attribute',
+        type: "attribute",
         id: `attr-${attribute.id}`,
         attribute,
       });
@@ -100,7 +105,7 @@ function buildAttributeColumns(
 
   const totalAttributes = sections.reduce(
     (acc, section) => acc + section.items.length,
-    0
+    0,
   );
 
   const basePerColumn = Math.floor(totalAttributes / columnCount);
@@ -113,7 +118,7 @@ function buildAttributeColumns(
 
   const columns: AttributeDisplayItem[][] = Array.from(
     { length: columnCount },
-    () => []
+    () => [],
   );
 
   let pointer = 0;
@@ -128,7 +133,7 @@ function buildAttributeColumns(
     while (pointer < flatItems.length) {
       const nextItem = flatItems[pointer];
 
-      if (nextItem.type === 'header') {
+      if (nextItem.type === "header") {
         if (
           !isLastColumn &&
           usedAttributes >= capacity &&
@@ -166,7 +171,6 @@ export default function PlayerProfileCard({
   data: PlayerProfileData;
   shouldAnimateRatings?: boolean;
 }) {
-
   const radarData = data.radar_axes.map((axis: PlayerRadarAxis) => ({
     key: axis.key,
     label: axis.label,
@@ -175,83 +179,74 @@ export default function PlayerProfileCard({
 
   const age = calcAge(data.date_of_birth);
 
-  const overall = formatOverall(data.overall, 'rounded');
+  const overall = formatOverall(data.overall, "rounded");
 
-  const overallExact = formatOverall(data.overall, 'exact');
+  const overallExact = formatOverall(data.overall, "exact");
 
   const overallDelta7d = data.overall_trend_7d;
 
-  const isGoalkeeper = data.position?.toUpperCase() === 'GK';
+  const isGoalkeeper = data.position?.toUpperCase() === "GK";
 
   const goalkeeping = pickAttrsByGroups(data.attributes, [
-    'SHOT_STOPPING',
-    'AERIAL',
-    'DISTRIBUTION',
-    'RUSHING_OUT',
-    'ECCENTRICITY',
+    "SHOT_STOPPING",
+    "AERIAL",
+    "DISTRIBUTION",
+    "RUSHING_OUT",
+    "ECCENTRICITY",
   ]);
 
-  const gkMental = pickAttrsByGroups(
-    data.attributes,
-    ['MENTALITY']
-  );
+  const gkMental = pickAttrsByGroups(data.attributes, ["MENTALITY"]);
 
-  const gkPhysical = pickAttrsByGroups(
-    data.attributes,
-    ['PACE', 'PHYSICALITY']
-  );
+  const gkPhysical = pickAttrsByGroups(data.attributes, [
+    "PACE",
+    "PHYSICALITY",
+  ]);
 
   const technical = pickAttrsByGroups(data.attributes, [
-    'TECHNIQUE',
-    'ATTACK',
-    'PASSING',
-    'DEFENCE',
-    'SET_PIECES',
+    "TECHNIQUE",
+    "ATTACK",
+    "PASSING",
+    "DEFENCE",
+    "SET_PIECES",
   ]);
 
-  const mental = pickAttrsByGroups(
-    data.attributes,
-    ['MENTALITY']
-  );
+  const mental = pickAttrsByGroups(data.attributes, ["MENTALITY"]);
 
-  const physical = pickAttrsByGroups(
-    data.attributes,
-    ['PACE', 'PHYSICALITY']
-  );
+  const physical = pickAttrsByGroups(data.attributes, ["PACE", "PHYSICALITY"]);
 
   const attributeSections = isGoalkeeper
     ? [
         {
-          title: 'Goalkeeping',
+          title: "Goalkeeping",
           items: goalkeeping,
         },
         {
-          title: 'Mental',
+          title: "Mental",
           items: gkMental,
         },
         {
-          title: 'Physical',
+          title: "Physical",
           items: gkPhysical,
         },
       ]
     : [
         {
-          title: 'Technical',
+          title: "Technical",
           items: technical,
         },
         {
-          title: 'Mental',
+          title: "Mental",
           items: mental,
         },
         {
-          title: 'Physical',
+          title: "Physical",
           items: physical,
         },
       ];
 
   const attributeColumns = buildAttributeColumns(
     attributeSections,
-    isGoalkeeper ? 2 : 3
+    isGoalkeeper ? 2 : 3,
   );
 
   const scoutReportAttributes = attributeSections
@@ -285,28 +280,47 @@ export default function PlayerProfileCard({
 
                   <span>{data.name}</span>
                 </h1>
+                {data.archetype ? (
+                  <Tooltip
+                    content="Player archetype"
+                    side="bottom"
+                    align="start"
+                  >
+                    <div className={styles.playerArchetype}>
+                      <Image
+                        src="/icons/clipboard-text.svg"
+                        width={16}
+                        height={16}
+                        alt=""
+                        aria-hidden
+                        style={{
+                          width: 16,
+                          height: 16,
+                          flex: "0 0 16px",
+                          objectFit: "contain",
+                          filter:
+                            "brightness(0) saturate(100%) invert(72%) sepia(55%) saturate(5111%) hue-rotate(193deg) brightness(101%) contrast(103%)",
+                        }}
+                      />
+                      <span>{data.archetype.label}</span>
+                    </div>
+                  </Tooltip>
+                ) : null}
 
                 <div className={styles.playerMeta}>
-                  <span>{data.club?.name ?? 'No club'}</span>
+                  <span>{data.club?.name ?? "No club"}</span>
 
                   <span className={styles.metaDot}>•</span>
 
-                  <span>
-                    {data.position ?? 'Unknown position'}
-                  </span>
+                  <span>{data.position ?? "Unknown position"}</span>
 
                   <span className={styles.metaDot}>•</span>
 
-                  <span>
-                    {data.country?.name ??
-                      'Unknown nationality'}
-                  </span>
+                  <span>{data.country?.name ?? "Unknown nationality"}</span>
 
                   {age != null ? (
                     <>
-                      <span className={styles.metaDot}>
-                        •
-                      </span>
+                      <span className={styles.metaDot}>•</span>
 
                       <span>{age}</span>
                     </>
@@ -317,20 +331,16 @@ export default function PlayerProfileCard({
 
             <div className={styles.topCardCenter}>
               <div className={styles.overallBlock}>
-                <div className={styles.overallLabel}>
-                  OVERALL
-                </div>
+                <div className={styles.overallLabel}>OVERALL</div>
 
                 <div className={styles.overallRow}>
                   <PlayerOverallRating
                     overall={overall}
-                    overallConfidence={
-                        data.overall_confidence
-                    }
+                    overallConfidence={data.overall_confidence}
                     overallExact={overallExact}
                     overallDelta7d={overallDelta7d}
                     shouldAnimate={shouldAnimateRatings}
-                    />
+                  />
                 </div>
               </div>
             </div>

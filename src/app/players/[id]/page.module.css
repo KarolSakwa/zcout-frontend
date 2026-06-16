@@ -25,7 +25,8 @@
   width: 40px;
   height: 82px;
   padding: 0;
-  border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
+  border: var(--ui-border-width-thin) solid
+    color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
   border-radius: 13px;
   background: color-mix(in srgb, var(--ui-surface-elevated) 68%, transparent);
   color: var(--ui-text-dim);
@@ -33,7 +34,12 @@
   font-weight: 800;
   line-height: 1;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
-  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
   z-index: 3;
 }
 
@@ -82,7 +88,8 @@
   min-height: 34px;
   padding: 0 2px 10px;
   margin-bottom: 10px;
-  border-bottom: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
+  border-bottom: var(--ui-border-width-thin) solid
+    color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
 }
 
 .topCardBack,
@@ -134,7 +141,8 @@
   height: 78%;
   min-height: 0;
   padding: 0;
-  border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 92%, transparent);
+  border: var(--ui-border-width-thin) solid
+    color-mix(in srgb, var(--ui-border-subtle) 92%, transparent);
   border-radius: var(--ui-radius-rail);
   background: color-mix(in srgb, var(--ui-surface-soft) 88%, transparent);
   color: var(--ui-text-dim);
@@ -145,7 +153,10 @@
 
 .topCardGrid {
   display: grid;
-  grid-template-columns: minmax(250px, 0.98fr) minmax(108px, 0.34fr) minmax(290px, 0.84fr);
+  grid-template-columns: minmax(250px, 0.98fr) minmax(108px, 0.34fr) minmax(
+      290px,
+      0.84fr
+    );
   gap: 6px;
   align-items: stretch;
   height: 100%;
@@ -252,7 +263,9 @@
 .attributeYouRating {
   font-family: var(--font-rating), "Segoe UI", system-ui, sans-serif;
   font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
 }
 
 .overallConfidence {
@@ -304,7 +317,8 @@
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  border: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-border-subtle) 88%, transparent);
+  border: var(--ui-border-width-thin) solid
+    color-mix(in srgb, var(--ui-border-subtle) 88%, transparent);
   border-radius: var(--ui-radius-panel-inner);
   background: color-mix(in srgb, var(--ui-surface-elevated) 90%, transparent);
   color: var(--ui-text-dim);
@@ -478,11 +492,19 @@
 }
 
 .attributeDeltaSoft {
-  color: color-mix(in srgb, var(--ui-accent-primary) 42%, var(--ui-text-primary));
+  color: color-mix(
+    in srgb,
+    var(--ui-accent-primary) 42%,
+    var(--ui-text-primary)
+  );
 }
 
 .attributeDeltaMedium {
-  color: color-mix(in srgb, var(--ui-accent-primary) 66%, var(--ui-text-primary));
+  color: color-mix(
+    in srgb,
+    var(--ui-accent-primary) 66%,
+    var(--ui-text-primary)
+  );
 }
 
 .attributeDeltaStrong {
@@ -516,6 +538,26 @@
   width: 100%;
 }
 
+.playerArchetype {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  color: var(--ui-accent-primary);
+  opacity: 0.82;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.playerArchetypeIcon {
+  font-size: 12px;
+  line-height: 1;
+}
+
 @media (max-width: 1420px) {
   .profileNavLeft {
     left: -44px;
@@ -532,7 +574,10 @@
   }
 
   .topCardGrid {
-    grid-template-columns: minmax(240px, 1fr) minmax(108px, 0.34fr) minmax(270px, 0.82fr);
+    grid-template-columns: minmax(240px, 1fr) minmax(108px, 0.34fr) minmax(
+        270px,
+        0.82fr
+      );
     gap: 4px;
   }
 
@@ -780,7 +825,8 @@
     justify-content: center;
     height: 230px;
     padding-right: 0;
-    border-top: 1px solid color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
+    border-top: 1px solid
+      color-mix(in srgb, var(--ui-border-subtle) 82%, transparent);
     padding-top: 14px;
     margin-top: 4px;
   }
