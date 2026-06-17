@@ -37,15 +37,14 @@
 
   border: 1px solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-xl);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(14, 24, 42, 0.35),
-      rgba(6, 12, 22, 0.25)
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(14, 24, 42, 0.35),
+    rgba(6, 12, 22, 0.25)
+  );
 
   min-height: 400px;
-  padding: 20px;
+  padding: 20px 20px 0;
 }
 
 .duel > * {
