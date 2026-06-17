@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import PlayerRadarChart from "./PlayerRadarChart";
 import PlayerAttributesSection from "./PlayerAttributesSection";
@@ -6,8 +5,7 @@ import PlayerOverallRating from "./PlayerOverallRating";
 import AuthAwareScoutReportTrigger from "./AuthAwareScoutReportTrigger";
 import { formatOverall } from "@/lib/ratings";
 import { calcAge } from "@/lib/playerAge";
-import Image from "next/image";
-import Tooltip from "@/components/Tooltip";
+import PlayerArchetype from "./PlayerArchetype";
 
 export type PlayerProfileAttribute = {
   id: number;
@@ -281,30 +279,7 @@ export default function PlayerProfileCard({
                   <span>{data.name}</span>
                 </h1>
                 {data.archetype ? (
-                  <Tooltip
-                    content="Player archetype"
-                    side="bottom"
-                    align="start"
-                  >
-                    <div className={styles.playerArchetype}>
-                      <Image
-                        src="/icons/clipboard-text.svg"
-                        width={16}
-                        height={16}
-                        alt=""
-                        aria-hidden
-                        style={{
-                          width: 16,
-                          height: 16,
-                          flex: "0 0 16px",
-                          objectFit: "contain",
-                          filter:
-                            "brightness(0) saturate(100%) invert(72%) sepia(55%) saturate(5111%) hue-rotate(193deg) brightness(101%) contrast(103%)",
-                        }}
-                      />
-                      <span>{data.archetype.label}</span>
-                    </div>
-                  </Tooltip>
+                  <PlayerArchetype label={data.archetype.label} />
                 ) : null}
 
                 <div className={styles.playerMeta}>
