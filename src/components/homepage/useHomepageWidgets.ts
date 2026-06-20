@@ -1,0 +1,40 @@
+'use client';
+
+const HOMEPAGE_ITEMS_LIMIT = 5;
+
+type NeedsMoreRatingsResponse = {
+  items: NeedsMoreRatingsItem[];
+};
+
+export type NeedsMoreRatingsItem = {
+  id: string;
+  playerId: number;
+  player: string;
+  slug: string | null;
+  club: string | null;
+  position: string | null;
+  confidence: number;
+};
+
+async function fetchJson<T>(input: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(input, {
+    method: 'GET',
+    cache: 'no-store',
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+export async function fetchNeedsMoreRatings(
+  signal?: AbortSignal
+): Promise<NeedsMoreRatingsResponse> {
+  return fetchJson<NeedsMoreRatingsResponse>(
+    `/api/homepage/needs-more-ratings?limit=${HOMEPAGE_ITEMS_LIMIT}`,
+    signal
+  );
+}
