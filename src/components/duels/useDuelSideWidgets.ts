@@ -98,11 +98,20 @@ async function fetchJson<T>(input: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-async function fetchTopMoversSummary(
+export async function fetchTopMoversSummary(
   signal?: AbortSignal
 ): Promise<TopMoversSummaryResponse> {
   return fetchJson<TopMoversSummaryResponse>(
     `/api/live/top-movers-summary?period=7d&limit=${LIVE_ITEMS_LIMIT}`,
+    signal
+  );
+}
+
+export async function fetchRecentVotes(
+  signal?: AbortSignal
+): Promise<RecentVotesResponse> {
+  return fetchJson<RecentVotesResponse>(
+    `/api/live/recent-votes?limit=${LIVE_ITEMS_LIMIT}`,
     signal
   );
 }
@@ -142,10 +151,7 @@ export function useDuelSideWidgets(_pair: unknown) {
       try {
         setIsRecentVotesLoading(true);
 
-        const data = await fetchJson<RecentVotesResponse>(
-          `/api/live/recent-votes?limit=${LIVE_ITEMS_LIMIT}`,
-          controller.signal
-        );
+        const data = await fetchRecentVotes(controller.signal);
 
         const items = Array.isArray(data.items) ? data.items : [];
 

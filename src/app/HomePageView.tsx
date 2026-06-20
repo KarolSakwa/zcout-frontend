@@ -25,20 +25,32 @@ export default async function HomePageView() {
     <main className={styles.page}>
       <div className={styles.container}>
         <section className={styles.rowHero}>
-          <HeroSection />
-          <FeaturedPlayerSection player={featuredPlayer} />
+          <div className={`${styles.gridItem} ${styles.colSpan7}`}>
+            <HeroSection />
+          </div>
+          <div className={`${styles.gridItem} ${styles.colSpan5}`}>
+            <FeaturedPlayerSection player={featuredPlayer} />
+          </div>
         </section>
 
         <section className={styles.rowMain}>
-          <TopRisersSection />
-          <TopFallersSection />
-
-          <div className={styles.duel}>
+          <div className={`${styles.gridItem} ${styles.colSpan3}`}>
+            <TopRisersSection />
+          </div>
+          <div className={`${styles.gridItem} ${styles.colSpan4}`}>
+            <TopFallersSection />
+          </div>
+          <div
+            className={`${styles.gridItem} ${styles.colSpan5} ${styles.rowSpan2} ${styles.duel}`}
+          >
             <DuelWidgetSection />
           </div>
-
-          <LatestVotesSection />
-          <NeedsMoreRatingsSection />
+          <div className={`${styles.gridItem} ${styles.colSpan4}`}>
+            <LatestVotesSection />
+          </div>
+          <div className={`${styles.gridItem} ${styles.colSpan3}`}>
+            <NeedsMoreRatingsSection />
+          </div>
         </section>
 
         <section className={styles.rowRankings}>

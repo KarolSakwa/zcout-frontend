@@ -7,22 +7,48 @@
 
 .rowHero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 24px;
   align-items: stretch;
 }
 
 .rowMain {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 24px;
+  grid-template-rows: auto auto;
 }
 
-.leftStack {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.gridItem {
+  min-width: 0;
+}
+
+.colSpan3 {
+  grid-column: span 3;
+}
+
+.colSpan4 {
+  grid-column: span 4;
+}
+
+.colSpan5 {
+  grid-column: span 5;
+}
+
+.colSpan6 {
+  grid-column: span 6;
+}
+
+.colSpan7 {
+  grid-column: span 7;
+}
+
+.colSpan12 {
+  grid-column: span 12;
+}
+
+.rowSpan2 {
+  grid-row: span 2;
 }
 
 .rowRankings {
@@ -30,8 +56,6 @@
 }
 
 .duel {
-  grid-column: 3;
-  grid-row: 1 / span 2;
   display: flex;
   justify-content: center;
 
@@ -84,8 +108,15 @@
 }
 
 @media (max-width: 1024px) {
-  .rowHero,
-  .rowMain {
-    grid-template-columns: 1fr;
+  .colSpan3,
+  .colSpan4,
+  .colSpan5,
+  .colSpan6,
+  .colSpan7 {
+    grid-column: span 12;
+  }
+
+  .rowSpan2 {
+    grid-row: span 1;
   }
 }

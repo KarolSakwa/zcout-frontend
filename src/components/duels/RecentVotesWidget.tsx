@@ -3,7 +3,7 @@
 import LiveWidgetAttributeMeta from '@/components/duels/LiveWidgetAttributeMeta';
 import Link from 'next/link';
 
-type RecentVoteItem = {
+export type RecentVoteItem = {
   id: string;
   leftPlayer: string;
   rightPlayer: string;
@@ -17,19 +17,29 @@ type RecentVoteItem = {
 export default function RecentVotesWidget({
   items,
   latestItemId,
+  embedded = false,
 }: {
   items: RecentVoteItem[];
   latestItemId: string | null;
+  embedded?: boolean;
 }) {
   return (
     <aside
-      className="recentVotesWidget"
+      className={embedded ? 'recentVotesWidgetEmbedded' : 'recentVotesWidget'}
       style={{
-        position: 'absolute',
-        top: 'clamp(210px, 20vh, 300px)',
-        transform: 'none',
-        left: 'calc(100% + var(--duel-widget-offset, 40px))',
-        width: 'var(--duel-widget-width, 318px)',
+        ...(embedded
+          ? {
+              position: 'relative',
+              width: '100%',
+            }
+          : {
+              position: 'absolute',
+              top: 'clamp(210px, 20vh, 300px)',
+              transform: 'none',
+              left: 'calc(100% + var(--duel-widget-offset, 40px))',
+              width: 'var(--duel-widget-width, 318px)',
+              zIndex: 20,
+            }),
         height: 'auto',
         borderRadius: '22px',
         border: '1px solid rgba(140, 170, 210, 0.16)',
@@ -38,7 +48,6 @@ export default function RecentVotesWidget({
         padding: '14px 14px 10px',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        zIndex: 20,
       }}
     >
       <div
