@@ -15,12 +15,57 @@
 .rowMain {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 24px;
+  column-gap: 30px;
+  row-gap: 24px;
   grid-template-rows: auto auto;
+  margin-top: 12px;
 }
 
 .gridItem {
   min-width: 0;
+}
+
+.moversCluster {
+  grid-column: 1 / 8;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.moversWidget {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.moversWidget > * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.secondaryCluster {
+  grid-column: 1 / 8;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.recentVotesWidgetSlot {
+  flex: 3 1 0;
+  min-width: 0;
+}
+
+.nmrWidgetSlot {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.secondaryCluster > * > * {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .colSpan3 {
@@ -53,11 +98,15 @@
 
 .rowRankings {
   width: 100%;
+  margin-top: 12px;
 }
 
 .duel {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  align-self: start;
+  grid-column: 8 / span 5;
 
   border: 1px solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-xl);
@@ -118,5 +167,22 @@
 
   .rowSpan2 {
     grid-row: span 1;
+  }
+
+  .duel {
+    grid-column: span 12;
+  }
+
+  .moversCluster {
+    grid-column: span 12;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .secondaryCluster {
+    grid-column: span 12;
+    flex-direction: column;
+    gap: 30px;
+    padding-right: 0;
   }
 }

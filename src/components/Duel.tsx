@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import ZLoader from "./ZLoader";
 import type {
   PairResponse,
@@ -728,7 +729,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                     }}
                   >
                     <Tooltip content={attributeDescriptions[attribute] ?? ""}>
-                      <div
+                      <Link
+                        href="/duels"
+                        className="duelHomepageAttributeLink"
                         style={{
                           display: "flex",
                           alignItems: "center",
@@ -736,12 +739,12 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                           width: "100%",
                           gap: 8,
                           marginBottom: 12,
-                          cursor: "help",
                           color: "var(--ui-text-muted)",
                           fontSize: 15,
                           fontWeight: 800,
                           letterSpacing: "0.12em",
                           textTransform: "uppercase",
+                          textDecoration: "none",
                         }}
                       >
                         <>
@@ -775,7 +778,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                           label={attribute}
                           size={22}
                         />
-                      </div>
+                      </Link>
                     </Tooltip>
                   </div>
                 ) : (
@@ -938,6 +941,15 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       </div>
 
       <style jsx>{`
+        .duelHomepageAttributeLink {
+          cursor: pointer;
+          transition: opacity 140ms ease;
+        }
+
+        .duelHomepageAttributeLink:hover {
+          opacity: 0.88;
+        }
+
         .duelStageOuter {
           position: relative;
           width: 100%;

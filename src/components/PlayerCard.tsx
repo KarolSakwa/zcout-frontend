@@ -61,6 +61,7 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
     <article
       className="card"
       data-state={state}
+      data-compact={compact ? 'true' : undefined}
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -237,6 +238,43 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           font-size: 12px;
         }
 
+        .card[data-compact='true'] .top {
+          padding: 8px 9px 5px;
+          min-height: 40px;
+        }
+
+        .card[data-compact='true'] .name {
+          font-size: 11px;
+          max-width: calc(100% - 72px);
+          letter-spacing: 0.025em;
+        }
+
+        .card[data-compact='true'] .name.nameLong {
+          font-size: 10px;
+          letter-spacing: 0.02em;
+        }
+
+        .card[data-compact='true'] .name.nameVeryLong {
+          font-size: 9px;
+          letter-spacing: 0.015em;
+        }
+
+        .card[data-compact='true'] .posBadge {
+          width: 28px;
+          height: 20px;
+          border-radius: var(--ui-radius-sm);
+          box-shadow: 0 5px 12px rgba(0, 0, 0, 0.38);
+        }
+
+        .card[data-compact='true'] .posText {
+          font-size: 8px;
+          letter-spacing: 0.03em;
+        }
+
+        .card[data-compact='true'] .mid {
+          transform: translateY(-12px);
+        }
+
         .nameLong {
           font-size: 15px;
           letter-spacing: 0.02em;
@@ -372,6 +410,28 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           max-width: calc(100% - 76px);
         }
 
+        .card[data-compact='true'] .name {
+          font-size: 11px;
+          max-width: calc(100% - 72px);
+        }
+
+        .card[data-compact='true'] .name.nameLong {
+          font-size: 10px;
+        }
+
+        .card[data-compact='true'] .name.nameVeryLong {
+          font-size: 9px;
+        }
+
+        .card[data-compact='true'] .posBadge {
+          width: 28px;
+          height: 16px;
+        }
+
+        .card[data-compact='true'] .posText {
+          font-size: 8px;
+        }
+
         .club {
           font-size: 10px;
         }
@@ -405,6 +465,18 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
             font-size: 14px;
           }
 
+          .card[data-compact='true'] .name {
+            font-size: 11px;
+          }
+
+          .card[data-compact='true'] .name.nameLong {
+            font-size: 10px;
+          }
+
+          .card[data-compact='true'] .name.nameVeryLong {
+            font-size: 9px;
+          }
+
           .club {
             font-size: 11px;
           }
@@ -436,6 +508,19 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           -webkit-line-clamp: 2;
         }
 
+        .card[data-compact='true'] .name {
+          font-size: 11px;
+          max-width: calc(100% - 64px);
+        }
+
+        .card[data-compact='true'] .name.nameLong {
+          font-size: 10px;
+        }
+
+        .card[data-compact='true'] .name.nameVeryLong {
+          font-size: 9px;
+        }
+
         .posBadge {
           right: 6px;
           top: 7px;
@@ -461,6 +546,10 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           .mid {
             height: 58%;
             transform: translateY(-8px);
+          }
+
+          .card[data-compact='true'] .mid {
+            transform: translateY(-12px);
           }
       }
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./HomepageSection.module.css";
 import PlayerRadarChart from "@/app/players/[id]/PlayerRadarChart";
 import RatingWithConfidence from "@/components/RatingWithConfidence";
@@ -12,6 +13,8 @@ type RadarAxis = {
 };
 
 type FeaturedPlayer = {
+  id?: number;
+  player_id?: number;
   name: string;
   rank: number | null;
   position: string | null;
@@ -37,6 +40,8 @@ type Props = {
 export default function FeaturedPlayerSection({ player }: Props) {
   const radarData = player.radar_axes;
   const age = calcAge(player.date_of_birth);
+  const playerId = player.id ?? player.player_id;
+  const nameFontSize = player.name.length > 18 ? 24 : 28;
 
   return (
     <div className={styles.card}>
@@ -47,16 +52,30 @@ export default function FeaturedPlayerSection({ player }: Props) {
       <div className={styles.playerContent}>
         <div className={styles.playerLeftColumn}>
           <div className={styles.playerHeader}>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: player.name.length > 18 ? 24 : 28,
-                fontWeight: 800,
-                lineHeight: 1,
-              }}
-            >
-              {player.name}
-            </h2>
+            {playerId != null ? (
+              <Link
+                href={`/players/${playerId}`}
+                className={styles.playerNameLink}
+                style={{
+                  fontSize: nameFontSize,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                }}
+              >
+                {player.name}
+              </Link>
+            ) : (
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: nameFontSize,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                }}
+              >
+                {player.name}
+              </h2>
+            )}
 
             {player.archetype ? (
               <PlayerArchetype label={player.archetype.label} />

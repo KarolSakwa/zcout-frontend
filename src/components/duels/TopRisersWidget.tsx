@@ -96,24 +96,17 @@ export default function TopRisersWidget({
           <div
             key={item.id}
             style={{
-              padding: '11px 0 10px',
+              padding: embedded ? '7px 0' : '11px 0 10px',
               borderTop: '1px solid rgba(255,255,255,0.05)',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 12,
-              }}
-            >
+            {embedded ? (
               <div
                 style={{
-                  minWidth: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4,
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(0, 6fr) minmax(0, 4fr) minmax(0, 2fr)',
+                  alignItems: 'center',
+                  columnGap: 8,
                 }}
               >
                 <Link
@@ -127,38 +120,95 @@ export default function TopRisersWidget({
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
+                    minWidth: 0,
                   }}
                 >
                   {item.player}
                 </Link>
 
-                <div
-                  style={{
-                    color: 'rgba(170,184,205,0.74)',
-                    fontSize: 11,
-                    fontWeight: 500,
-                    lineHeight: 1.2,
-                  }}
-                >
+                <div style={{ minWidth: 0, justifySelf: 'start' }}>
                   <LiveWidgetAttributeMeta
                     attributeKey={item.attributeKey}
                     attributeLabel={item.attributeLabel}
+                    variant="inline"
                   />
                 </div>
-              </div>
 
+                <div
+                  style={{
+                    justifySelf: 'end',
+                    color: deltaColor,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    letterSpacing: '0.02em',
+                    whiteSpace: 'nowrap',
+                    textAlign: 'right',
+                  }}
+                >
+                  {item.delta}
+                </div>
+              </div>
+            ) : (
               <div
                 style={{
-                  flexShrink: 0,
-                  color: deltaColor,
-                  fontSize: 13,
-                  fontWeight: 800,
-                  letterSpacing: '0.02em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
                 }}
               >
-                {item.delta}
+                <div
+                  style={{
+                    minWidth: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
+                  <Link
+                    href={`/players/${item.playerId}`}
+                    className="topRiserPlayerLink"
+                    style={{
+                      color: 'rgba(232,240,252,0.95)',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {item.player}
+                  </Link>
+
+                  <div
+                    style={{
+                      color: 'rgba(170,184,205,0.74)',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    <LiveWidgetAttributeMeta
+                      attributeKey={item.attributeKey}
+                      attributeLabel={item.attributeLabel}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    flexShrink: 0,
+                    color: deltaColor,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {item.delta}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ))}
       </div>

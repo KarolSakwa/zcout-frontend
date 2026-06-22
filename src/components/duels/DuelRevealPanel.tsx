@@ -55,7 +55,7 @@ export default function DuelRevealPanel({
     duelVotePct.left >= 0 &&
     duelVotePct.right >= 0;
 
-  const label = useMemo(() => "Crowd verdict", []);
+  const label = "Crowd verdict";
 
   const leftImpact = postVoteRatings
     ? postVoteRatings[String(leftId)]
@@ -86,7 +86,7 @@ export default function DuelRevealPanel({
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: -4,
+            marginBottom: -10,
             fontSize: 10,
             letterSpacing: "0.12em",
             textTransform: "uppercase",

@@ -14,7 +14,24 @@ export type NeedsMoreRatingsItem = {
   club: string | null;
   position: string | null;
   confidence: number;
+  rating?: number | null;
+  overall?: number | null;
+  overall_rating?: number | null;
 };
+
+// export function getNeedsMoreRatingsDisplayRating(
+//   item: NeedsMoreRatingsItem
+// ): number | null {
+//   const candidates = [item.rating, item.overall, item.overall_rating];
+
+//   for (const candidate of candidates) {
+//     if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+//       return candidate;
+//     }
+//   }
+
+//   return null;
+// }
 
 async function fetchJson<T>(input: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(input, {

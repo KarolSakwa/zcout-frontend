@@ -2,13 +2,7 @@ import GlobalSearch from '@/components/GlobalSearch';
 
 export default function HeroSection() {
   return (
-    <section
-      style={{
-        padding: '36px',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '16px',
-      }}
-    >
+    <section>
       <h1
         style={{
           margin: 0,
@@ -34,7 +28,7 @@ export default function HeroSection() {
           lineHeight: 1.6,
         }}
       >
-        Zcout is a community-driven scouting database.
+        Community-built football intelligence.
         <br />
         Real opinions. Live ratings. Always evolving.
       </p>
