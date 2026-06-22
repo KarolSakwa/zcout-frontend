@@ -116,33 +116,10 @@ export async function fetchRecentVotes(
   );
 }
 
-export function useDuelSideWidgets(_pair: unknown) {
+export function useRecentVotesLive() {
   const [recentVotes, setRecentVotes] = useState<RecentVoteItem[]>([]);
   const [latestRecentVoteId, setLatestRecentVoteId] = useState<string | null>(null);
-
-  const [topMoversMode, setTopMoversMode] = useState<TopMoversMode>('risers');
-  const [riserItems, setRiserItems] = useState<TopRiserItem[]>([]);
-  const [fallerItems, setFallerItems] = useState<TopRiserItem[]>([]);
-
   const [isRecentVotesLoading, setIsRecentVotesLoading] = useState(true);
-  const [isTopMoversLoading, setIsTopMoversLoading] = useState(true);
-
-  const topMoversDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const refetchTopMoversSummary = useCallback(async () => {
-    try {
-      const summary = await fetchTopMoversSummary();
-
-      setRiserItems(Array.isArray(summary.risers) ? summary.risers : []);
-      setFallerItems(Array.isArray(summary.fallers) ? summary.fallers : []);
-    } catch (error) {
-      console.error('Failed to refetch top movers summary', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    setTopMoversMode(resolveDailyMode());
-  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -166,6 +143,65 @@ export function useDuelSideWidgets(_pair: unknown) {
     })();
 
     return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    initEcho();
+
+    if (typeof window === 'undefined' || !window.Echo) {
+      return;
+    }
+
+    const channel = window.Echo.channel('live');
+
+    const handleRecentVote = (item: RecentVoteItem) => {
+      setRecentVotes((prev) => {
+        const next = [item, ...prev.filter((existing) => existing.id !== item.id)];
+        return next.slice(0, LIVE_ITEMS_LIMIT);
+      });
+
+      setLatestRecentVoteId(item.id);
+    };
+
+    channel.listen('.live.recent-vote.created', handleRecentVote);
+
+    return () => {
+      channel.stopListening?.('.live.recent-vote.created');
+      window.Echo?.leaveChannel?.('live');
+    };
+  }, []);
+
+  return {
+    recentVotes,
+    latestRecentVoteId,
+    isRecentVotesLoading,
+  };
+}
+
+export function useDuelSideWidgets(_pair: unknown) {
+  const { recentVotes, latestRecentVoteId, isRecentVotesLoading } = useRecentVotesLive();
+
+  const [topMoversMode, setTopMoversMode] = useState<TopMoversMode>('risers');
+  const [riserItems, setRiserItems] = useState<TopRiserItem[]>([]);
+  const [fallerItems, setFallerItems] = useState<TopRiserItem[]>([]);
+
+  const [isTopMoversLoading, setIsTopMoversLoading] = useState(true);
+
+  const topMoversDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refetchTopMoversSummary = useCallback(async () => {
+    try {
+      const summary = await fetchTopMoversSummary();
+
+      setRiserItems(Array.isArray(summary.risers) ? summary.risers : []);
+      setFallerItems(Array.isArray(summary.fallers) ? summary.fallers : []);
+    } catch (error) {
+      console.error('Failed to refetch top movers summary', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    setTopMoversMode(resolveDailyMode());
   }, []);
 
   useEffect(() => {
@@ -199,15 +235,6 @@ export function useDuelSideWidgets(_pair: unknown) {
 
       const channel = window.Echo.channel('live');
 
-      const handleRecentVote = (item: RecentVoteItem) => {
-        setRecentVotes(prev => {
-          const next = [item, ...prev.filter(existing => existing.id !== item.id)];
-          return next.slice(0, LIVE_ITEMS_LIMIT);
-        });
-
-        setLatestRecentVoteId(item.id);
-      };
-
       const handleTopMoversMaybeChanged = () => {
         if (topMoversDebounceRef.current) {
           clearTimeout(topMoversDebounceRef.current);
@@ -219,7 +246,6 @@ export function useDuelSideWidgets(_pair: unknown) {
         }, TOP_MOVERS_REFETCH_DEBOUNCE_MS);
       };
 
-      channel.listen<RecentVoteItem>('.live.recent-vote.created', handleRecentVote);
       channel.listen('.live.top-movers.maybe-changed', handleTopMoversMaybeChanged);
 
       return () => {
@@ -228,7 +254,6 @@ export function useDuelSideWidgets(_pair: unknown) {
           topMoversDebounceRef.current = null;
         }
 
-        channel.stopListening?.('.live.recent-vote.created');
         channel.stopListening?.('.live.top-movers.maybe-changed');
         window.Echo?.leaveChannel?.('live');
       };

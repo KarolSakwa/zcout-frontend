@@ -46,7 +46,7 @@ export default function DuelImpact({
   const displayAfter = roundToDisplay(after);
   const displayDelta = roundToDisplay(displayAfter - displayBefore);
   const isPositive = displayDelta >= 0;
-  const showBadge = true;
+  const showBadge = impact.is_top_ten && impact.attribute_rank !== null;
   const compactMode = homepageMode;
 
   void playerId;
