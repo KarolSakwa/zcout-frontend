@@ -7,6 +7,11 @@ Inspired by Football Manager-style scouting and designed around ultra-fast inter
 ---
 
 # Screenshots
+
+## Homepage
+
+![Homepage Screen](./public/screenshots/homepage.jpg)
+
 ## Duel Experience
 
 ![Duel Screen](./public/screenshots/duel.jpg)
