@@ -58,7 +58,9 @@ export default async function HomePageView() {
         </section>
 
         <section className={styles.rowRankings}>
-          <FeaturedRankingsSection />
+          <div className={styles.rowRankingsTrack}>
+            <FeaturedRankingsSection />
+          </div>
         </section>
       </div>
     </main>

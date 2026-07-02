@@ -44,7 +44,7 @@ export default function DuelCardsRow({
 
   return (
     <>
-      <div className="duelCardsRow">
+      <div className={`duelCardsRow${homepageMode ? ' duelCardsRowHomepage' : ''}`}>
         <div className="flex flex-col gap-2" style={cardStyle('left')}>
           {isHomepageLoading ? (
             <div className="cardPlaceholder" aria-hidden />
@@ -63,6 +63,7 @@ export default function DuelCardsRow({
               isWinner={lastWinner === pair!.left.id}
               glowColor={glow}
               compact={homepageMode}
+              homepageMode={homepageMode}
             />
           )}
         </div>
@@ -93,6 +94,7 @@ export default function DuelCardsRow({
               isWinner={lastWinner === pair!.right.id}
               glowColor={glow}
               compact={homepageMode}
+              homepageMode={homepageMode}
             />
           )}
         </div>
@@ -153,6 +155,35 @@ export default function DuelCardsRow({
             top: 42%;
             transform: translate(-50%, -50%);
             z-index: 5;
+          }
+        }
+        .duelCardsRowHomepage {
+          grid-template-columns: minmax(0, 1fr) 71px minmax(0, 1fr);
+          gap: 31px;
+          width: min(100%, 425px);
+          margin: 17px auto 0;
+        }
+
+        @media (max-width: 1720px) {
+          .duelCardsRowHomepage {
+            grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
+            gap: 20px;
+            width: min(100%, 561px);
+          }
+        }
+
+        @media (max-width: 1360px) {
+          .duelCardsRowHomepage {
+            grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+            gap: 17px;
+            width: min(100%, 527px);
+          }
+        }
+
+        @media (max-width: 700px) {
+          .duelCardsRowHomepage {
+            width: 100%;
+            margin: 20px auto 0;
           }
         }
       `}</style>

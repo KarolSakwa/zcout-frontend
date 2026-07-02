@@ -1,24 +1,24 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 24px;
+  gap: 20px;
+  padding: 20px;
 }
 
 .rowHero {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 24px;
+  gap: 20px;
   align-items: stretch;
 }
 
 .rowMain {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: 30px;
-  row-gap: 24px;
+  column-gap: 25px;
+  row-gap: 20px;
   grid-template-rows: auto auto;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .gridItem {
@@ -29,7 +29,7 @@
   grid-column: 1 / 8;
   display: flex;
   flex-direction: row;
-  gap: 30px;
+  gap: 25px;
   align-items: flex-start;
   min-width: 0;
 }
@@ -48,7 +48,7 @@
   grid-column: 1 / 8;
   display: flex;
   flex-direction: row;
-  gap: 30px;
+  gap: 25px;
   align-items: flex-start;
   min-width: 0;
 }
@@ -97,8 +97,17 @@
 }
 
 .rowRankings {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 25px;
+  margin-top: 10px;
   width: 100%;
-  margin-top: 12px;
+  min-width: 0;
+}
+
+.rowRankingsTrack {
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 
 .duel {
@@ -116,24 +125,24 @@
     rgba(6, 12, 22, 0.25)
   );
 
-  min-height: 400px;
-  padding: 20px 20px 0;
+  min-height: 340px;
+  padding: 17px 17px 0;
 }
 
 .duel > * {
   width: 100%;
-  max-width: 760px;
+  max-width: 646px;
 }
 
 .playerCard {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 24px;
+  grid-template-columns: 1fr 272px;
+  gap: 20px;
   align-items: start;
 }
 
 .playerRadar {
-  height: 260px;
+  height: 221px;
 }
 
 .playerMeta {
@@ -146,7 +155,7 @@
 
 .container {
   width: 100%;
-  max-width: 1600px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 

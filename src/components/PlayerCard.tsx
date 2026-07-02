@@ -1,6 +1,7 @@
 'use client';
 
 import React, { type CSSProperties } from 'react';
+import { getHomepagePlayerNameDisplay } from '@/lib/homepagePlayerName';
 
 type PlayerCardProps = {
   name: string;
@@ -17,6 +18,7 @@ type PlayerCardProps = {
   glowColor?: string;
   revealFooter?: React.ReactNode;
   compact?: boolean;
+  homepageMode?: boolean;
 };
 
 export default function PlayerCard({
@@ -33,11 +35,13 @@ export default function PlayerCard({
   glowColor,
   revealFooter,
   compact = false,
+  homepageMode = false,
 }: PlayerCardProps) {
   const state = reveal ? (isWinner ? 'winner' : 'loser') : 'idle';
 
   const normalizedName = String(name ?? '').toUpperCase();
   const nameLengthClass = normalizedName.length >= 24 ? 'nameVeryLong' : normalizedName.length >= 18 ? 'nameLong' : '';
+  const homepageName = homepageMode ? getHomepagePlayerNameDisplay(name) : null;
 
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
   const specialFlags: Record<string, string> = {
@@ -62,6 +66,7 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
       className="card"
       data-state={state}
       data-compact={compact ? 'true' : undefined}
+      data-homepage={homepageMode ? 'true' : undefined}
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -73,17 +78,29 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
 
       <div className="inner">
         <div className="top">
-          <div
-            className={[
-              'name',
-              compact ? 'nameCompact' : '',
-              nameLengthClass,
-            ]
-              .filter(Boolean)
-              .join(' ')}
-          >
-            {normalizedName}
-          </div>
+          {homepageMode && homepageName ? (
+            <div
+              className="name nameHomepage"
+              style={{ fontSize: `${homepageName.fontSizePx}px` }}
+            >
+              <span className="nameLine">{homepageName.firstLine}</span>
+              {homepageName.secondLine ? (
+                <span className="nameLine">{homepageName.secondLine}</span>
+              ) : null}
+            </div>
+          ) : (
+            <div
+              className={[
+                'name',
+                compact ? 'nameCompact' : '',
+                nameLengthClass,
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {normalizedName}
+            </div>
+          )}
 
           <div className="posBadge" aria-label="Pozycja">
             <span className="posText">{position ?? '--'}</span>
@@ -239,40 +256,81 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         }
 
         .card[data-compact='true'] .top {
-          padding: 8px 9px 5px;
-          min-height: 40px;
+          padding: 7px 8px 4px;
+          min-height: 34px;
         }
 
         .card[data-compact='true'] .name {
-          font-size: 11px;
-          max-width: calc(100% - 72px);
+          font-size: 10px;
+          max-width: calc(100% - 64px);
           letter-spacing: 0.025em;
         }
 
         .card[data-compact='true'] .name.nameLong {
-          font-size: 10px;
+          font-size: 9px;
           letter-spacing: 0.02em;
         }
 
         .card[data-compact='true'] .name.nameVeryLong {
-          font-size: 9px;
+          font-size: 8px;
           letter-spacing: 0.015em;
         }
 
         .card[data-compact='true'] .posBadge {
-          width: 28px;
-          height: 20px;
+          width: 24px;
+          height: 17px;
           border-radius: var(--ui-radius-sm);
-          box-shadow: 0 5px 12px rgba(0, 0, 0, 0.38);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.38);
         }
 
         .card[data-compact='true'] .posText {
-          font-size: 8px;
+          font-size: 7px;
           letter-spacing: 0.03em;
         }
 
         .card[data-compact='true'] .mid {
-          transform: translateY(-12px);
+          transform: translateY(-10px);
+        }
+
+        .card[data-homepage='true'] .name.nameHomepage {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          max-width: calc(100% - 58px);
+          line-height: 1.05;
+          letter-spacing: 0.02em;
+          white-space: normal;
+          overflow: hidden;
+        }
+
+        .card[data-homepage='true'] .nameLine {
+          display: block;
+          max-width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .card[data-homepage='true'] .flag {
+          left: 7px;
+          top: 9px;
+        }
+
+        .card[data-homepage='true'] .flagImg {
+          width: 18px;
+          height: 12px;
+        }
+
+        .card[data-homepage='true'] .posBadge {
+          right: 7px;
+          top: 6px;
+          width: 22px;
+          height: 15px;
+        }
+
+        .card[data-homepage='true'] .posText {
+          font-size: 6.5px;
         }
 
         .nameLong {
@@ -340,7 +398,7 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         }
 
         .number.numberCompact {
-          font-size: clamp(42px, 4vw, 62px);
+          font-size: clamp(36px, 3.4vw, 53px);
         }
 
         .bottom {
@@ -368,7 +426,7 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         }
 
         .club.clubCompact {
-          font-size: 9px;
+          font-size: 8px;
           letter-spacing: 0.03em;
         }
 

@@ -722,7 +722,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                     style={{
                       display: "flex",
                       justifyContent: "center",
-                      marginBottom: 12,
+                      marginBottom: 10,
                     }}
                   >
                     <Tooltip content={attributeDescriptions[attribute] ?? ""}>
@@ -734,10 +734,10 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                           alignItems: "center",
                           justifyContent: "center",
                           width: "100%",
-                          gap: 8,
-                          marginBottom: 12,
+                          gap: 7,
+                          marginBottom: 10,
                           color: "var(--ui-text-muted)",
-                          fontSize: 15,
+                          fontSize: 13,
                           fontWeight: 800,
                           letterSpacing: "0.12em",
                           textTransform: "uppercase",
@@ -748,7 +748,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                           <span
                             style={{
                               color: "var(--ui-text-muted)",
-                              fontSize: 11,
+                              fontSize: 10,
                               fontWeight: 800,
                               letterSpacing: "0.12em",
                             }}
@@ -759,7 +759,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                           <span
                             style={{
                               color: "var(--ui-text-primary)",
-                              fontSize: 20,
+                              fontSize: 17,
                               fontWeight: 900,
                               letterSpacing: "0.08em",
                             }}
@@ -773,7 +773,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                         <AttributeIcon
                           attributeKey={attribute}
                           label={attribute}
-                          size={22}
+                          size={19}
                         />
                       </Link>
                     </Tooltip>
@@ -860,7 +860,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
         <div
           style={{
-            height: 160,
+            height: homepageMode ? 136 : 160,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -948,12 +948,28 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         .duelShell {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 14px;
           width: 100%;
         }
 
         .duelHomepageShell {
           position: relative;
+        }
+
+        .duelHomepageShell .duelStageCenter {
+          max-width: 527px;
+        }
+
+        @media (max-width: 1720px) {
+          .duelHomepageShell .duelStageCenter {
+            max-width: 714px;
+          }
+        }
+
+        @media (max-width: 1360px) {
+          .duelHomepageShell .duelStageCenter {
+            max-width: 595px;
+          }
         }
 
         .duelHomepageInitialLoader {
@@ -984,7 +1000,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         .duelStageCenter {
           --duel-widget-width: 318px;
           --duel-widget-offset: 40px;
-          max-width: ${homepageMode ? 620 : 996}px;
+          max-width: ${homepageMode ? 527 : 996}px;
           margin: 0 auto;
           position: relative;
           overflow: visible;

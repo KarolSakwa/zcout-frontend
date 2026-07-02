@@ -41,7 +41,7 @@ export default function FeaturedPlayerSection({ player }: Props) {
   const radarData = player.radar_axes;
   const age = calcAge(player.date_of_birth);
   const playerId = player.id ?? player.player_id;
-  const nameFontSize = player.name.length > 18 ? 24 : 28;
+  const nameFontSize = player.name.length > 18 ? 20 : 24;
 
   return (
     <div className={styles.card}>
@@ -84,8 +84,8 @@ export default function FeaturedPlayerSection({ player }: Props) {
             <div
               className={styles.playerMeta}
               style={{
-                marginTop: 12,
-                fontSize: 14,
+                marginTop: 10,
+                fontSize: 12,
               }}
             >
               {player.club?.name} • {player.position} • {player.country?.name}{" "}
@@ -97,7 +97,7 @@ export default function FeaturedPlayerSection({ player }: Props) {
             rating={Math.round(player.overall ?? 0)}
             exactRating={player.overall}
             confidence={player.overall_confidence ?? 0}
-            scalePx={60}
+            scalePx={51}
           />
         </div>
 

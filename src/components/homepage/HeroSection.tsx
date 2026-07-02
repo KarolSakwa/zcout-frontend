@@ -6,10 +6,10 @@ export default function HeroSection() {
       <h1
         style={{
           margin: 0,
-          fontSize: '44px',
+          fontSize: '37px',
           lineHeight: 1.05,
           fontWeight: 800,
-          maxWidth: '700px',
+          maxWidth: '595px',
         }}
       >
         The crowd&apos;s view
@@ -21,10 +21,10 @@ export default function HeroSection() {
 
       <p
         style={{
-          marginTop: '20px',
-          maxWidth: '520px',
+          marginTop: '17px',
+          maxWidth: '442px',
           color: 'var(--ui-text-muted)',
-          fontSize: '16px',
+          fontSize: '14px',
           lineHeight: 1.6,
         }}
       >
@@ -35,8 +35,8 @@ export default function HeroSection() {
 
       <div
         style={{
-          marginTop: '32px',
-          maxWidth: '600px',
+          marginTop: '27px',
+          maxWidth: '510px',
         }}
       >
         <GlobalSearch />

@@ -43,11 +43,11 @@ export default function TopRisersWidget({
               width: 'var(--duel-widget-width, 318px)',
               zIndex: 20,
             }),
-        borderRadius: '22px',
+        borderRadius: embedded ? '19px' : '22px',
         border: '1px solid rgba(140, 170, 210, 0.16)',
         background: 'linear-gradient(180deg, rgba(14,22,36,0.88), rgba(8,14,24,0.82))',
         boxShadow: '0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04)',
-        padding: '14px 14px 10px',
+        padding: embedded ? '12px 12px 8px' : '14px 14px 10px',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
       }}
@@ -57,12 +57,12 @@ export default function TopRisersWidget({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 8,
+          marginBottom: embedded ? 7 : 8,
         }}
       >
         <div
           style={{
-            fontSize: 10,
+            fontSize: embedded ? 9 : 10,
             fontWeight: 800,
             letterSpacing: '0.22em',
             textTransform: 'uppercase',
@@ -75,7 +75,7 @@ export default function TopRisersWidget({
 
         <div
           style={{
-            fontSize: 10,
+            fontSize: embedded ? 9 : 10,
             fontWeight: 600,
             color: 'var(--ui-accent-primary)',
             whiteSpace: 'nowrap',
@@ -96,7 +96,7 @@ export default function TopRisersWidget({
           <div
             key={item.id}
             style={{
-              padding: embedded ? '7px 0' : '11px 0 10px',
+              padding: embedded ? '6px 0' : '11px 0 10px',
               borderTop: '1px solid rgba(255,255,255,0.05)',
             }}
           >
@@ -106,7 +106,7 @@ export default function TopRisersWidget({
                   display: 'grid',
                   gridTemplateColumns: 'minmax(0, 6fr) minmax(0, 4fr) minmax(0, 2fr)',
                   alignItems: 'center',
-                  columnGap: 8,
+                  columnGap: embedded ? 7 : 8,
                 }}
               >
                 <Link
@@ -114,7 +114,7 @@ export default function TopRisersWidget({
                   className="topRiserPlayerLink"
                   style={{
                     color: 'rgba(232,240,252,0.95)',
-                    fontSize: 13,
+                    fontSize: embedded ? 11 : 13,
                     fontWeight: 700,
                     textDecoration: 'none',
                     whiteSpace: 'nowrap',
@@ -131,6 +131,7 @@ export default function TopRisersWidget({
                     attributeKey={item.attributeKey}
                     attributeLabel={item.attributeLabel}
                     variant="inline"
+                    compact={embedded}
                   />
                 </div>
 
@@ -138,7 +139,7 @@ export default function TopRisersWidget({
                   style={{
                     justifySelf: 'end',
                     color: deltaColor,
-                    fontSize: 13,
+                    fontSize: embedded ? 11 : 13,
                     fontWeight: 800,
                     letterSpacing: '0.02em',
                     whiteSpace: 'nowrap',
@@ -200,7 +201,7 @@ export default function TopRisersWidget({
                   style={{
                     flexShrink: 0,
                     color: deltaColor,
-                    fontSize: 13,
+                    fontSize: embedded ? 11 : 13,
                     fontWeight: 800,
                     letterSpacing: '0.02em',
                   }}

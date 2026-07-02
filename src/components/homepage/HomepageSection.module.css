@@ -1,14 +1,14 @@
 .card {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 14px;
   background: rgba(8, 14, 24, 0.35);
   position: relative;
   width: 100%;
 }
 
 .cardTitle {
-  margin: 0 0 16px;
-  font-size: 20px;
+  margin: 0 0 14px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -25,17 +25,17 @@
 }
 
 .playerRadar {
-  width: 280px;
-  height: 280px;
+  width: 238px;
+  height: 238px;
 }
 
 .playerHeader {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .playerContent {
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: 1fr 238px;
   gap: 0;
   align-items: stretch;
 }
@@ -50,19 +50,19 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 280px;
+  width: 238px;
 }
 
 .rankBadge {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 20px;
+  right: 20px;
 
-  padding: 8px 12px;
+  padding: 7px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -71,8 +71,8 @@
 }
 
 .playerHeader {
-  margin-bottom: 24px;
-  padding-bottom: 24px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 

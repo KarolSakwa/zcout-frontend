@@ -41,11 +41,11 @@ export default function RecentVotesWidget({
               zIndex: 20,
             }),
         height: 'auto',
-        borderRadius: '22px',
+        borderRadius: embedded ? '19px' : '22px',
         border: '1px solid rgba(140, 170, 210, 0.16)',
         background: 'linear-gradient(180deg, rgba(14,22,36,0.88), rgba(8,14,24,0.82))',
         boxShadow: '0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04)',
-        padding: '14px 14px 10px',
+        padding: embedded ? '12px 12px 8px' : '14px 14px 10px',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
       }}
@@ -55,7 +55,7 @@ export default function RecentVotesWidget({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: 8,
+          marginBottom: embedded ? 7 : 8,
         }}
       >
         <div
@@ -68,7 +68,7 @@ export default function RecentVotesWidget({
         >
           <div
             style={{
-              fontSize: 10,
+              fontSize: embedded ? 9 : 10,
               fontWeight: 800,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
@@ -84,8 +84,8 @@ export default function RecentVotesWidget({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-            fontSize: 10,
+            gap: embedded ? 5 : 6,
+            fontSize: embedded ? 9 : 10,
             fontWeight: 600,
             color: 'var(--ui-accent-primary)',
             whiteSpace: 'nowrap',
@@ -120,7 +120,7 @@ export default function RecentVotesWidget({
             <div
               key={item.id}
               style={{
-                padding: '11px 0 10px',
+                padding: embedded ? '9px 0 8px' : '11px 0 10px',
                 borderTop: '1px solid rgba(255,255,255,0.05)',
                 animation: isLatest ? 'recentVoteEnter 420ms ease' : 'none',
               }}
@@ -130,7 +130,7 @@ export default function RecentVotesWidget({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 8,
+                  gap: embedded ? 7 : 8,
                   flexWrap: 'wrap',
                   lineHeight: 1.26,
                   textAlign: 'center',
@@ -144,7 +144,7 @@ export default function RecentVotesWidget({
                     alignItems: 'center',
                     gap: 4,
                     color: leftWon ? 'rgba(232,240,252,0.95)' : 'rgba(232,240,252,0.78)',
-                    fontSize: 13,
+                    fontSize: embedded ? 12 : 13,
                     fontWeight: leftWon ? 700 : 600,
                     textDecoration: 'none',
                   }}
@@ -183,7 +183,7 @@ export default function RecentVotesWidget({
                     alignItems: 'center',
                     gap: 4,
                     color: rightWon ? 'rgba(232,240,252,0.95)' : 'rgba(232,240,252,0.78)',
-                    fontSize: 13,
+                    fontSize: embedded ? 12 : 13,
                     fontWeight: rightWon ? 700 : 600,
                     textDecoration: 'none',
                   }}
@@ -205,7 +205,7 @@ export default function RecentVotesWidget({
 
               <div
                 style={{
-                  marginTop: 4,
+                  marginTop: embedded ? 3 : 4,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
