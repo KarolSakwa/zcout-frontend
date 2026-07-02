@@ -17,8 +17,9 @@ export default function DuelCardsRow({
   postVoteRatings,
   barPct,
   homepageMode = false,
+  loading = false,
 }: {
-  pair: PairResponse;
+  pair?: PairResponse | null;
   cardStyle: (side: 'left' | 'right') => React.CSSProperties;
   showPendingUi: boolean;
   showReveal: boolean;
@@ -29,59 +30,71 @@ export default function DuelCardsRow({
   postVoteRatings?: RatingsMap | null;
   barPct: Record<string, number>;
   homepageMode?: boolean;
+  loading?: boolean;
 }) {
   void showImpact;
   void postVoteRatings;
   void barPct;
 
+  const isHomepageLoading = homepageMode && loading && !pair;
+
+  if (!pair && !isHomepageLoading) {
+    return null;
+  }
+
   return (
     <>
       <div className="duelCardsRow">
-        <div           className="flex flex-col gap-2"           style={cardStyle('left')}        >
-          <PlayerCard
-            name={pair.left.name}
-            position={pair.left.position}
-            club={pair.left.club ?? 'â€”'}
-            color={pair.left.color ?? 'var(--ui-surface-panel-solid)'}
-            secondaryColor={pair.left.secondaryColor}
-            avatarSrc={pair.left.avatarSrc ?? `/players/${pair.left.id}.png`}
-            countryIso2={pair.left.countryIso2}
-            number={pair.left.number}
-            onClick={() => handleVote(pair.left.id)}
-            reveal={showReveal}
-            isWinner={lastWinner === pair.left.id}
-            glowColor={glow}
-            compact={homepageMode}
-          />
+        <div className="flex flex-col gap-2" style={cardStyle('left')}>
+          {isHomepageLoading ? (
+            <div className="cardPlaceholder" aria-hidden />
+          ) : (
+            <PlayerCard
+              name={pair!.left.name}
+              position={pair!.left.position}
+              club={pair!.left.club ?? 'â€”'}
+              color={pair!.left.color ?? 'var(--ui-surface-panel-solid)'}
+              secondaryColor={pair!.left.secondaryColor}
+              avatarSrc={pair!.left.avatarSrc ?? `/players/${pair!.left.id}.png`}
+              countryIso2={pair!.left.countryIso2}
+              number={pair!.left.number}
+              onClick={() => handleVote(pair!.left.id)}
+              reveal={showReveal}
+              isWinner={lastWinner === pair!.left.id}
+              glowColor={glow}
+              compact={homepageMode}
+            />
+          )}
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            placeItems: 'center',
-            alignSelf: 'center',
-            pointerEvents: 'none',
-          }}
-        >
-          {showPendingUi ? <ZLoader /> : <div style={{ width: 30, height: 30 }} />}
+        <div className="cardCenterSlot">
+          {showPendingUi ? (
+            <ZLoader />
+          ) : (
+            <div style={{ width: 30, height: 30 }} />
+          )}
         </div>
 
         <div className="flex flex-col gap-2" style={cardStyle('right')}>
-          <PlayerCard
-            name={pair.right.name}
-            position={pair.right.position}
-            club={pair.right.club ?? 'â€”'}
-            color={pair.right.color ?? 'var(--ui-surface-panel-solid)'}
-            secondaryColor={pair.right.secondaryColor}
-            avatarSrc={pair.right.avatarSrc ?? `/players/${pair.right.id}.png`}
-            countryIso2={pair.right.countryIso2}
-            number={pair.right.number}
-            onClick={() => handleVote(pair.right.id)}
-            reveal={showReveal}
-            isWinner={lastWinner === pair.right.id}
-            glowColor={glow}
-            compact={homepageMode}
-          />
+          {isHomepageLoading ? (
+            <div className="cardPlaceholder" aria-hidden />
+          ) : (
+            <PlayerCard
+              name={pair!.right.name}
+              position={pair!.right.position}
+              club={pair!.right.club ?? 'â€”'}
+              color={pair!.right.color ?? 'var(--ui-surface-panel-solid)'}
+              secondaryColor={pair!.right.secondaryColor}
+              avatarSrc={pair!.right.avatarSrc ?? `/players/${pair!.right.id}.png`}
+              countryIso2={pair!.right.countryIso2}
+              number={pair!.right.number}
+              onClick={() => handleVote(pair!.right.id)}
+              reveal={showReveal}
+              isWinner={lastWinner === pair!.right.id}
+              glowColor={glow}
+              compact={homepageMode}
+            />
+          )}
         </div>
       </div>
 
@@ -94,6 +107,19 @@ export default function DuelCardsRow({
           width: min(100%, ${homepageMode ? 500 : 720}px);
           margin: 20px auto 0;
           position: relative;
+        }
+
+        .cardCenterSlot {
+          display: grid;
+          place-items: center;
+          align-self: center;
+          pointer-events: none;
+        }
+
+        .cardPlaceholder {
+          width: 100%;
+          aspect-ratio: 2 / 3;
+          visibility: hidden;
         }
 
         @media (max-width: 1720px) {
@@ -121,7 +147,7 @@ export default function DuelCardsRow({
             padding: 0;
           }
 
-          .duelCardsRow > div:nth-child(2) {
+          .duelCardsRow > .cardCenterSlot {
             position: absolute;
             left: 50%;
             top: 42%;

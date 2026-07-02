@@ -681,10 +681,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   return (
     <>
       <div
-        className="flex flex-col gap-4"
-        style={{
-          width: "100%",
-        }}
+        className={`duelShell${homepageMode ? " duelHomepageShell" : ""}`}
       >
         <DuelCountdownBar
           show={showCountdown}
@@ -805,10 +802,11 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                   </div>
                 )}
 
-                {pair && (
+                {(pair || (homepageMode && loadingPair)) && (
                   <div style={{ position: "relative" }}>
                     <DuelCardsRow
                       pair={pair}
+                      loading={homepageMode && loadingPair && !pair}
                       cardStyle={cardStyle}
                       showPendingUi={showPendingUi}
                       showReveal={showReveal}
@@ -920,7 +918,13 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           )}
         </div>
 
-        {showOverlayLoader && (
+        {homepageMode && loadingPair && !pair && (
+          <div className="duelHomepageInitialLoader" aria-hidden>
+            <ZLoader />
+          </div>
+        )}
+
+        {showOverlayLoader && !homepageMode && (
           <div
             style={{
               position: "fixed",
@@ -941,6 +945,26 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       </div>
 
       <style jsx>{`
+        .duelShell {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          width: 100%;
+        }
+
+        .duelHomepageShell {
+          position: relative;
+        }
+
+        .duelHomepageInitialLoader {
+          position: absolute;
+          inset: 0;
+          z-index: 80;
+          display: grid;
+          place-items: center;
+          pointer-events: none;
+        }
+
         .duelHomepageAttributeLink {
           cursor: pointer;
           transition: opacity 140ms ease;
