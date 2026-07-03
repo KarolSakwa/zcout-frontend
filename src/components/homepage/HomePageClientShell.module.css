@@ -1,0 +1,4 @@
+.shell {
+  position: relative;
+  min-height: calc(100dvh - 72px);
+}

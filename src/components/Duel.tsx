@@ -24,6 +24,7 @@ import {
   attributeDescriptions,
   formatAttributeLabel,
 } from "@/lib/attributeDescriptions";
+import { useHomepageSectionLoading } from "@/components/homepage/HomepageLoadingContext";
 
 const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
@@ -62,6 +63,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const [voting, setVoting] = useState(false);
   const [skipping, setSkipping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [duelBootstrapped, setDuelBootstrapped] = useState(false);
 
   const [showPendingUi, setShowPendingUi] = useState(false);
   const pendingUiTimerRef = useRef<number | null>(null);
@@ -102,6 +104,15 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } =
     useDuelSideWidgets(pair);
+
+  useEffect(() => {
+    if (!homepageMode) return;
+    if (pair || error) {
+      setDuelBootstrapped(true);
+    }
+  }, [homepageMode, pair, error]);
+
+  useHomepageSectionLoading("duel", !duelBootstrapped, homepageMode);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 700px)");
@@ -663,6 +674,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   );
 
   const showImpact = impactVisible && !!postVoteRatings;
+  const showHomepagePairLoading =
+    homepageMode && duelBootstrapped && loadingPair && !pair;
   const showCountdown = showImpact && autoNextRunning && transition === "idle";
 
   const nextDisabled = transition !== "idle" || loadingPair;
@@ -802,11 +815,11 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                   </div>
                 )}
 
-                {(pair || (homepageMode && loadingPair)) && (
+                {(pair || showHomepagePairLoading) && (
                   <div style={{ position: "relative" }}>
                     <DuelCardsRow
                       pair={pair}
-                      loading={homepageMode && loadingPair && !pair}
+                      loading={showHomepagePairLoading}
                       cardStyle={cardStyle}
                       showPendingUi={showPendingUi}
                       showReveal={showReveal}
@@ -918,7 +931,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           )}
         </div>
 
-        {homepageMode && loadingPair && !pair && (
+        {showHomepagePairLoading && (
           <div className="duelHomepageInitialLoader" aria-hidden>
             <ZLoader />
           </div>

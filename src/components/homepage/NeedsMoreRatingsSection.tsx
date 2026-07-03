@@ -6,12 +6,18 @@ import {
   fetchNeedsMoreRatings,
   type NeedsMoreRatingsItem,
 } from '@/components/homepage/useHomepageWidgets';
+import { useHomepageSectionLoading } from '@/components/homepage/HomepageLoadingContext';
 
 export default function NeedsMoreRatingsSection() {
   const [items, setItems] = useState<NeedsMoreRatingsItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useHomepageSectionLoading('needsMoreRatings', isLoading);
 
   useEffect(() => {
     const controller = new AbortController();
+
+    setIsLoading(true);
 
     fetchNeedsMoreRatings(controller.signal)
       .then((data) => {
@@ -19,6 +25,9 @@ export default function NeedsMoreRatingsSection() {
       })
       .catch(() => {
         setItems([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
 
     return () => controller.abort();

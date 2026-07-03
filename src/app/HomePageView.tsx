@@ -6,6 +6,7 @@ import TopFallersSection from "@/components/homepage/TopFallersSection";
 import LatestVotesSection from "@/components/homepage/LatestVotesSection";
 import NeedsMoreRatingsSection from "@/components/homepage/NeedsMoreRatingsSection";
 import FeaturedRankingsSection from "@/components/homepage/FeaturedRankingsSection";
+import HomePageClientShell from "@/components/homepage/HomePageClientShell";
 import styles from "./HomePageView.module.css";
 
 export default async function HomePageView() {
@@ -22,7 +23,8 @@ export default async function HomePageView() {
   const featuredPlayer = await featuredPlayerRes.json();
 
   return (
-    <main className={styles.page}>
+    <HomePageClientShell>
+      <main className={styles.page}>
       <div className={styles.container}>
         <section className={styles.rowHero}>
           <div className={`${styles.gridItem} ${styles.colSpan6}`}>
@@ -63,6 +65,7 @@ export default async function HomePageView() {
           </div>
         </section>
       </div>
-    </main>
+      </main>
+    </HomePageClientShell>
   );
 }
