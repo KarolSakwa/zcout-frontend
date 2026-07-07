@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import ReactECharts from 'echarts-for-react';
+import { useEffect, useMemo, useRef, useState } from "react";
+import ReactECharts from "echarts-for-react";
 
 type PlayerRadarDatum = {
   key: string;
@@ -11,7 +11,7 @@ type PlayerRadarDatum = {
 
 type PlayerRadarChartProps = {
   data: PlayerRadarDatum[];
-  variant?: 'profile' | 'homepage';
+  variant?: "profile" | "homepage";
   shortenLabels?: boolean;
 };
 
@@ -31,7 +31,7 @@ const HOMEPAGE_RADAR_RADIUS_RATIO = 0.5;
 const LABEL_GAP = 18;
 
 function toRgba(hex: string, alpha: number) {
-  const normalized = hex.replace('#', '').trim();
+  const normalized = hex.replace("#", "").trim();
 
   if (normalized.length !== 6) return `rgba(137, 174, 251, ${alpha})`;
 
@@ -43,25 +43,27 @@ function toRgba(hex: string, alpha: number) {
 }
 
 function getAccentColor() {
-  if (typeof window === 'undefined') return '#89aefb';
+  if (typeof window === "undefined") return "#89aefb";
 
-  const value = getComputedStyle(document.documentElement).getPropertyValue('--ui-accent-primary').trim();
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue("--ui-accent-primary")
+    .trim();
 
-  return value || '#89aefb';
+  return value || "#89aefb";
 }
 
 function getTextAnchor(angleDeg: number) {
   const normalized = ((angleDeg % 360) + 360) % 360;
 
-  if (normalized > 67.5 && normalized < 112.5) return 'center';
-  if (normalized > 247.5 && normalized < 292.5) return 'center';
+  if (normalized > 67.5 && normalized < 112.5) return "center";
+  if (normalized > 247.5 && normalized < 292.5) return "center";
 
-  return normalized < 90 || normalized > 270 ? 'left' : 'right';
+  return normalized < 90 || normalized > 270 ? "left" : "right";
 }
 
 export default function PlayerRadarChart({
   data,
-  variant = 'profile',
+  variant = "profile",
   shortenLabels = false,
 }: PlayerRadarChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -69,18 +71,19 @@ export default function PlayerRadarChart({
   const [hoveredAxis, setHoveredAxis] = useState<HoveredAxis | null>(null);
 
   const accentColor = useMemo(() => getAccentColor(), []);
-  const isCompact = typeof window !== 'undefined' && window.matchMedia('(max-width: 560px)').matches;
+  const isCompact =
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 560px)").matches;
   const radarCenterX = isCompact
-  ? 0.5
-  : variant === 'homepage'
-    ? HOMEPAGE_RADAR_CENTER_X
-    : PROFILE_RADAR_CENTER_X;
+    ? 0.5
+    : variant === "homepage"
+      ? HOMEPAGE_RADAR_CENTER_X
+      : PROFILE_RADAR_CENTER_X;
 
-const radarRadiusRatio =
-  variant === 'homepage'
-    ? HOMEPAGE_RADAR_RADIUS_RATIO
-    : PROFILE_RADAR_RADIUS_RATIO;
-    console.log('RADAR VARIANT', variant, radarRadiusRatio);
+  const radarRadiusRatio =
+    variant === "homepage"
+      ? HOMEPAGE_RADAR_RADIUS_RATIO
+      : PROFILE_RADAR_RADIUS_RATIO;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -115,50 +118,50 @@ const radarRadiusRatio =
         radius: `${radarRadiusRatio * 100}%`,
         startAngle: 90,
         splitNumber: 4,
-        shape: 'polygon',
+        shape: "polygon",
         axisName: {
-          color: 'rgba(233, 237, 241, 0.84)',
+          color: "rgba(233, 237, 241, 0.84)",
           fontSize: 10,
           fontWeight: 600,
           margin: 24,
         },
         axisLine: {
           lineStyle: {
-            color: 'rgba(255, 255, 255, 0.12)',
+            color: "rgba(255, 255, 255, 0.12)",
             width: 1,
           },
         },
         splitLine: {
           lineStyle: {
             color: [
-              'rgba(255, 255, 255, 0.05)',
-              'rgba(255, 255, 255, 0.07)',
-              'rgba(255, 255, 255, 0.09)',
-              'rgba(255, 255, 255, 0.12)',
+              "rgba(255, 255, 255, 0.05)",
+              "rgba(255, 255, 255, 0.07)",
+              "rgba(255, 255, 255, 0.09)",
+              "rgba(255, 255, 255, 0.12)",
             ],
           },
         },
         splitArea: {
           areaStyle: {
             color: [
-              'rgba(255, 255, 255, 0.008)',
-              'rgba(255, 255, 255, 0.014)',
-              'rgba(255, 255, 255, 0.02)',
-              'rgba(255, 255, 255, 0.028)',
+              "rgba(255, 255, 255, 0.008)",
+              "rgba(255, 255, 255, 0.014)",
+              "rgba(255, 255, 255, 0.02)",
+              "rgba(255, 255, 255, 0.028)",
             ],
           },
         },
         indicator: data.map((item) => ({
-        name: shortenLabels
-          ? item.label.slice(0, 3).toUpperCase()
-          : item.label,
-        max: 99,
-      })),
+          name: shortenLabels
+            ? item.label.slice(0, 3).toUpperCase()
+            : item.label,
+          max: 99,
+        })),
       },
       series: [
         {
-          type: 'radar',
-          symbol: 'circle',
+          type: "radar",
+          symbol: "circle",
           symbolSize: 4,
           lineStyle: {
             color: accentColor,
@@ -166,7 +169,7 @@ const radarRadiusRatio =
           },
           itemStyle: {
             color: accentColor,
-            borderColor: '#09111d',
+            borderColor: "#09111d",
             borderWidth: 1.2,
           },
           areaStyle: {
@@ -188,7 +191,7 @@ const radarRadiusRatio =
         },
       ],
     }),
-    [accentColor, data, radarCenterX, radarRadiusRatio]
+    [accentColor, data, radarCenterX, radarRadiusRatio],
   );
 
   const hotspots = useMemo(() => {
@@ -226,16 +229,30 @@ const radarRadiusRatio =
   }, [data, radarCenterX, size.height, size.width]);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <ReactECharts option={option} style={{ width: '100%', height: '100%' }} opts={{ renderer: 'svg' }} />
+    <div
+      ref={containerRef}
+      style={{ position: "relative", width: "100%", height: "100%" }}
+    >
+      <ReactECharts
+        option={option}
+        style={{ width: "100%", height: "100%" }}
+        opts={{ renderer: "svg" }}
+      />
 
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      >
         {hotspots.map((item) => {
           const labelWidth = item.label.length > 9 ? 88 : 70;
           const labelLeft =
-            item.textAnchor === 'center'
+            item.textAnchor === "center"
               ? item.labelX - labelWidth / 2
-              : item.textAnchor === 'left'
+              : item.textAnchor === "left"
                 ? item.labelX - 6
                 : item.labelX - labelWidth + 6;
 
@@ -244,41 +261,65 @@ const radarRadiusRatio =
               <button
                 type="button"
                 aria-label={`${item.label} ${item.value.toFixed(1)}`}
-                onMouseEnter={() => setHoveredAxis({ key: item.key, label: item.label, value: item.value, x: item.labelX, y: item.labelY })}
-                onMouseLeave={() => setHoveredAxis((current) => (current?.key === item.key ? null : current))}
+                onMouseEnter={() =>
+                  setHoveredAxis({
+                    key: item.key,
+                    label: item.label,
+                    value: item.value,
+                    x: item.labelX,
+                    y: item.labelY,
+                  })
+                }
+                onMouseLeave={() =>
+                  setHoveredAxis((current) =>
+                    current?.key === item.key ? null : current,
+                  )
+                }
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   left: labelLeft,
                   top: item.labelY - 12,
                   width: labelWidth,
                   height: 24,
-                  background: 'transparent',
+                  background: "transparent",
                   border: 0,
                   padding: 0,
                   margin: 0,
-                  pointerEvents: 'auto',
-                  cursor: 'help',
+                  pointerEvents: "auto",
+                  cursor: "help",
                 }}
               />
 
               <button
                 type="button"
                 aria-label={`${item.label} ${item.value.toFixed(1)}`}
-                onMouseEnter={() => setHoveredAxis({ key: item.key, label: item.label, value: item.value, x: item.pointX, y: item.pointY })}
-                onMouseLeave={() => setHoveredAxis((current) => (current?.key === item.key ? null : current))}
+                onMouseEnter={() =>
+                  setHoveredAxis({
+                    key: item.key,
+                    label: item.label,
+                    value: item.value,
+                    x: item.pointX,
+                    y: item.pointY,
+                  })
+                }
+                onMouseLeave={() =>
+                  setHoveredAxis((current) =>
+                    current?.key === item.key ? null : current,
+                  )
+                }
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   left: item.pointX - 11,
                   top: item.pointY - 11,
                   width: 22,
                   height: 22,
-                  borderRadius: '999px',
-                  background: 'transparent',
+                  borderRadius: "999px",
+                  background: "transparent",
                   border: 0,
                   padding: 0,
                   margin: 0,
-                  pointerEvents: 'auto',
-                  cursor: 'help',
+                  pointerEvents: "auto",
+                  cursor: "help",
                 }}
               />
             </div>
@@ -288,24 +329,25 @@ const radarRadiusRatio =
         {hoveredAxis ? (
           <div
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: hoveredAxis.x,
               top: hoveredAxis.y - 14,
-              transform: 'translate(-50%, -100%)',
-              padding: '6px 8px',
+              transform: "translate(-50%, -100%)",
+              padding: "6px 8px",
               border: `1px solid ${toRgba(accentColor, 0.34)}`,
               borderRadius: 8,
-              background: 'rgba(10, 14, 18, 0.96)',
-              color: '#f5f7fa',
+              background: "rgba(10, 14, 18, 0.96)",
+              color: "#f5f7fa",
               fontSize: 12,
               fontWeight: 700,
               lineHeight: 1,
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.28)',
+              whiteSpace: "nowrap",
+              pointerEvents: "none",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.28)",
             }}
           >
-            {hoveredAxis.label}: <span className="ratingValue">{hoveredAxis.value.toFixed(1)}</span>
+            {hoveredAxis.label}:{" "}
+            <span className="ratingValue">{hoveredAxis.value.toFixed(1)}</span>
           </div>
         ) : null}
       </div>
