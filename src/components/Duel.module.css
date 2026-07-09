@@ -1,0 +1,70 @@
+.duelShell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.duelHomepageShell {
+  position: relative;
+}
+
+.duelHomepageShell .duelStageCenter {
+  max-width: 527px;
+}
+
+@media (max-width: 1720px) {
+  .duelHomepageShell .duelStageCenter {
+    max-width: 714px;
+  }
+}
+
+@media (max-width: 1360px) {
+  .duelHomepageShell .duelStageCenter {
+    max-width: 595px;
+  }
+}
+
+.duelStageOuter {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.duelStageCenter {
+  --duel-widget-width: 318px;
+  --duel-widget-offset: 40px;
+  max-width: 996px;
+  margin: 0 auto;
+  position: relative;
+  overflow: visible;
+}
+
+@media (max-width: 1720px) {
+  .duelStageCenter {
+    --duel-widget-width: 280px;
+    --duel-widget-offset: 20px;
+    max-width: 840px;
+  }
+}
+
+@media (max-width: 1360px) {
+  .duelStageCenter {
+    --duel-widget-width: 240px;
+    --duel-widget-offset: 12px;
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 700px) {
+  .duelStageOuter {
+    max-width: 100%;
+  }
+
+  .duelStageCenter {
+    max-width: 390px;
+    width: 100%;
+    overflow: visible;
+  }
+}

@@ -1,35 +1,28 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import ZLoader from "./ZLoader";
 import type {
-  PairResponse,
   RatingsMap,
   VoteApiResponse,
 } from "./duels/duelTypes";
-import { ATTR_MAP, SLIDE_MS, normalizePair, toPct } from "./duels/duelUtils";
+import { ATTR_MAP, SLIDE_MS, toPct } from "./duels/duelUtils";
+import { useDuelPairNavigation } from "./duels/useDuelPairNavigation";
 import DuelCountdownBar from "./duels/DuelCountdownBar";
 import DuelAttributeHeader from "./duels/DuelAttributeHeader";
 import DuelCardsRow from "./duels/DuelCardsRow";
 import DuelRevealPanel from "./duels/DuelRevealPanel";
+import DuelHomepageAttributeLink from "./duels/DuelHomepageAttributeLink";
+import DuelLoadingOverlays from "./duels/DuelLoadingOverlays";
 import RecentVotesWidget from "./duels/RecentVotesWidget";
 import TopRisersWidget from "./duels/TopRisersWidget";
 import { useDuelSideWidgets } from "./duels/useDuelSideWidgets";
+import { useDuelAutoNext } from "./duels/useDuelAutoNext";
 import { logEvent } from "@/lib/telemetry";
 import { ensureCsrfToken } from "@/lib/ensureCsrfToken";
-import Tooltip from "@/components/Tooltip";
-import AttributeIcon from "@/components/AttributeIcon";
-import {
-  attributeDescriptions,
-  formatAttributeLabel,
-} from "@/lib/attributeDescriptions";
 import { useHomepageSectionLoading } from "@/components/homepage/HomepageLoadingContext";
+import styles from "./Duel.module.css";
 
-const AUTO_NEXT_MS = 5000;
 const COUNTDOWN_BAR_H = 7;
-const COUNTDOWN_START_AFTER_REVEAL_MS = 450;
-const COUNTDOWN_TICK_MS = 50;
 
 type VotePlayerResult = {
   id: number | string;
@@ -51,18 +44,7 @@ type DuelProps = {
 };
 
 export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
-  const [pair, setPair] = useState<PairResponse | null>(() => {
-    try {
-      return initialPair ? normalizePair(initialPair) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const [loadingPair, setLoadingPair] = useState(false);
   const [voting, setVoting] = useState(false);
-  const [skipping, setSkipping] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [duelBootstrapped, setDuelBootstrapped] = useState(false);
 
   const [showPendingUi, setShowPendingUi] = useState(false);
@@ -75,35 +57,73 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   const [impactVisible, setImpactVisible] = useState(false);
   const [barPct, setBarPct] = useState<Record<string, number>>({});
-  const [transition, setTransition] = useState<"idle" | "exit" | "enter">(
-    "idle",
-  );
-
-  const [autoNextProgress, setAutoNextProgress] = useState(0);
-  const [autoNextRunning, setAutoNextRunning] = useState(false);
-  const [autoNextPaused, setAutoNextPaused] = useState(false);
 
   const [nextHover, setNextHover] = useState(false);
   const [duelVotePct, setDuelVotePct] = useState<{
     left: number;
     right: number;
   } | null>(null);
-  const [showDelayedNextPending, setShowDelayedNextPending] = useState(false);
   const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
 
-  const autoNextStartTimerRef = useRef<number | null>(null);
-  const autoNextIntervalRef = useRef<number | null>(null);
-  const autoNextStartAtRef = useRef<number | null>(null);
-  const autoNextElapsedRef = useRef(0);
+  const goNextRef = useRef<() => void>(() => {});
 
-  const fetchAbortRef = useRef<AbortController | null>(null);
-  const fetchSeqRef = useRef(0);
-
-  const attribute = pair?.attribute ?? "";
   const glow = "var(--ui-accent-primary)";
 
   const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } =
     useDuelSideWidgets();
+
+  const resetRevealState = useCallback(() => {
+    setPostVoteRatings(null);
+    setLastWinner(null);
+    setImpactVisible(false);
+    setBarPct({});
+    setDuelVotePct(null);
+
+    setShowPendingUi(false);
+    if (pendingUiTimerRef.current)
+      window.clearTimeout(pendingUiTimerRef.current);
+    pendingUiTimerRef.current = null;
+  }, []);
+
+  const clearPendingUi = useCallback(() => {
+    setShowPendingUi(false);
+    if (pendingUiTimerRef.current)
+      window.clearTimeout(pendingUiTimerRef.current);
+    pendingUiTimerRef.current = null;
+  }, []);
+
+  const {
+    progress: autoNextProgress,
+    running: autoNextRunning,
+    paused: autoNextPaused,
+    clear: clearAutoNext,
+    scheduleAfterReveal: scheduleAutoNextAfterReveal,
+    pause: pauseAutoNext,
+    resume: resumeAutoNext,
+  } = useDuelAutoNext({ onComplete: () => goNextRef.current() });
+
+  const {
+    pair,
+    loadingPair,
+    error,
+    setError,
+    transition,
+    skipping,
+    showDelayedNextPending,
+    goNext,
+    handleSkip,
+  } = useDuelPairNavigation({
+    initialPair,
+    clearAutoNext,
+    resetRevealState,
+    clearPendingUi,
+    voting,
+    lastWinner,
+  });
+
+  goNextRef.current = goNext;
+
+  const attribute = pair?.attribute ?? "";
 
   useEffect(() => {
     if (!homepageMode) return;
@@ -123,300 +143,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
     return () => mq.removeEventListener("change", update);
   }, []);
-
-  const clearAutoNext = useCallback((resetProgress: boolean) => {
-    if (autoNextStartTimerRef.current)
-      window.clearTimeout(autoNextStartTimerRef.current);
-    autoNextStartTimerRef.current = null;
-
-    if (autoNextIntervalRef.current)
-      window.clearInterval(autoNextIntervalRef.current);
-    autoNextIntervalRef.current = null;
-
-    autoNextStartAtRef.current = null;
-    autoNextElapsedRef.current = 0;
-
-    setAutoNextRunning(false);
-    setAutoNextPaused(false);
-    if (resetProgress) setAutoNextProgress(0);
-  }, []);
-
-  const resetRevealState = useCallback(() => {
-    setPostVoteRatings(null);
-    setLastWinner(null);
-    setImpactVisible(false);
-    setBarPct({});
-    setDuelVotePct(null);
-
-    setShowPendingUi(false);
-    if (pendingUiTimerRef.current)
-      window.clearTimeout(pendingUiTimerRef.current);
-    pendingUiTimerRef.current = null;
-  }, []);
-
-  const fetchInitialPair = useCallback(async () => {
-    clearAutoNext(true);
-
-    if (fetchAbortRef.current) fetchAbortRef.current.abort();
-    const controller = new AbortController();
-    fetchAbortRef.current = controller;
-    const seq = ++fetchSeqRef.current;
-
-    setError(null);
-    setLoadingPair(true);
-
-    setPair(null);
-    resetRevealState();
-    setTransition("idle");
-
-    try {
-      const res = await fetch("/api/duels/next", {
-        cache: "no-store",
-        headers: { Accept: "application/json" },
-        signal: controller.signal,
-      });
-
-      if (fetchSeqRef.current !== seq) return;
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(
-          `Pair fetch failed: ${res.status} ${txt.slice(0, 160)}`,
-        );
-      }
-
-      const raw = (await res.json()) as unknown;
-
-      if (fetchSeqRef.current !== seq) return;
-
-      setTransition("enter");
-      setPair(normalizePair(raw));
-      requestAnimationFrame(() => setTransition("idle"));
-    } catch (e: unknown) {
-      if (controller.signal.aborted) return;
-      if (fetchSeqRef.current !== seq) return;
-      const msg = e instanceof Error ? e.message : "Błąd pobierania pary";
-      setError(msg);
-      setTransition("idle");
-    } finally {
-      if (fetchSeqRef.current !== seq) return;
-      setLoadingPair(false);
-    }
-  }, [clearAutoNext, resetRevealState]);
-
-  const fetchNextPair = useCallback(async () => {
-    if (loadingPair) return;
-
-    clearAutoNext(true);
-
-    if (fetchAbortRef.current) fetchAbortRef.current.abort();
-    const controller = new AbortController();
-    fetchAbortRef.current = controller;
-    const seq = ++fetchSeqRef.current;
-
-    setError(null);
-    setLoadingPair(true);
-
-    try {
-      const res = await fetch("/api/duels/next", {
-        cache: "no-store",
-        headers: { Accept: "application/json" },
-        signal: controller.signal,
-      });
-
-      if (fetchSeqRef.current !== seq) return;
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(
-          `Pair fetch failed: ${res.status} ${txt.slice(0, 160)}`,
-        );
-      }
-
-      const raw = (await res.json()) as unknown;
-
-      if (fetchSeqRef.current !== seq) return;
-
-      const next = normalizePair(raw);
-
-      setTransition("exit");
-      window.setTimeout(() => {
-        if (fetchSeqRef.current !== seq) return;
-
-        setPair(next);
-        resetRevealState();
-
-        setTransition("enter");
-        requestAnimationFrame(() => setTransition("idle"));
-
-        setLoadingPair(false);
-      }, SLIDE_MS);
-    } catch (e: unknown) {
-      if (controller.signal.aborted) return;
-      if (fetchSeqRef.current !== seq) return;
-      const msg = e instanceof Error ? e.message : "Błąd pobierania pary";
-      setError(msg);
-      setTransition("idle");
-      setLoadingPair(false);
-    }
-  }, [loadingPair, clearAutoNext, resetRevealState]);
-
-  const goNext = useCallback(() => {
-    if (pendingUiTimerRef.current)
-      window.clearTimeout(pendingUiTimerRef.current);
-    pendingUiTimerRef.current = null;
-    setShowPendingUi(false);
-
-    fetchNextPair();
-  }, [fetchNextPair]);
-
-  const handleSkip = useCallback(async () => {
-    if (!pair) return;
-    if (voting || skipping) return;
-    if (transition !== "idle" || loadingPair) return;
-    if (lastWinner !== null) return;
-
-    clearAutoNext(true);
-    setError(null);
-    setSkipping(true);
-
-    if (pendingUiTimerRef.current)
-      window.clearTimeout(pendingUiTimerRef.current);
-    pendingUiTimerRef.current = null;
-    setShowPendingUi(false);
-    setShowDelayedNextPending(true);
-
-    try {
-      const duelId = Number(pair.pair_id);
-      if (!Number.isFinite(duelId) || duelId <= 0) {
-        throw new Error("Invalid duel_id");
-      }
-
-      const res = await fetch("/api/duels/skip", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ duel_id: duelId }),
-      });
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(`Skip failed: ${res.status} ${txt.slice(0, 160)}`);
-      }
-
-      logEvent("skip_clicked", {
-        pair_id: pair.pair_id ?? null,
-        duel_id: duelId,
-        attribute_key: pair.attribute,
-        player_a_id: pair.left.id,
-        player_b_id: pair.right.id,
-      });
-
-      goNext();
-    } catch (e: unknown) {
-      setShowDelayedNextPending(false);
-      const msg = e instanceof Error ? e.message : "Błąd pomijania pojedynku";
-      setError(msg);
-    } finally {
-      setSkipping(false);
-    }
-  }, [
-    pair,
-    voting,
-    skipping,
-    transition,
-    loadingPair,
-    lastWinner,
-    clearAutoNext,
-    goNext,
-  ]);
-
-  const startAutoNextNow = useCallback(() => {
-    if (autoNextIntervalRef.current)
-      window.clearInterval(autoNextIntervalRef.current);
-    autoNextIntervalRef.current = null;
-
-    autoNextElapsedRef.current = 0;
-    autoNextStartAtRef.current = performance.now();
-
-    setAutoNextProgress(0);
-    setAutoNextRunning(true);
-    setAutoNextPaused(false);
-
-    autoNextIntervalRef.current = window.setInterval(() => {
-      const startAt = autoNextStartAtRef.current;
-      const base = autoNextElapsedRef.current;
-      const now = performance.now();
-      const elapsed = startAt == null ? base : base + (now - startAt);
-      const p = Math.min(1, elapsed / AUTO_NEXT_MS);
-      setAutoNextProgress(p);
-
-      if (p >= 1) {
-        if (autoNextIntervalRef.current)
-          window.clearInterval(autoNextIntervalRef.current);
-        autoNextIntervalRef.current = null;
-        autoNextStartAtRef.current = null;
-        autoNextElapsedRef.current = 0;
-        setAutoNextRunning(false);
-        setAutoNextPaused(false);
-        goNext();
-      }
-    }, COUNTDOWN_TICK_MS);
-  }, [goNext]);
-
-  const scheduleAutoNextAfterReveal = useCallback(() => {
-    if (autoNextStartTimerRef.current)
-      window.clearTimeout(autoNextStartTimerRef.current);
-    autoNextStartTimerRef.current = window.setTimeout(() => {
-      autoNextStartTimerRef.current = null;
-      startAutoNextNow();
-    }, COUNTDOWN_START_AFTER_REVEAL_MS);
-  }, [startAutoNextNow]);
-
-  const pauseAutoNext = useCallback(() => {
-    if (!autoNextRunning || autoNextPaused) return;
-
-    if (autoNextIntervalRef.current)
-      window.clearInterval(autoNextIntervalRef.current);
-    autoNextIntervalRef.current = null;
-
-    const startAt = autoNextStartAtRef.current;
-    if (startAt != null)
-      autoNextElapsedRef.current += performance.now() - startAt;
-    autoNextStartAtRef.current = null;
-    setAutoNextPaused(true);
-  }, [autoNextRunning, autoNextPaused]);
-
-  const resumeAutoNext = useCallback(() => {
-    if (!autoNextRunning || !autoNextPaused) return;
-
-    autoNextStartAtRef.current = performance.now();
-    setAutoNextPaused(false);
-
-    if (autoNextIntervalRef.current)
-      window.clearInterval(autoNextIntervalRef.current);
-    autoNextIntervalRef.current = window.setInterval(() => {
-      const startAt = autoNextStartAtRef.current;
-      const base = autoNextElapsedRef.current;
-      const now = performance.now();
-      const elapsed = startAt == null ? base : base + (now - startAt);
-      const p = Math.min(1, elapsed / AUTO_NEXT_MS);
-      setAutoNextProgress(p);
-
-      if (p >= 1) {
-        if (autoNextIntervalRef.current)
-          window.clearInterval(autoNextIntervalRef.current);
-        autoNextIntervalRef.current = null;
-        autoNextStartAtRef.current = null;
-        autoNextElapsedRef.current = 0;
-        setAutoNextRunning(false);
-        setAutoNextPaused(false);
-        goNext();
-      }
-    }, COUNTDOWN_TICK_MS);
-  }, [autoNextRunning, autoNextPaused, goNext]);
 
   const showReveal = lastWinner !== null;
 
@@ -472,21 +198,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   );
 
   useEffect(() => {
-    if (pair) return;
-    if (loadingPair) return;
-    if (error) return;
-    fetchInitialPair();
-  }, [pair, loadingPair, error, fetchInitialPair]);
-
-  useEffect(() => {
     return () => {
       if (pendingUiTimerRef.current)
         window.clearTimeout(pendingUiTimerRef.current);
-      if (autoNextStartTimerRef.current)
-        window.clearTimeout(autoNextStartTimerRef.current);
-      if (autoNextIntervalRef.current)
-        window.clearInterval(autoNextIntervalRef.current);
-      if (fetchAbortRef.current) fetchAbortRef.current.abort();
     };
   }, []);
 
@@ -505,31 +219,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       setBarPct(after);
     });
   }, [postVoteRatings]);
-
-  useEffect(() => {
-    if (!pair || !loadingPair) {
-      setShowDelayedNextPending(false);
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      setShowDelayedNextPending(true);
-    }, 180);
-
-    return () => window.clearTimeout(timeout);
-  }, [pair, loadingPair]);
-
-  useEffect(() => {
-    if (!pair?.pair_id) return;
-
-    logEvent("duel_loaded", {
-      pair_id: pair.pair_id,
-      attribute_key: pair.attribute,
-      attribute_label: pair.attributeLabel ?? null,
-      player_a_id: pair.left.id,
-      player_b_id: pair.right.id,
-    });
-  }, [pair?.pair_id]);
 
   const handleVote = useCallback(
     async (winnerId: number) => {
@@ -670,6 +359,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       scheduleAutoNextAfterReveal,
       lastWinner,
       goNext,
+      setError,
     ],
   );
 
@@ -692,8 +382,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     showReveal;
 
   return (
-    <>
-      <div className={`duelShell${homepageMode ? " duelHomepageShell" : ""}`}>
+    <div
+      className={`${styles.duelShell}${homepageMode ? ` ${styles.duelHomepageShell}` : ""}`}
+    >
         <DuelCountdownBar
           show={showCountdown}
           progress={autoNextProgress}
@@ -709,8 +400,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             pointerEvents: overlayBlur ? "none" : "auto",
           }}
         >
-          <div className="duelStageOuter">
-            <div className="duelStageCenter">
+          <div className={styles.duelStageOuter}>
+            <div className={styles.duelStageCenter}>
               {!homepageMode && (
                 <>
                   <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
@@ -729,66 +420,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                 }}
               >
                 {homepageMode ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      marginBottom: 10,
-                    }}
-                  >
-                    <Tooltip content={attributeDescriptions[attribute] ?? ""}>
-                      <Link
-                        href="/duels"
-                        className="duelHomepageAttributeLink"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "100%",
-                          gap: 7,
-                          marginBottom: 10,
-                          color: "var(--ui-text-muted)",
-                          fontSize: 13,
-                          fontWeight: 800,
-                          letterSpacing: "0.12em",
-                          textTransform: "uppercase",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <>
-                          <span
-                            style={{
-                              color: "var(--ui-text-muted)",
-                              fontSize: 10,
-                              fontWeight: 800,
-                              letterSpacing: "0.12em",
-                            }}
-                          >
-                            WHO&apos;S BETTER AT
-                          </span>
-
-                          <span
-                            style={{
-                              color: "var(--ui-text-primary)",
-                              fontSize: 17,
-                              fontWeight: 900,
-                              letterSpacing: "0.08em",
-                            }}
-                          >
-                            {formatAttributeLabel(
-                              String(pair?.attribute ?? attribute),
-                            ).toUpperCase()}
-                          </span>
-                        </>
-
-                        <AttributeIcon
-                          attributeKey={attribute}
-                          label={attribute}
-                          size={19}
-                        />
-                      </Link>
-                    </Tooltip>
-                  </div>
+                  <DuelHomepageAttributeLink
+                    attribute={String(pair?.attribute ?? attribute)}
+                  />
                 ) : (
                   <DuelAttributeHeader
                     attribute={String(pair?.attribute ?? attribute)}
@@ -833,38 +467,11 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                 )}
               </div>
 
-              {showDelayedNextPending &&
-                (homepageMode ? (
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      zIndex: 80,
-                      display: "grid",
-                      placeItems: "center",
-                      pointerEvents: "none",
-                    }}
-                    aria-hidden
-                  >
-                    <ZLoader />
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      position: "fixed",
-                      left: "50vw",
-                      top: "50dvh",
-                      transform: "translate(-50%, -50%)",
-                      zIndex: 80,
-                      display: "grid",
-                      placeItems: "center",
-                      pointerEvents: "none",
-                    }}
-                    aria-hidden
-                  >
-                    <ZLoader />
-                  </div>
-                ))}
+              <DuelLoadingOverlays
+                placement="stage"
+                homepageMode={homepageMode}
+                showDelayedNextPending={showDelayedNextPending}
+              />
             </div>
           </div>
         </div>
@@ -929,122 +536,12 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           )}
         </div>
 
-        {showHomepagePairLoading && (
-          <div className="duelHomepageInitialLoader" aria-hidden>
-            <ZLoader />
-          </div>
-        )}
-
-        {showOverlayLoader && !homepageMode && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 80,
-              background:
-                "radial-gradient(circle at 50% 35%, rgba(0,0,0,0.45), rgba(0,0,0,0.82))",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-              display: "grid",
-              placeItems: "center",
-            }}
-            aria-hidden
-          >
-            <ZLoader />
-          </div>
-        )}
-      </div>
-
-      <style jsx>{`
-        .duelShell {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-          width: 100%;
-        }
-
-        .duelHomepageShell {
-          position: relative;
-        }
-
-        .duelHomepageShell .duelStageCenter {
-          max-width: 527px;
-        }
-
-        @media (max-width: 1720px) {
-          .duelHomepageShell .duelStageCenter {
-            max-width: 714px;
-          }
-        }
-
-        @media (max-width: 1360px) {
-          .duelHomepageShell .duelStageCenter {
-            max-width: 595px;
-          }
-        }
-
-        .duelHomepageInitialLoader {
-          position: absolute;
-          inset: 0;
-          z-index: 80;
-          display: grid;
-          place-items: center;
-          pointer-events: none;
-        }
-
-        .duelHomepageAttributeLink {
-          cursor: pointer;
-          transition: opacity 140ms ease;
-        }
-
-        .duelHomepageAttributeLink:hover {
-          opacity: 0.88;
-        }
-
-        .duelStageOuter {
-          position: relative;
-          width: 100%;
-          max-width: 1600px;
-          margin: 0 auto;
-        }
-
-        .duelStageCenter {
-          --duel-widget-width: 318px;
-          --duel-widget-offset: 40px;
-          max-width: ${homepageMode ? 527 : 996}px;
-          margin: 0 auto;
-          position: relative;
-          overflow: visible;
-        }
-
-        @media (max-width: 1720px) {
-          .duelStageCenter {
-            --duel-widget-width: 280px;
-            --duel-widget-offset: 20px;
-            max-width: 840px;
-          }
-        }
-
-        @media (max-width: 1360px) {
-          .duelStageCenter {
-            --duel-widget-width: 240px;
-            --duel-widget-offset: 12px;
-            max-width: 700px;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .duelStageOuter {
-            max-width: 100%;
-          }
-
-          .duelStageCenter {
-            max-width: 390px;
-            width: 100%;
-            overflow: visible;
-          }
-        }
-      `}</style>
-    </>
+        <DuelLoadingOverlays
+          placement="shell"
+          homepageMode={homepageMode}
+          showHomepagePairLoading={showHomepagePairLoading}
+          showOverlayLoader={showOverlayLoader}
+        />
+    </div>
   );
 }
