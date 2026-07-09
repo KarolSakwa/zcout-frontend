@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Inter, IBM_Plex_Sans_Condensed } from 'next/font/google';
 import './globals.css';

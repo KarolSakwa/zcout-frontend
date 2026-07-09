@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import React, { type CSSProperties } from 'react';
-import { getHomepagePlayerNameDisplay } from '@/lib/homepagePlayerName';
+import React, { type CSSProperties } from "react";
+import { getHomepagePlayerNameDisplay } from "@/lib/homepagePlayerName";
+import Image from "next/image";
 
 type PlayerCardProps = {
   name: string;
@@ -37,40 +38,46 @@ export default function PlayerCard({
   compact = false,
   homepageMode = false,
 }: PlayerCardProps) {
-  const state = reveal ? (isWinner ? 'winner' : 'loser') : 'idle';
+  const state = reveal ? (isWinner ? "winner" : "loser") : "idle";
 
-  const normalizedName = String(name ?? '').toUpperCase();
-  const nameLengthClass = normalizedName.length >= 24 ? 'nameVeryLong' : normalizedName.length >= 18 ? 'nameLong' : '';
+  const normalizedName = String(name ?? "").toUpperCase();
+  const nameLengthClass =
+    normalizedName.length >= 24
+      ? "nameVeryLong"
+      : normalizedName.length >= 18
+        ? "nameLong"
+        : "";
   const homepageName = homepageMode ? getHomepagePlayerNameDisplay(name) : null;
 
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
   const specialFlags: Record<string, string> = {
-  ENG: 'gb-eng',
-  SCO: 'gb-sct',
-  WAL: 'gb-wls',
-  NIR: 'gb-nir',
-};
+    ENG: "gb-eng",
+    SCO: "gb-sct",
+    WAL: "gb-wls",
+    NIR: "gb-nir",
+  };
 
-const flagCode = iso ? (specialFlags[iso] ?? iso.toLowerCase()) : null;
+  const flagCode = iso ? (specialFlags[iso] ?? iso.toLowerCase()) : null;
 
-const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
+  const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
 
-  const cardVars: CSSProperties & Record<'--primary' | '--secondary' | '--glow', string> = {
-    '--primary': color,
-    '--secondary': secondaryColor ?? color,
-    '--glow': glowColor ?? 'var(--ui-accent-success)',
+  const cardVars: CSSProperties &
+    Record<"--primary" | "--secondary" | "--glow", string> = {
+    "--primary": color,
+    "--secondary": secondaryColor ?? color,
+    "--glow": glowColor ?? "var(--ui-accent-success)",
   };
 
   return (
     <article
       className="card"
       data-state={state}
-      data-compact={compact ? 'true' : undefined}
-      data-homepage={homepageMode ? 'true' : undefined}
+      data-compact={compact ? "true" : undefined}
+      data-homepage={homepageMode ? "true" : undefined}
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onClick?.()}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick?.()}
       aria-label={`Głosuj na ${name}`}
       style={cardVars}
     >
@@ -90,30 +97,25 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
             </div>
           ) : (
             <div
-              className={[
-                'name',
-                compact ? 'nameCompact' : '',
-                nameLengthClass,
-              ]
+              className={["name", compact ? "nameCompact" : "", nameLengthClass]
                 .filter(Boolean)
-                .join(' ')}
+                .join(" ")}
             >
               {normalizedName}
             </div>
           )}
 
           <div className="posBadge" aria-label="Pozycja">
-            <span className="posText">{position ?? '--'}</span>
+            <span className="posText">{position ?? "--"}</span>
           </div>
 
           {flagSrc ? (
             <div className="flag" aria-hidden>
-              <img
+              <Image
                 src={flagSrc}
                 width={22}
                 height={14}
                 alt=""
-                loading="lazy"
                 draggable={false}
                 className="flagImg"
               />
@@ -122,18 +124,20 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         </div>
 
         <div className="mid">
-          <div className={compact ? 'number numberCompact' : 'number'}>
-            {number ?? '--'}
+          <div className={compact ? "number numberCompact" : "number"}>
+            {number ?? "--"}
           </div>
         </div>
 
         <div className="bottom">
-          <div className={compact ? 'club clubCompact' : 'club'}>
-            {String(club ?? '—').toUpperCase()}
+          <div className={compact ? "club clubCompact" : "club"}>
+            {String(club ?? "—").toUpperCase()}
           </div>
         </div>
 
-        {revealFooter ? <div className="revealFooter">{revealFooter}</div> : null}
+        {revealFooter ? (
+          <div className="revealFooter">{revealFooter}</div>
+        ) : null}
 
         <div className="texture" />
       </div>
@@ -147,7 +151,10 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           cursor: pointer;
           user-select: none;
           transform: translateZ(0);
-          transition: transform 160ms ease, filter 160ms ease, opacity 160ms ease;
+          transition:
+            transform 160ms ease,
+            filter 160ms ease,
+            opacity 160ms ease;
         }
 
         .card:hover {
@@ -156,28 +163,29 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         }
 
         .card:focus-visible {
-          outline: 2px solid color-mix(in srgb, var(--ui-text-primary) 82%, transparent);
+          outline: 2px solid
+            color-mix(in srgb, var(--ui-text-primary) 82%, transparent);
           outline-offset: 3px;
           border-radius: calc(var(--ui-radius-xl) + 4px);
         }
 
-        .card[data-state='winner'] {
+        .card[data-state="winner"] {
           transform: translateY(-1px) scale(1.03);
           filter: brightness(1.03);
         }
 
-        .card[data-state='loser'] {
+        .card[data-state="loser"] {
           opacity: 0.68;
           filter: blur(1px) saturate(0.9) brightness(0.96);
           transform: translateY(0) scale(0.995);
         }
 
-        .card[data-state='winner']:hover {
+        .card[data-state="winner"]:hover {
           transform: translateY(-1px) scale(1.03);
           filter: brightness(1.03);
         }
 
-        .card[data-state='loser']:hover {
+        .card[data-state="loser"]:hover {
           opacity: 0.68;
           filter: blur(1px) saturate(0.9) brightness(0.96);
           transform: translateY(0) scale(0.995);
@@ -196,14 +204,14 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           transition: box-shadow 160ms ease;
         }
 
-        .card[data-state='winner'] .frame {
+        .card[data-state="winner"] .frame {
           box-shadow:
             0 14px 38px rgba(0, 0, 0, 0.5),
             0 0 0 var(--ui-border-width-strong) var(--ui-accent-primary),
             0 0 22px 8px color-mix(in srgb, var(--glow) 55%, transparent);
         }
 
-        .card[data-state='loser'] .frame {
+        .card[data-state="loser"] .frame {
           box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
         }
 
@@ -255,44 +263,44 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           font-size: 12px;
         }
 
-        .card[data-compact='true'] .top {
+        .card[data-compact="true"] .top {
           padding: 7px 8px 4px;
           min-height: 34px;
         }
 
-        .card[data-compact='true'] .name {
+        .card[data-compact="true"] .name {
           font-size: 10px;
           max-width: calc(100% - 64px);
           letter-spacing: 0.025em;
         }
 
-        .card[data-compact='true'] .name.nameLong {
+        .card[data-compact="true"] .name.nameLong {
           font-size: 9px;
           letter-spacing: 0.02em;
         }
 
-        .card[data-compact='true'] .name.nameVeryLong {
+        .card[data-compact="true"] .name.nameVeryLong {
           font-size: 8px;
           letter-spacing: 0.015em;
         }
 
-        .card[data-compact='true'] .posBadge {
+        .card[data-compact="true"] .posBadge {
           width: 24px;
           height: 17px;
           border-radius: var(--ui-radius-sm);
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.38);
         }
 
-        .card[data-compact='true'] .posText {
+        .card[data-compact="true"] .posText {
           font-size: 7px;
           letter-spacing: 0.03em;
         }
 
-        .card[data-compact='true'] .mid {
+        .card[data-compact="true"] .mid {
           transform: translateY(-10px);
         }
 
-        .card[data-homepage='true'] .name.nameHomepage {
+        .card[data-homepage="true"] .name.nameHomepage {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -304,7 +312,7 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           overflow: hidden;
         }
 
-        .card[data-homepage='true'] .nameLine {
+        .card[data-homepage="true"] .nameLine {
           display: block;
           max-width: 100%;
           white-space: nowrap;
@@ -312,24 +320,24 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           text-overflow: ellipsis;
         }
 
-        .card[data-homepage='true'] .flag {
+        .card[data-homepage="true"] .flag {
           left: 7px;
           top: 9px;
         }
 
-        .card[data-homepage='true'] .flagImg {
+        .card[data-homepage="true"] .flagImg {
           width: 18px;
           height: 12px;
         }
 
-        .card[data-homepage='true'] .posBadge {
+        .card[data-homepage="true"] .posBadge {
           right: 7px;
           top: 6px;
           width: 22px;
           height: 15px;
         }
 
-        .card[data-homepage='true'] .posText {
+        .card[data-homepage="true"] .posText {
           font-size: 6.5px;
         }
 
@@ -407,8 +415,13 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           right: 0;
           bottom: 0;
           padding: 8px 10px;
-          background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.55));
-          border-top: var(--ui-border-width-thin) solid color-mix(in srgb, var(--ui-text-primary) 12%, transparent);
+          background: linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.55)
+          );
+          border-top: var(--ui-border-width-thin) solid
+            color-mix(in srgb, var(--ui-text-primary) 12%, transparent);
           display: grid;
           place-items: center;
         }
@@ -438,8 +451,8 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           z-index: 3;
         }
 
-        .card[data-state='winner'] .revealFooter,
-        .card[data-state='loser'] .revealFooter {
+        .card[data-state="winner"] .revealFooter,
+        .card[data-state="loser"] .revealFooter {
           opacity: 1;
         }
 
@@ -449,9 +462,21 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
           pointer-events: none;
           opacity: 0.18;
           background:
-            radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.55) 0, transparent 2px),
-            radial-gradient(1px 1px at 70% 35%, rgba(255, 255, 255, 0.45) 0, transparent 2px),
-            radial-gradient(1px 1px at 40% 75%, rgba(255, 255, 255, 0.4) 0, transparent 2px),
+            radial-gradient(
+              1px 1px at 10% 20%,
+              rgba(255, 255, 255, 0.55) 0,
+              transparent 2px
+            ),
+            radial-gradient(
+              1px 1px at 70% 35%,
+              rgba(255, 255, 255, 0.45) 0,
+              transparent 2px
+            ),
+            radial-gradient(
+              1px 1px at 40% 75%,
+              rgba(255, 255, 255, 0.4) 0,
+              transparent 2px
+            ),
             repeating-linear-gradient(
               0deg,
               rgba(255, 255, 255, 0.06),
@@ -463,75 +488,75 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         }
 
         @media (max-width: 1360px) {
-        .name {
-          font-size: 13px;
-          max-width: calc(100% - 76px);
-        }
+          .name {
+            font-size: 13px;
+            max-width: calc(100% - 76px);
+          }
 
-        .card[data-compact='true'] .name {
-          font-size: 11px;
-          max-width: calc(100% - 72px);
-        }
+          .card[data-compact="true"] .name {
+            font-size: 11px;
+            max-width: calc(100% - 72px);
+          }
 
-        .card[data-compact='true'] .name.nameLong {
-          font-size: 10px;
-        }
+          .card[data-compact="true"] .name.nameLong {
+            font-size: 10px;
+          }
 
-        .card[data-compact='true'] .name.nameVeryLong {
-          font-size: 9px;
-        }
+          .card[data-compact="true"] .name.nameVeryLong {
+            font-size: 9px;
+          }
 
-        .card[data-compact='true'] .posBadge {
-          width: 28px;
-          height: 16px;
-        }
+          .card[data-compact="true"] .posBadge {
+            width: 28px;
+            height: 16px;
+          }
 
-        .card[data-compact='true'] .posText {
-          font-size: 8px;
-        }
+          .card[data-compact="true"] .posText {
+            font-size: 8px;
+          }
 
-        .club {
-          font-size: 10px;
-        }
+          .club {
+            font-size: 10px;
+          }
 
-        .number {
-          font-size: clamp(50px, 5vw, 78px);
-        }
+          .number {
+            font-size: clamp(50px, 5vw, 78px);
+          }
 
-        .posBadge {
-          width: 34px;
-          height: 29px;
-        }
+          .posBadge {
+            width: 34px;
+            height: 29px;
+          }
 
-        .posText {
-          font-size: 10px;
-        }
+          .posText {
+            font-size: 10px;
+          }
 
-        .flag {
-          left: 8px;
-          top: 10px;
-        }
+          .flag {
+            left: 8px;
+            top: 10px;
+          }
 
-        .flagImg {
-          width: 20px;
-          height: 13px;
+          .flagImg {
+            width: 20px;
+            height: 13px;
+          }
         }
-      }
 
         @media (max-width: 900px) {
           .name {
             font-size: 14px;
           }
 
-          .card[data-compact='true'] .name {
+          .card[data-compact="true"] .name {
             font-size: 11px;
           }
 
-          .card[data-compact='true'] .name.nameLong {
+          .card[data-compact="true"] .name.nameLong {
             font-size: 10px;
           }
 
-          .card[data-compact='true'] .name.nameVeryLong {
+          .card[data-compact="true"] .name.nameVeryLong {
             font-size: 9px;
           }
 
@@ -554,62 +579,62 @@ const flagSrc = flagCode ? `https://flagcdn.com/${flagCode}.svg` : null;
         }
 
         @media (max-width: 700px) {
-        .top {
-          padding: 8px 7px 4px;
-          min-height: 48px;
-        }
+          .top {
+            padding: 8px 7px 4px;
+            min-height: 48px;
+          }
 
-        .name {
-          font-size: 13px;
-          max-width: calc(100% - 58px);
-          line-height: 1.02;
-          -webkit-line-clamp: 2;
-        }
+          .name {
+            font-size: 13px;
+            max-width: calc(100% - 58px);
+            line-height: 1.02;
+            -webkit-line-clamp: 2;
+          }
 
-        .card[data-compact='true'] .name {
-          font-size: 11px;
-          max-width: calc(100% - 64px);
-        }
+          .card[data-compact="true"] .name {
+            font-size: 11px;
+            max-width: calc(100% - 64px);
+          }
 
-        .card[data-compact='true'] .name.nameLong {
-          font-size: 10px;
-        }
+          .card[data-compact="true"] .name.nameLong {
+            font-size: 10px;
+          }
 
-        .card[data-compact='true'] .name.nameVeryLong {
-          font-size: 9px;
-        }
+          .card[data-compact="true"] .name.nameVeryLong {
+            font-size: 9px;
+          }
 
-        .posBadge {
-          right: 6px;
-          top: 7px;
-          width: 32px;
-          height: 28px;
-        }
+          .posBadge {
+            right: 6px;
+            top: 7px;
+            width: 32px;
+            height: 28px;
+          }
 
-        .flag {
-          left: 7px;
-          top: 10px;
-        }
+          .flag {
+            left: 7px;
+            top: 10px;
+          }
 
-        .flagImg {
-          width: 18px;
-          height: 12px;
-        }
+          .flagImg {
+            width: 18px;
+            height: 12px;
+          }
 
-        .club {
-          font-size: 10px;
-          max-width: 96%;
-        }
+          .club {
+            font-size: 10px;
+            max-width: 96%;
+          }
 
           .mid {
             height: 58%;
             transform: translateY(-8px);
           }
 
-          .card[data-compact='true'] .mid {
+          .card[data-compact="true"] .mid {
             transform: translateY(-12px);
           }
-      }
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .card {

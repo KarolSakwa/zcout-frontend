@@ -103,7 +103,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const glow = "var(--ui-accent-primary)";
 
   const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } =
-    useDuelSideWidgets(pair);
+    useDuelSideWidgets();
 
   useEffect(() => {
     if (!homepageMode) return;
@@ -693,9 +693,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   return (
     <>
-      <div
-        className={`duelShell${homepageMode ? " duelHomepageShell" : ""}`}
-      >
+      <div className={`duelShell${homepageMode ? " duelHomepageShell" : ""}`}>
         <DuelCountdownBar
           show={showCountdown}
           progress={autoNextProgress}

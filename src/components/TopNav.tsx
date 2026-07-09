@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './TopNav.module.css';
@@ -21,7 +22,14 @@ export default function TopNav() {
     <header className={styles.topnav}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="Zcout">
-          <img src="/logo.png" alt="Zcout" className={styles.brandLogo} />
+          <Image
+            src="/logo.png"
+            alt="Zcout"
+            width={120}
+            height={24}
+            className={styles.brandLogo}
+            priority
+          />
         </Link>
 
         <nav className={styles.menu} aria-label="Main">

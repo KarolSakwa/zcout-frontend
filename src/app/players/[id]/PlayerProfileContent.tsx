@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic';
 
 import styles from './page.module.css';
-import { formatOverall } from '@/lib/ratings';
 import { headers } from 'next/headers';
 import PlayerProfileTelemetry from './PlayerProfileTelemetry';
 import AnimatedProfileContent from './AnimatedProfileContent';

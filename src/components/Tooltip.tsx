@@ -13,7 +13,6 @@ type TooltipProps = {
   children: ReactNode;
   side?: 'top' | 'bottom';
   align?: 'center' | 'start' | 'end';
-  maxWidth?: number;
 };
 
 export default function Tooltip({
@@ -21,7 +20,6 @@ export default function Tooltip({
   children,
   side = 'top',
   align = 'center',
-  maxWidth = 240,
 }: TooltipProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);

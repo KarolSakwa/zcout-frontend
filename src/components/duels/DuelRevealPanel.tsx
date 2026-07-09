@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import type { PairResponse, RatingsMap } from "./duelTypes";
 import CrowdVerdictBar from "./CrowdVerdictBar";
 import DuelImpact from "./DuelImpact";

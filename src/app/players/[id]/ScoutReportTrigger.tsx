@@ -88,7 +88,6 @@ export default function ScoutReportTrigger({
   playerName,
   playerPosition,
   clubName,
-  attributes: _attributes,
   className,
 }: ScoutReportTriggerProps) {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -98,7 +97,6 @@ export default function ScoutReportTrigger({
   const [drafts, setDrafts] = useState<Record<number, AttributeDraft>>({});
   const [serverAttributes, setServerAttributes] = useState<ScoutReportAttribute[] | null>(null);
 
-  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
   const [isLoadingModalAttributes, setIsLoadingModalAttributes] = useState(false);
 
   const [attributesError, setAttributesError] = useState<string | null>(null);
@@ -148,8 +146,6 @@ export default function ScoutReportTrigger({
 
       if (modal) {
         setIsLoadingModalAttributes(true);
-      } else {
-        setIsCheckingAvailability(true);
       }
 
       setAttributesError(null);
@@ -208,8 +204,6 @@ export default function ScoutReportTrigger({
       } finally {
         if (modal) {
           setIsLoadingModalAttributes(false);
-        } else {
-          setIsCheckingAvailability(false);
         }
       }
     },
@@ -229,7 +223,6 @@ export default function ScoutReportTrigger({
       setIsCompleted(false);
       setRemainingAttributesCount(null);
       setRequiresAuth(true);
-      setIsCheckingAvailability(false);
       return;
     }
 
@@ -450,20 +443,6 @@ export default function ScoutReportTrigger({
     );
 
     setVisible(false);
-  };
-
-  const reopenForNextPack = () => {
-    if (isCompleted || remainingAttributesCount === 0) {
-      setShowSuccessToast(false);
-      return;
-    }
-
-    setShowSuccessToast(false);
-    setSubmitError(null);
-    setAttributesError(null);
-    setRequiresAuth(false);
-    setIsModalMounted(true);
-    void loadScoutReportAvailability({ modal: true });
   };
 
   const setVoteValue = (attributeId: number, nextValue: string) => {

@@ -15,14 +15,6 @@ type RecentVoteItem = {
   attributeLabel: string;
 };
 
-type EchoLike = {
-  channel: (name: string) => {
-    listen: <T = unknown>(event: string, callback: (payload: T) => void) => void;
-    stopListening?: (event: string) => void;
-    unsubscribe?: () => void;
-  };
-};
-
 declare global {
   interface Window {
     Echo?: Echo<'pusher'>
@@ -178,7 +170,7 @@ export function useRecentVotesLive() {
   };
 }
 
-export function useDuelSideWidgets(_pair: unknown) {
+export function useDuelSideWidgets() {
   const { recentVotes, latestRecentVoteId, isRecentVotesLoading } = useRecentVotesLive();
 
   const [topMoversMode, setTopMoversMode] = useState<TopMoversMode>('risers');

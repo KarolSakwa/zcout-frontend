@@ -1,7 +1,6 @@
 import Link from "next/link";
 import styles from "./HomepageSection.module.css";
 import PlayerRadarChart from "@/app/players/[id]/PlayerRadarChart";
-import RatingWithConfidence from "@/components/RatingWithConfidence";
 import FeaturedOverallBlock from "../FeaturedOverallBlock";
 import { calcAge } from "@/lib/playerAge";
 import PlayerArchetype from "@/app/players/[id]/PlayerArchetype";

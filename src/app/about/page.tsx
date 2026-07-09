@@ -81,11 +81,13 @@ function AboutSection(props: {
       <div className={styles.iconColumn}>
         <div className={styles.iconCircle}>
           {isImageIcon ? (
-            <img
-                src={props.icon}
-                alt=""
-                className={styles.svgIcon}
-                />
+            <Image
+              src={props.icon}
+              alt=""
+              width={42}
+              height={42}
+              className={styles.svgIcon}
+            />
           ) : (
             props.textIcon
           )}
