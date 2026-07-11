@@ -12,7 +12,7 @@ import {
 
 export const HOMEPAGE_LOADING_SECTIONS = [
   'topRisers',
-  'topFallers',
+  'featuredRanking',
   'recentVotes',
   'needsMoreRatings',
   'duel',
@@ -24,7 +24,7 @@ type LoadingMap = Record<HomepageLoadingSection, boolean>;
 
 const initialLoading: LoadingMap = {
   topRisers: true,
-  topFallers: true,
+  featuredRanking: true,
   recentVotes: true,
   needsMoreRatings: true,
   duel: true,

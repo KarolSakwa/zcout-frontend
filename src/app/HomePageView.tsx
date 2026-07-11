@@ -2,7 +2,7 @@ import HeroSection from "@/components/homepage/HeroSection";
 import FeaturedPlayerSection from "@/components/homepage/FeaturedPlayerSection";
 import DuelWidgetSection from "@/components/homepage/DuelWidgetSection";
 import TopRisersSection from "@/components/homepage/TopRisersSection";
-import TopFallersSection from "@/components/homepage/TopFallersSection";
+import FeaturedAttributeRankingSection from "@/components/homepage/FeaturedAttributeRankingSection";
 import LatestVotesSection from "@/components/homepage/LatestVotesSection";
 import NeedsMoreRatingsSection from "@/components/homepage/NeedsMoreRatingsSection";
 import FeaturedRankingsSection from "@/components/homepage/FeaturedRankingsSection";
@@ -42,7 +42,7 @@ export default async function HomePageView() {
               <TopRisersSection />
             </div>
             <div className={styles.moversWidget}>
-              <TopFallersSection />
+              <FeaturedAttributeRankingSection />
             </div>
           </div>
           <WidgetPanel
