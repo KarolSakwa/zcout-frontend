@@ -1,0 +1,132 @@
+.panel {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.glass {
+  border: 1px solid rgba(140, 170, 210, 0.16);
+  background: linear-gradient(180deg, rgba(14, 22, 36, 0.88), rgba(8, 14, 24, 0.82));
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass.embedded {
+  border-radius: 19px;
+  padding: 12px 12px 8px;
+}
+
+.glass.floating {
+  border-radius: 22px;
+  padding: 14px 14px 10px;
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(8, 14, 24, 0.35);
+  padding: 14px 17px 17px;
+}
+
+.card.noPadding {
+  padding: 0;
+}
+
+.duel {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: start;
+  border: 1px solid var(--ui-border-subtle);
+  border-radius: var(--ui-radius-xl);
+  background: linear-gradient(
+    180deg,
+    rgba(14, 24, 42, 0.35),
+    rgba(6, 12, 22, 0.25)
+  );
+  min-height: 340px;
+  padding: 17px 17px 0;
+}
+
+.duel > :last-child {
+  width: 100%;
+  max-width: 646px;
+}
+
+.borderTitle {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  transform: translateY(-50%);
+  z-index: 2;
+  padding: 0 6px;
+  background: var(--ui-bg-canvas-1);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(214, 226, 244, 0.82);
+  white-space: nowrap;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.glass .borderTitle {
+  font-size: 9px;
+  letter-spacing: 0.19em;
+}
+
+.card .borderTitle,
+.duel .borderTitle {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.headerRow,
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.glass.embedded .headerRow,
+.glass.embedded .metaRow {
+  margin-bottom: 7px;
+}
+
+.glass.floating .headerRow,
+.glass.floating .metaRow {
+  margin-bottom: 8px;
+}
+
+.inlineTitle {
+  font-weight: 800;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+  color: rgba(214, 226, 244, 0.82);
+  white-space: nowrap;
+}
+
+.glass.embedded .inlineTitle {
+  font-size: 9px;
+}
+
+.glass.floating .inlineTitle {
+  font-size: 10px;
+}
+
+.headerMeta {
+  flex-shrink: 0;
+}
+
+.metaSpacer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .duel {
+    min-height: 0;
+  }
+}

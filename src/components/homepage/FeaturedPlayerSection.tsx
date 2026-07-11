@@ -4,6 +4,7 @@ import PlayerRadarChart from "@/app/players/[id]/PlayerRadarChart";
 import FeaturedOverallBlock from "../FeaturedOverallBlock";
 import { calcAge } from "@/lib/playerAge";
 import PlayerArchetype from "@/app/players/[id]/PlayerArchetype";
+import WidgetPanel from "@/components/ui/WidgetPanel";
 
 type RadarAxis = {
   key: string;
@@ -43,7 +44,7 @@ export default function FeaturedPlayerSection({ player }: Props) {
   const nameFontSize = player.name.length > 18 ? 20 : 24;
 
   return (
-    <div className={styles.card}>
+    <WidgetPanel variant="card" title="Featured Player" noPadding>
       <div className={styles.rankBadge}>
         Rank <span>#{player.rank}</span>
       </div>
@@ -110,6 +111,6 @@ export default function FeaturedPlayerSection({ player }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </WidgetPanel>
   );
 }

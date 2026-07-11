@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AttributeIcon from "@/components/AttributeIcon";
 import { FEATURED_RANKING_TILES } from "@/components/homepage/featuredRankingsTiles";
+import WidgetPanel from "@/components/ui/WidgetPanel";
 import styles from "./FeaturedRankingsSection.module.css";
 
 function FeaturedRankingTileIcon({
@@ -17,11 +18,12 @@ function FeaturedRankingTileIcon({
 
 export default function FeaturedRankingsSection() {
   return (
-    <section className={styles.section} aria-labelledby="featured-rankings-title">
-      <h2 id="featured-rankings-title" className={styles.title}>
-        Featured Rankings
-      </h2>
-
+    <WidgetPanel
+      as="section"
+      variant="card"
+      id="featured-rankings"
+      title="Featured Rankings"
+    >
       <div className={styles.tiles}>
         {FEATURED_RANKING_TILES.map((tile) => (
           <Link key={tile.id} href={tile.href} className={styles.tile}>
@@ -35,6 +37,6 @@ export default function FeaturedRankingsSection() {
           </Link>
         ))}
       </div>
-    </section>
+    </WidgetPanel>
   );
 }

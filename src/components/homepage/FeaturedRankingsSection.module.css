@@ -1,25 +1,8 @@
-.section {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  background: rgba(8, 14, 24, 0.35);
-  padding: 14px 17px 17px;
-}
-
-.title {
-  margin: 0 0 12px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(214, 226, 244, 0.82);
-}
-
 .tiles {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 10px;
+  margin-top: 8px;
 }
 
 .tile {

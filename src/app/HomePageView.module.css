@@ -111,27 +111,7 @@
 }
 
 .duel {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  align-self: start;
   grid-column: 8 / span 5;
-
-  border: 1px solid var(--ui-border-subtle);
-  border-radius: var(--ui-radius-xl);
-  background: linear-gradient(
-    180deg,
-    rgba(14, 24, 42, 0.35),
-    rgba(6, 12, 22, 0.25)
-  );
-
-  min-height: 340px;
-  padding: 17px 17px 0;
-}
-
-.duel > * {
-  width: 100%;
-  max-width: 646px;
 }
 
 .playerCard {

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import LiveWidgetAttributeMeta from '@/components/duels/LiveWidgetAttributeMeta';
+import WidgetPanel from '@/components/ui/WidgetPanel';
 
 export type TopRiserItem = {
   id: string;
@@ -13,6 +14,18 @@ export type TopRiserItem = {
 };
 
 type WidgetMode = 'risers' | 'fallers';
+
+const sevenDayMetaStyle = {
+  fontSize: 9,
+  fontWeight: 600,
+  color: 'var(--ui-accent-primary)',
+  whiteSpace: 'nowrap' as const,
+};
+
+const sevenDayMetaFloatingStyle = {
+  ...sevenDayMetaStyle,
+  fontSize: 10,
+};
 
 export default function TopRisersWidget({
   items,
@@ -27,14 +40,20 @@ export default function TopRisersWidget({
   const deltaColor = mode === 'risers' ? 'var(--ui-accent-primary)' : 'var(--ui-accent-faller)';
 
   return (
-    <aside
+    <WidgetPanel
+      as="aside"
+      variant="glass"
+      embedded={embedded}
+      title={title}
+      headerMeta={
+        <div style={embedded ? sevenDayMetaStyle : sevenDayMetaFloatingStyle}>
+          7d
+        </div>
+      }
       className={embedded ? 'topRisersWidgetEmbedded' : 'topRisersWidget'}
-      style={{
-        ...(embedded
-          ? {
-              position: 'relative',
-              width: '100%',
-            }
+      style={
+        embedded
+          ? undefined
           : {
               position: 'absolute',
               top: 'clamp(210px, 20vh, 300px)',
@@ -42,49 +61,9 @@ export default function TopRisersWidget({
               right: 'calc(100% + var(--duel-widget-offset, 40px))',
               width: 'var(--duel-widget-width, 318px)',
               zIndex: 20,
-            }),
-        borderRadius: embedded ? '19px' : '22px',
-        border: '1px solid rgba(140, 170, 210, 0.16)',
-        background: 'linear-gradient(180deg, rgba(14,22,36,0.88), rgba(8,14,24,0.82))',
-        boxShadow: '0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04)',
-        padding: embedded ? '12px 12px 8px' : '14px 14px 10px',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-      }}
+            }
+      }
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: embedded ? 7 : 8,
-        }}
-      >
-        <div
-          style={{
-            fontSize: embedded ? 9 : 10,
-            fontWeight: 800,
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: 'rgba(214, 226, 244, 0.82)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {title}
-        </div>
-
-        <div
-          style={{
-            fontSize: embedded ? 9 : 10,
-            fontWeight: 600,
-            color: 'var(--ui-accent-primary)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          7d
-        </div>
-      </div>
-
       <div
         style={{
           display: 'flex',
@@ -92,12 +71,15 @@ export default function TopRisersWidget({
           gap: 0,
         }}
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <div
             key={item.id}
             style={{
               padding: embedded ? '6px 0' : '11px 0 10px',
-              borderTop: '1px solid rgba(255,255,255,0.05)',
+              borderTop:
+                embedded && index === 0
+                  ? undefined
+                  : '1px solid rgba(255,255,255,0.05)',
             }}
           >
             {embedded ? (
@@ -230,6 +212,6 @@ export default function TopRisersWidget({
           }
         }
       `}</style>
-    </aside>
+    </WidgetPanel>
   );
 }

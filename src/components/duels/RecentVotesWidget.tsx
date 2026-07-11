@@ -2,6 +2,7 @@
 
 import LiveWidgetAttributeMeta from '@/components/duels/LiveWidgetAttributeMeta';
 import Link from 'next/link';
+import WidgetPanel from '@/components/ui/WidgetPanel';
 
 export type RecentVoteItem = {
   id: string;
@@ -14,6 +15,41 @@ export type RecentVoteItem = {
   attributeLabel: string;
 };
 
+const liveMetaStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 5,
+  fontSize: 9,
+  fontWeight: 600,
+  color: 'var(--ui-accent-primary)',
+  whiteSpace: 'nowrap' as const,
+};
+
+const liveMetaFloatingStyle = {
+  ...liveMetaStyle,
+  gap: 6,
+  fontSize: 10,
+};
+
+function LiveMeta({ embedded }: { embedded: boolean }) {
+  const style = embedded ? liveMetaStyle : liveMetaFloatingStyle;
+
+  return (
+    <div style={style}>
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '999px',
+          background: 'var(--ui-accent-primary)',
+          boxShadow: '0 0 8px color-mix(in srgb, var(--ui-accent-primary) 60%, transparent)',
+        }}
+      />
+      <span>Live</span>
+    </div>
+  );
+}
+
 export default function RecentVotesWidget({
   items,
   latestItemId,
@@ -24,14 +60,16 @@ export default function RecentVotesWidget({
   embedded?: boolean;
 }) {
   return (
-    <aside
+    <WidgetPanel
+      as="aside"
+      variant="glass"
+      embedded={embedded}
+      title="Last votes"
+      headerMeta={<LiveMeta embedded={embedded} />}
       className={embedded ? 'recentVotesWidgetEmbedded' : 'recentVotesWidget'}
-      style={{
-        ...(embedded
-          ? {
-              position: 'relative',
-              width: '100%',
-            }
+      style={
+        embedded
+          ? undefined
           : {
               position: 'absolute',
               top: 'clamp(210px, 20vh, 300px)',
@@ -39,71 +77,9 @@ export default function RecentVotesWidget({
               left: 'calc(100% + var(--duel-widget-offset, 40px))',
               width: 'var(--duel-widget-width, 318px)',
               zIndex: 20,
-            }),
-        height: 'auto',
-        borderRadius: embedded ? '19px' : '22px',
-        border: '1px solid rgba(140, 170, 210, 0.16)',
-        background: 'linear-gradient(180deg, rgba(14,22,36,0.88), rgba(8,14,24,0.82))',
-        boxShadow: '0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04)',
-        padding: embedded ? '12px 12px 8px' : '14px 14px 10px',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-      }}
+            }
+      }
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: embedded ? 7 : 8,
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0,
-            minWidth: 0,
-          }}
-        >
-          <div
-            style={{
-              fontSize: embedded ? 9 : 10,
-              fontWeight: 800,
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: 'rgba(214, 226, 244, 0.82)',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Last votes
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: embedded ? 5 : 6,
-            fontSize: embedded ? 9 : 10,
-            fontWeight: 600,
-            color: 'var(--ui-accent-primary)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '999px',
-              background: 'var(--ui-accent-primary)',
-              boxShadow: '0 0 8px color-mix(in srgb, var(--ui-accent-primary) 60%, transparent)',
-            }}
-          />
-          <span>Live</span>
-        </div>
-      </div>
-
       <div
         style={{
           display: 'flex',
@@ -111,7 +87,7 @@ export default function RecentVotesWidget({
           gap: 0,
         }}
       >
-        {items.map((item) => {
+        {items.map((item, index) => {
           const isLatest = item.id === latestItemId;
           const leftWon = item.winnerPlayerId === item.leftPlayerId;
           const rightWon = item.winnerPlayerId === item.rightPlayerId;
@@ -121,7 +97,10 @@ export default function RecentVotesWidget({
               key={item.id}
               style={{
                 padding: embedded ? '9px 0 8px' : '11px 0 10px',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
+                borderTop:
+                  embedded && index === 0
+                    ? undefined
+                    : '1px solid rgba(255,255,255,0.05)',
                 animation: isLatest ? 'recentVoteEnter 420ms ease' : 'none',
               }}
             >
@@ -240,6 +219,6 @@ export default function RecentVotesWidget({
           }
         }
       `}</style>
-    </aside>
+    </WidgetPanel>
   );
 }

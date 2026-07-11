@@ -7,6 +7,7 @@ import LatestVotesSection from "@/components/homepage/LatestVotesSection";
 import NeedsMoreRatingsSection from "@/components/homepage/NeedsMoreRatingsSection";
 import FeaturedRankingsSection from "@/components/homepage/FeaturedRankingsSection";
 import HomePageClientShell from "@/components/homepage/HomePageClientShell";
+import WidgetPanel from "@/components/ui/WidgetPanel";
 import styles from "./HomePageView.module.css";
 
 export default async function HomePageView() {
@@ -44,11 +45,13 @@ export default async function HomePageView() {
               <TopFallersSection />
             </div>
           </div>
-          <div
+          <WidgetPanel
+            variant="duel"
+            title="Current Duel"
             className={`${styles.gridItem} ${styles.colSpan5} ${styles.rowSpan2} ${styles.duel}`}
           >
             <DuelWidgetSection />
-          </div>
+          </WidgetPanel>
           <div className={styles.secondaryCluster}>
             <div className={styles.recentVotesWidgetSlot}>
               <LatestVotesSection />

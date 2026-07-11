@@ -5,6 +5,7 @@ import {
   type NeedsMoreRatingsItem,
 } from '@/components/homepage/useHomepageWidgets';
 import { getRatingColor } from '@/lib/ratings';
+import WidgetPanel from '@/components/ui/WidgetPanel';
 
 const confidenceLabelStyle = {
   fontSize: 9,
@@ -31,54 +32,13 @@ export default function NeedsMoreRatingsWidget({
   embedded?: boolean;
 }) {
   return (
-    <aside
-      className={embedded ? 'needsMoreRatingsWidgetEmbedded' : 'needsMoreRatingsWidget'}
-      style={{
-        ...(embedded
-          ? {
-              position: 'relative',
-              width: '100%',
-            }
-          : {
-              position: 'absolute',
-              top: 'clamp(210px, 20vh, 300px)',
-              transform: 'none',
-              right: 'calc(100% + var(--duel-widget-offset, 40px))',
-              width: 'var(--duel-widget-width, 318px)',
-              zIndex: 20,
-            }),
-        borderRadius: embedded ? '19px' : '22px',
-        border: '1px solid rgba(140, 170, 210, 0.16)',
-        background: 'linear-gradient(180deg, rgba(14,22,36,0.88), rgba(8,14,24,0.82))',
-        boxShadow: '0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04)',
-        padding: embedded ? '12px 12px 8px' : '14px 14px 10px',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: embedded ? 10 : 12,
-          marginBottom: embedded ? 7 : 8,
-        }}
-      >
-        <div
-          style={{
-            fontSize: embedded ? 9 : 10,
-            fontWeight: 800,
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: 'rgba(214, 226, 244, 0.82)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Needs more ratings
-        </div>
-
-        {embedded ? (
+    <WidgetPanel
+      as="aside"
+      variant="glass"
+      embedded={embedded}
+      title="Needs more ratings"
+      headerMeta={
+        embedded ? (
           <span
             style={{
               ...confidenceLabelStyle,
@@ -87,9 +47,22 @@ export default function NeedsMoreRatingsWidget({
           >
             Confidence
           </span>
-        ) : null}
-      </div>
-
+        ) : undefined
+      }
+      className={embedded ? 'needsMoreRatingsWidgetEmbedded' : 'needsMoreRatingsWidget'}
+      style={
+        embedded
+          ? undefined
+          : {
+              position: 'absolute',
+              top: 'clamp(210px, 20vh, 300px)',
+              transform: 'none',
+              right: 'calc(100% + var(--duel-widget-offset, 40px))',
+              width: 'var(--duel-widget-width, 318px)',
+              zIndex: 20,
+            }
+      }
+    >
       <div
         style={{
           display: 'flex',
@@ -97,7 +70,7 @@ export default function NeedsMoreRatingsWidget({
           gap: 0,
         }}
       >
-        {items.map((item) => {
+        {items.map((item, index) => {
           const metaParts = [item.position, item.club].filter(Boolean);
 
           return (
@@ -105,7 +78,10 @@ export default function NeedsMoreRatingsWidget({
               key={item.id}
               style={{
                 padding: embedded ? '9px 0 8px' : '11px 0 10px',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
+                borderTop:
+                  embedded && index === 0
+                    ? undefined
+                    : '1px solid rgba(255,255,255,0.05)',
               }}
             >
               {embedded ? (
@@ -269,6 +245,6 @@ export default function NeedsMoreRatingsWidget({
           }
         }
       `}</style>
-    </aside>
+    </WidgetPanel>
   );
 }
