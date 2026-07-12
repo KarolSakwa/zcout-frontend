@@ -113,7 +113,7 @@ describe('fetchDuelPair', () => {
     })
 
     await expect(fetchDuelPair(new AbortController().signal)).rejects.toThrow(
-      'Brak dwóch graczy w odpowiedzi /api/duels/next',
+      'Expected two players in the /api/duels/next response',
     )
   })
 })

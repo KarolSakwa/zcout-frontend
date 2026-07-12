@@ -73,7 +73,7 @@ describe('normalizePair', () => {
     }
 
     expect(() => normalizePair(payload)).toThrow(
-      'Brak dwóch graczy w odpowiedzi /api/duels/next',
+      'Expected two players in the /api/duels/next response',
     )
   })
 
@@ -84,7 +84,7 @@ describe('normalizePair', () => {
     }
 
     expect(() => normalizePair(payload)).toThrow(
-      'Brak dwóch graczy w odpowiedzi /api/duels/next',
+      'Expected two players in the /api/duels/next response',
     )
   })
 
@@ -95,7 +95,7 @@ describe('normalizePair', () => {
     }
 
     expect(() => normalizePair(payload)).toThrow(
-      'Brak dwóch graczy w odpowiedzi /api/duels/next',
+      'Expected two players in the /api/duels/next response',
     )
   })
 
@@ -256,7 +256,7 @@ describe('normalizePair', () => {
       }
 
       expect(() => normalizePair(payloadWithNullLeft)).toThrow(
-        'Brak dwóch graczy w odpowiedzi /api/duels/next',
+        'Expected two players in the /api/duels/next response',
       )
 
       const payloadWithInvalidPlayer = {
@@ -266,7 +266,7 @@ describe('normalizePair', () => {
       }
 
       expect(() => normalizePair(payloadWithInvalidPlayer)).toThrow(
-        'Brak dwóch graczy w odpowiedzi /api/duels/next',
+        'Expected two players in the /api/duels/next response',
       )
     })
   })

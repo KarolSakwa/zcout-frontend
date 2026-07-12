@@ -115,7 +115,7 @@ export function normalizePair(raw: unknown): PairResponse {
 
   const players = payload.players;
   if (!Array.isArray(players) || players.length < 2) {
-    throw new Error('Expected two players in the /api/duels/next response.');
+    throw new Error('Expected two players in the /api/duels/next response');
   }
 
   const firstPlayerRaw = toObjectRecord(players[0]);
