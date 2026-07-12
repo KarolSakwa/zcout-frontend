@@ -2,6 +2,8 @@
 
 import AttributeIcon from '@/components/AttributeIcon';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
+import Tooltip from '@/components/Tooltip';
+import { formatTrend7d, getTrend7dColor } from '@/lib/trends';
 import WidgetPanel from '@/components/ui/WidgetPanel';
 import Link from 'next/link';
 
@@ -17,6 +19,7 @@ export type FeaturedRankingPlayer = {
   player: string;
   rating: number;
   confidence: number | null;
+  trend_7d: number | null;
 };
 
 export type FeaturedRankingResponse = {
@@ -26,11 +29,19 @@ export type FeaturedRankingResponse = {
 
 type WidgetState = 'loading' | 'error' | 'empty' | 'ready';
 
-const rowGridStyle = {
+const embeddedRowGridStyle = {
   display: 'grid',
   gridTemplateColumns: 'minmax(0, 1fr) auto',
-  columnGap: 7,
   alignItems: 'center',
+  columnGap: 7,
+};
+
+const metricsClusterStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: 15,
+  minWidth: 0,
 };
 
 const stateTextStyle = {
@@ -38,7 +49,7 @@ const stateTextStyle = {
   fontSize: 11,
   fontWeight: 500,
   lineHeight: 1.3,
-  padding: '9px 0 8px',
+  padding: '6px 0',
 };
 
 function resolveWidgetState(
@@ -100,22 +111,23 @@ export default function FeaturedAttributeRankingWidget({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 7,
-              padding: '6px 0 8px',
+              justifyContent: 'center',
+              gap: 6,
+              padding: '2px 0',
               minWidth: 0,
             }}
           >
             <AttributeIcon
               attributeKey={attribute.key}
               label={attribute.label}
-              size={14}
+              size={12}
             />
             <span
               style={{
                 color: 'rgba(232,240,252,0.95)',
                 fontSize: 11,
                 fontWeight: 700,
-                lineHeight: 1.2,
+                lineHeight: 1,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -125,41 +137,72 @@ export default function FeaturedAttributeRankingWidget({
             </span>
           </div>
 
-          {players.map((item) => (
+          {players.map((item, index) => (
             <div
               key={item.id}
               style={{
-                padding: '9px 0 8px',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
+                padding: '5px 0',
+                borderTop:
+                  index === 0
+                    ? undefined
+                    : '1px solid rgba(255,255,255,0.05)',
               }}
             >
-              <div style={rowGridStyle}>
-                <Link
-                  href={`/players/${item.playerId}`}
-                  className="featuredRankingPlayerLink"
+              <Link
+                href={`/players/${item.playerId}`}
+                className="featuredRankingRowLink"
+                style={{
+                  ...embeddedRowGridStyle,
+                  textDecoration: 'none',
+                  minWidth: 0,
+                }}
+              >
+                <span
                   style={{
                     color: 'rgba(232,240,252,0.95)',
                     fontSize: 11,
                     fontWeight: 700,
-                    textDecoration: 'none',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     minWidth: 0,
+                    lineHeight: 1,
                   }}
                 >
                   {item.player}
-                </Link>
+                </span>
 
-                <RatingWithConfidence
-                  rating={item.rating}
-                  confidence={item.confidence}
-                  fontSize={11}
-                  scalePx={11}
-                  expand={false}
-                  align="end"
-                />
-              </div>
+                <div style={metricsClusterStyle}>
+                  {item.trend_7d != null ? (
+                    <Tooltip content="Last 7 days" side="top" align="end">
+                      <span
+                        style={{
+                          color: getTrend7dColor(item.trend_7d),
+                          fontSize: 11,
+                          fontWeight: 800,
+                          letterSpacing: '0.02em',
+                          whiteSpace: 'nowrap',
+                          textAlign: 'right',
+                          lineHeight: 1,
+                          fontVariantNumeric: 'tabular-nums',
+                          cursor: 'help',
+                        }}
+                      >
+                        {formatTrend7d(item.trend_7d)}
+                      </span>
+                    </Tooltip>
+                  ) : null}
+
+                  <RatingWithConfidence
+                    rating={item.rating}
+                    confidence={item.confidence}
+                    fontSize={13}
+                    scalePx={13}
+                    expand={false}
+                    align="end"
+                  />
+                </div>
+              </Link>
             </div>
           ))}
         </div>
@@ -172,11 +215,11 @@ export default function FeaturedAttributeRankingWidget({
       )}
 
       <style jsx>{`
-        .featuredRankingPlayerLink {
+        .featuredRankingRowLink {
           transition: color 140ms ease, text-shadow 140ms ease;
         }
 
-        .featuredRankingPlayerLink:hover {
+        .featuredRankingRowLink:hover span:first-child {
           color: var(--ui-accent-primary) !important;
           text-shadow: 0 0 10px rgba(92, 163, 255, 0.18);
         }
@@ -190,3 +233,4 @@ export default function FeaturedAttributeRankingWidget({
     </WidgetPanel>
   );
 }
+
