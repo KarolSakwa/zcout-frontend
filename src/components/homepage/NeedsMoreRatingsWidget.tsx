@@ -36,6 +36,7 @@ export default function NeedsMoreRatingsWidget({
       as="aside"
       variant="glass"
       embedded={embedded}
+      compact={embedded}
       title="Needs more ratings"
       headerMeta={
         embedded ? (
@@ -64,6 +65,7 @@ export default function NeedsMoreRatingsWidget({
       }
     >
       <div
+        className={embedded ? 'homepageSecondaryContent' : undefined}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -77,7 +79,7 @@ export default function NeedsMoreRatingsWidget({
             <div
               key={item.id}
               style={{
-                padding: embedded ? '9px 0 8px' : '11px 0 10px',
+                padding: embedded ? '6px 0' : '11px 0 10px',
                 borderTop:
                   embedded && index === 0
                     ? undefined
@@ -119,7 +121,7 @@ export default function NeedsMoreRatingsWidget({
                   </div>
 
                   {item.overall != null || metaParts.length > 0 ? (
-                    <div style={{ ...rowGridStyle, columnGap: 7, marginTop: 3 }}>
+                    <div style={{ ...rowGridStyle, columnGap: 7, marginTop: 2 }}>
                       <div
                         style={{
                           display: 'flex',
@@ -230,6 +232,12 @@ export default function NeedsMoreRatingsWidget({
       </div>
 
       <style jsx>{`
+        .homepageSecondaryContent {
+          flex: 1;
+          min-height: 0;
+          justify-content: space-between;
+        }
+
         .needsMoreRatingsPlayerLink {
           transition: color 140ms ease, text-shadow 140ms ease;
         }

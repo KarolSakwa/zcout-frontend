@@ -64,6 +64,7 @@ export default function RecentVotesWidget({
       as="aside"
       variant="glass"
       embedded={embedded}
+      compact={embedded}
       title="Last votes"
       headerMeta={<LiveMeta embedded={embedded} />}
       className={embedded ? 'recentVotesWidgetEmbedded' : 'recentVotesWidget'}
@@ -81,6 +82,7 @@ export default function RecentVotesWidget({
       }
     >
       <div
+        className={embedded ? 'homepageSecondaryContent' : undefined}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -96,7 +98,7 @@ export default function RecentVotesWidget({
             <div
               key={item.id}
               style={{
-                padding: embedded ? '9px 0 8px' : '11px 0 10px',
+                padding: embedded ? '6px 0' : '11px 0 10px',
                 borderTop:
                   embedded && index === 0
                     ? undefined
@@ -109,9 +111,9 @@ export default function RecentVotesWidget({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: embedded ? 7 : 8,
+                  gap: embedded ? 6 : 8,
                   flexWrap: 'wrap',
-                  lineHeight: 1.26,
+                  lineHeight: embedded ? 1.2 : 1.26,
                   textAlign: 'center',
                 }}
               >
@@ -184,7 +186,7 @@ export default function RecentVotesWidget({
 
               <div
                 style={{
-                  marginTop: embedded ? 3 : 4,
+                  marginTop: embedded ? 2 : 4,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -202,6 +204,12 @@ export default function RecentVotesWidget({
       </div>
 
       <style jsx>{`
+        .homepageSecondaryContent {
+          flex: 1;
+          min-height: 0;
+          justify-content: space-between;
+        }
+
         @keyframes recentVoteEnter {
           0% {
             opacity: 0;

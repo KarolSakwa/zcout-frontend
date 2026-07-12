@@ -49,23 +49,36 @@
   display: flex;
   flex-direction: row;
   gap: 25px;
-  align-items: flex-start;
+  align-items: stretch;
   min-width: 0;
 }
 
 .recentVotesWidgetSlot {
   flex: 3 1 0;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .nmrWidgetSlot {
   flex: 2 1 0;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .secondaryCluster > * > * {
   box-sizing: border-box;
   max-width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.secondaryCluster :global(.recentVotesWidgetEmbedded),
+.secondaryCluster :global(.needsMoreRatingsWidgetEmbedded) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .colSpan3 {
@@ -100,7 +113,7 @@
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: 25px;
-  margin-top: 10px;
+  margin-top: 20px;
   width: 100%;
   min-width: 0;
 }

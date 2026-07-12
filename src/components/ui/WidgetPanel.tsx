@@ -8,6 +8,7 @@ export type WidgetPanelVariant = 'glass' | 'card' | 'duel';
 type WidgetPanelProps = {
   variant: WidgetPanelVariant;
   embedded?: boolean;
+  compact?: boolean;
   title?: string;
   headerMeta?: React.ReactNode;
   borderTitle?: boolean;
@@ -23,6 +24,7 @@ type WidgetPanelProps = {
 export default function WidgetPanel({
   variant,
   embedded = false,
+  compact = false,
   title,
   headerMeta,
   borderTitle,
@@ -42,7 +44,13 @@ export default function WidgetPanel({
   const panelClassName = [
     styles.panel,
     styles[variant],
-    variant === 'glass' ? (embedded ? styles.embedded : styles.floating) : '',
+    variant === 'glass'
+      ? embedded
+        ? compact
+          ? styles.embeddedCompact
+          : styles.embedded
+        : styles.floating
+      : '',
     variant === 'card' && noPadding ? styles.noPadding : '',
     className,
   ]

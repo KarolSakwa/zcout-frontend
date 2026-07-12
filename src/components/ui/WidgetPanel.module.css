@@ -19,6 +19,11 @@
   padding: 12px 12px 8px;
 }
 
+.glass.embeddedCompact {
+  border-radius: 19px;
+  padding: 10px 10px 6px;
+}
+
 .glass.floating {
   border-radius: 22px;
   padding: 14px 14px 10px;
@@ -93,6 +98,11 @@
 .glass.embedded .headerRow,
 .glass.embedded .metaRow {
   margin-bottom: 7px;
+}
+
+.glass.embeddedCompact .headerRow,
+.glass.embeddedCompact .metaRow {
+  margin-bottom: 5px;
 }
 
 .glass.floating .headerRow,
