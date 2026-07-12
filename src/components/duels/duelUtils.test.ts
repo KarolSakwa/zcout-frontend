@@ -134,12 +134,12 @@ describe('normalizePair', () => {
   })
 
   describe('pre-shaped payload with left, right and attribute', () => {
-    it('accepts the payload and returns its fields without mapping', () => {
+    it('normalizes a pre-shaped payload into the same PairResponse shape as players[]', () => {
       const left = { id: 1, name: 'Left', position: 'ST', seedRating: 80 }
       const right = { id: 2, name: 'Right', position: 'GK', seedRating: 75 }
       const payload = {
         pair_id: 'pair-99',
-        attribute: 'dribbling',
+        attribute: 'Dribbling',
         left,
         right,
       }
@@ -148,11 +148,35 @@ describe('normalizePair', () => {
 
       expect(result.pair_id).toBe('pair-99')
       expect(result.attribute).toBe('dribbling')
-      expect(result.left).toEqual(left)
-      expect(result.right).toEqual(right)
+      expect(result.left).toEqual({
+        id: 1,
+        name: 'Left',
+        position: 'ST',
+        nation: null,
+        countryIso2: null,
+        seedRating: 70,
+        avatarSrc: '/players/1.png',
+        club: null,
+        color: '#1f2937',
+        secondaryColor: '#111827',
+        number: undefined,
+      })
+      expect(result.right).toEqual({
+        id: 2,
+        name: 'Right',
+        position: 'GK',
+        nation: null,
+        countryIso2: null,
+        seedRating: 70,
+        avatarSrc: '/players/2.png',
+        club: null,
+        color: '#1f2937',
+        secondaryColor: '#111827',
+        number: undefined,
+      })
     })
 
-    it('returns the same object references as the input payload', () => {
+    it('returns a new object graph instead of reusing the input references', () => {
       const left = { id: 1, name: 'Left', position: 'ST' }
       const right = { id: 2, name: 'Right', position: 'GK' }
       const payload = {
@@ -164,12 +188,26 @@ describe('normalizePair', () => {
 
       const result = normalizePair(payload)
 
-      expect(result).toBe(payload)
-      expect(result.left).toBe(left)
-      expect(result.right).toBe(right)
+      expect(result).not.toBe(payload)
+      expect(result.left).not.toBe(left)
+      expect(result.right).not.toBe(right)
     })
 
-    it('does not validate missing or incomplete player fields on the fast path', () => {
+    it('normalizes object-shaped attribute values on the pre-shaped path', () => {
+      const payload = {
+        pair_id: 'pair-100',
+        attribute: { key: 'Defending', label: 'Defending' },
+        left: { id: 1, name: 'Left', position: 'CB' },
+        right: { id: 2, name: 'Right', position: 'LB' },
+      }
+
+      const result = normalizePair(payload)
+
+      expect(result.attribute).toBe('defending')
+      expect(result.attributeLabel).toBe('Defending')
+    })
+
+    it('fills default player fields for incomplete left and right objects', () => {
       const left = {}
       const right = { name: 'Only name' }
       const payload = {
@@ -180,17 +218,40 @@ describe('normalizePair', () => {
 
       const result = normalizePair(payload)
 
-      expect(result.left).toBe(left)
-      expect(result.right).toBe(right)
-      expect(result.left).toEqual({})
-      expect(result.right).toEqual({ name: 'Only name' })
+      expect(result.left).toEqual({
+        id: 0,
+        name: '',
+        position: 'ST',
+        nation: null,
+        countryIso2: null,
+        seedRating: 70,
+        avatarSrc: '/players/0.png',
+        club: null,
+        color: '#1f2937',
+        secondaryColor: '#111827',
+        number: undefined,
+      })
+      expect(result.right).toEqual({
+        id: 0,
+        name: 'Only name',
+        position: 'ST',
+        nation: null,
+        countryIso2: null,
+        seedRating: 70,
+        avatarSrc: '/players/0.png',
+        club: null,
+        color: '#1f2937',
+        secondaryColor: '#111827',
+        number: undefined,
+      })
+      expect(result.left).not.toBe(left)
+      expect(result.right).not.toBe(right)
     })
 
-    it('does not validate invalid player entries when they are still objects', () => {
-      const left = null as unknown as Record<string, unknown>
+    it('rejects evidently invalid pre-shaped payloads that cannot be normalized', () => {
       const payloadWithNullLeft = {
         attribute: 'shooting',
-        left,
+        left: null,
         right: { id: 2, name: 'Right' },
       }
 
@@ -198,13 +259,13 @@ describe('normalizePair', () => {
         'Brak dwóch graczy w odpowiedzi /api/duels/next',
       )
 
-      const payloadWithObjectAttribute = {
-        attribute: { key: 'defending', label: 'Defending' },
+      const payloadWithInvalidPlayer = {
+        attribute: 'shooting',
         left: { id: 1, name: 'Left' },
-        right: { id: 2, name: 'Right' },
+        right: null,
       }
 
-      expect(() => normalizePair(payloadWithObjectAttribute)).toThrow(
+      expect(() => normalizePair(payloadWithInvalidPlayer)).toThrow(
         'Brak dwóch graczy w odpowiedzi /api/duels/next',
       )
     })

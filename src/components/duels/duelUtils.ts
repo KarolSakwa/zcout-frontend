@@ -18,90 +18,109 @@ export function toPct(rating: number) {
   return (v / 99) * 100;
 }
 
-function asRec(v: unknown): Record<string, unknown> | null {
-  return typeof v === 'object' && v !== null ? (v as Record<string, unknown>) : null;
+function toObjectRecord(value: unknown): Record<string, unknown> | null {
+  return typeof value === 'object' && value !== null
+    ? (value as Record<string, unknown>)
+    : null;
 }
 
-function str(v: unknown, fallback = '') {
-  return typeof v === 'string' ? v : v == null ? fallback : String(v);
+function toStringValue(value: unknown, fallback = '') {
+  return typeof value === 'string' ? value : value == null ? fallback : String(value);
 }
 
-function num(v: unknown, fallback = 0) {
-  const n = typeof v === 'number' ? v : Number(v);
-  return Number.isFinite(n) ? n : fallback;
+function toNumberValue(value: unknown, fallback = 0) {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizePlayer(playerRaw: Record<string, unknown>): Player {
+  const club = toObjectRecord(playerRaw.club);
+  const country = toObjectRecord(playerRaw.country);
+
+  const clubName = club ? (club.name == null ? null : toStringValue(club.name)) : null;
+
+  const colorPrimary = club ? toStringValue(club.color_primary, '#1f2937') : '#1f2937';
+  const colorSecondary = club ? toStringValue(club.color_secondary, '#111827') : '#111827';
+
+  const iso2 = country ? (country.iso2 == null ? null : toStringValue(country.iso2)) : null;
+  const nation = country ? (country.name == null ? null : toStringValue(country.name)) : null;
+
+  const id = toNumberValue(playerRaw.id);
+  const numberVal = playerRaw.number == null ? undefined : toNumberValue(playerRaw.number);
+
+  return {
+    id,
+    name: toStringValue(playerRaw.name),
+    position: toStringValue(playerRaw.position, 'ST'),
+    nation,
+    countryIso2: iso2,
+    seedRating: 70,
+    avatarSrc: `/players/${id}.png`,
+    club: clubName,
+    color: colorPrimary,
+    secondaryColor: colorSecondary,
+    number: numberVal,
+  };
+}
+
+function normalizeAttribute(attributeRaw: unknown): {
+  attribute: string;
+  attributeLabel?: string;
+} {
+  let attributeKey = 'dribbling';
+  let attributeLabel: string | undefined;
+
+  if (typeof attributeRaw === 'string') {
+    attributeKey = attributeRaw;
+  } else {
+    const attributeObject = toObjectRecord(attributeRaw);
+    if (attributeObject?.key != null) attributeKey = toStringValue(attributeObject.key);
+    if (attributeObject?.label != null) attributeLabel = toStringValue(attributeObject.label);
+  }
+
+  return {
+    attribute: String(attributeKey).toLowerCase(),
+    attributeLabel,
+  };
+}
+
+function normalizePairId(payload: Record<string, unknown>): string {
+  const pairIdRaw = payload.duel_id ?? payload.pair_id;
+  return pairIdRaw == null ? 'next' : toStringValue(pairIdRaw);
+}
+
+function buildNormalizedPair(
+  payload: Record<string, unknown>,
+  leftPlayerRaw: Record<string, unknown>,
+  rightPlayerRaw: Record<string, unknown>,
+): PairResponse {
+  return {
+    pair_id: normalizePairId(payload),
+    ...normalizeAttribute(payload.attribute),
+    left: normalizePlayer(leftPlayerRaw),
+    right: normalizePlayer(rightPlayerRaw),
+  };
 }
 
 export function normalizePair(raw: unknown): PairResponse {
-  const o = asRec(raw);
-  if (!o) throw new Error('Invalid duel response');
+  const payload = toObjectRecord(raw);
+  if (!payload) throw new Error('Invalid duel response');
 
-  const maybeLeft = asRec(o.left);
-  const maybeRight = asRec(o.right);
+  const leftPlayerRaw = toObjectRecord(payload.left);
+  const rightPlayerRaw = toObjectRecord(payload.right);
 
-  if (maybeLeft && maybeRight && typeof o.attribute === 'string') {
-    return o as unknown as PairResponse;
+  if (leftPlayerRaw && rightPlayerRaw) {
+    return buildNormalizedPair(payload, leftPlayerRaw, rightPlayerRaw);
   }
 
-  const playersVal = o.players;
-  if (!Array.isArray(playersVal) || playersVal.length < 2) {
-    throw new Error('Brak dwóch graczy w odpowiedzi /api/duels/next');
+  const players = payload.players;
+  if (!Array.isArray(players) || players.length < 2) {
+    throw new Error('Expected two players in the /api/duels/next response.');
   }
 
-  const p1 = asRec(playersVal[0]);
-  const p2 = asRec(playersVal[1]);
-  if (!p1 || !p2) throw new Error('Invalid players payload');
+  const firstPlayerRaw = toObjectRecord(players[0]);
+  const secondPlayerRaw = toObjectRecord(players[1]);
+  if (!firstPlayerRaw || !secondPlayerRaw) throw new Error('Invalid players payload');
 
-  const mkPlayer = (p: Record<string, unknown>): Player => {
-    const club = asRec(p.club);
-    const country = asRec(p.country);
-
-    const clubName = club ? (club.name == null ? null : str(club.name)) : null;
-
-    const colorPrimary = club ? str(club.color_primary, '#1f2937') : '#1f2937';
-    const colorSecondary = club ? str(club.color_secondary, '#111827') : '#111827';
-
-    const iso2 = country ? (country.iso2 == null ? null : str(country.iso2)) : null;
-    const nation = country ? (country.name == null ? null : str(country.name)) : null;
-
-    const id = num(p.id);
-    const numberVal = p.number == null ? undefined : num(p.number);
-
-    return {
-      id,
-      name: str(p.name),
-      position: str(p.position, 'ST'),
-      nation,
-      countryIso2: iso2,
-      seedRating: 70,
-      avatarSrc: `/players/${id}.png`,
-      club: clubName,
-      color: colorPrimary,
-      secondaryColor: colorSecondary,
-      number: numberVal,
-    };
-  };
-
-  const attrVal = o.attribute;
-
-  let attrKey = 'dribbling';
-  let attrLabel: string | undefined;
-
-  if (typeof attrVal === 'string') {
-    attrKey = attrVal;
-  } else {
-    const a = asRec(attrVal);
-    if (a?.key != null) attrKey = str(a.key);
-    if (a?.label != null) attrLabel = str(a.label);
-  }
-
-  const pairIdRaw = o.duel_id ?? o.pair_id;
-  const pairId = pairIdRaw == null ? 'next' : str(pairIdRaw);
-
-  return {
-    pair_id: pairId,
-    attribute: String(attrKey).toLowerCase(),
-    attributeLabel: attrLabel,
-    left: mkPlayer(p1),
-    right: mkPlayer(p2),
-  };
+  return buildNormalizedPair(payload, firstPlayerRaw, secondPlayerRaw);
 }
