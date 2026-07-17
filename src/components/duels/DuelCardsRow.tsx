@@ -18,6 +18,7 @@ export default function DuelCardsRow({
   barPct,
   homepageMode = false,
   loading = false,
+  hintLiftActive = false,
 }: {
   pair?: PairResponse | null;
   cardStyle: (side: 'left' | 'right') => React.CSSProperties;
@@ -31,6 +32,7 @@ export default function DuelCardsRow({
   barPct: Record<string, number>;
   homepageMode?: boolean;
   loading?: boolean;
+  hintLiftActive?: boolean;
 }) {
   void showImpact;
   void postVoteRatings;
@@ -49,22 +51,27 @@ export default function DuelCardsRow({
           {isHomepageLoading ? (
             <div className="cardPlaceholder" aria-hidden />
           ) : (
-            <PlayerCard
-              name={pair!.left.name}
-              position={pair!.left.position}
-              club={pair!.left.club ?? 'â€”'}
-              color={pair!.left.color ?? 'var(--ui-surface-panel-solid)'}
-              secondaryColor={pair!.left.secondaryColor}
-              avatarSrc={pair!.left.avatarSrc ?? `/players/${pair!.left.id}.png`}
-              countryIso2={pair!.left.countryIso2}
-              number={pair!.left.number}
-              onClick={() => handleVote(pair!.left.id)}
-              reveal={showReveal}
-              isWinner={lastWinner === pair!.left.id}
-              glowColor={glow}
-              compact={homepageMode}
-              homepageMode={homepageMode}
-            />
+            <div
+              className={`cardHintLiftWrapper${hintLiftActive ? ' cardHintLiftActive' : ''}`}
+              style={{ ['--glow' as string]: glow }}
+            >
+              <PlayerCard
+                name={pair!.left.name}
+                position={pair!.left.position}
+                club={pair!.left.club ?? 'â€”'}
+                color={pair!.left.color ?? 'var(--ui-surface-panel-solid)'}
+                secondaryColor={pair!.left.secondaryColor}
+                avatarSrc={pair!.left.avatarSrc ?? `/players/${pair!.left.id}.png`}
+                countryIso2={pair!.left.countryIso2}
+                number={pair!.left.number}
+                onClick={() => handleVote(pair!.left.id)}
+                reveal={showReveal}
+                isWinner={lastWinner === pair!.left.id}
+                glowColor={glow}
+                compact={homepageMode}
+                homepageMode={homepageMode}
+              />
+            </div>
           )}
         </div>
 
@@ -80,22 +87,27 @@ export default function DuelCardsRow({
           {isHomepageLoading ? (
             <div className="cardPlaceholder" aria-hidden />
           ) : (
-            <PlayerCard
-              name={pair!.right.name}
-              position={pair!.right.position}
-              club={pair!.right.club ?? 'â€”'}
-              color={pair!.right.color ?? 'var(--ui-surface-panel-solid)'}
-              secondaryColor={pair!.right.secondaryColor}
-              avatarSrc={pair!.right.avatarSrc ?? `/players/${pair!.right.id}.png`}
-              countryIso2={pair!.right.countryIso2}
-              number={pair!.right.number}
-              onClick={() => handleVote(pair!.right.id)}
-              reveal={showReveal}
-              isWinner={lastWinner === pair!.right.id}
-              glowColor={glow}
-              compact={homepageMode}
-              homepageMode={homepageMode}
-            />
+            <div
+              className={`cardHintLiftWrapper${hintLiftActive ? ' cardHintLiftActive' : ''}`}
+              style={{ ['--glow' as string]: glow }}
+            >
+              <PlayerCard
+                name={pair!.right.name}
+                position={pair!.right.position}
+                club={pair!.right.club ?? 'â€”'}
+                color={pair!.right.color ?? 'var(--ui-surface-panel-solid)'}
+                secondaryColor={pair!.right.secondaryColor}
+                avatarSrc={pair!.right.avatarSrc ?? `/players/${pair!.right.id}.png`}
+                countryIso2={pair!.right.countryIso2}
+                number={pair!.right.number}
+                onClick={() => handleVote(pair!.right.id)}
+                reveal={showReveal}
+                isWinner={lastWinner === pair!.right.id}
+                glowColor={glow}
+                compact={homepageMode}
+                homepageMode={homepageMode}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -184,6 +196,54 @@ export default function DuelCardsRow({
           .duelCardsRowHomepage {
             width: 100%;
             margin: 20px auto 0;
+          }
+        }
+
+        .cardHintLiftWrapper {
+          width: 100%;
+          position: relative;
+        }
+
+        .cardHintLiftWrapper.cardHintLiftActive {
+          animation: duelCardHintLift 620ms ease-out;
+        }
+
+        .cardHintLiftWrapper.cardHintLiftActive::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: calc(var(--ui-radius-xl) + 2px);
+          pointer-events: none;
+          animation: duelCardHintGlow 620ms ease-out;
+        }
+
+        @keyframes duelCardHintLift {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+
+          45% {
+            transform: translateY(-4px);
+          }
+        }
+
+        @keyframes duelCardHintGlow {
+          0%,
+          100% {
+            box-shadow: 0 0 0 0 transparent;
+          }
+
+          45% {
+            box-shadow: 0 0 18px 6px
+              color-mix(in srgb, var(--glow) 38%, transparent);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .cardHintLiftWrapper.cardHintLiftActive,
+          .cardHintLiftWrapper.cardHintLiftActive::after {
+            animation: none;
           }
         }
       `}</style>

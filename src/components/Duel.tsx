@@ -13,13 +13,14 @@ import DuelCardsRow from "./duels/DuelCardsRow";
 import DuelRevealPanel from "./duels/DuelRevealPanel";
 import DuelHomepageAttributeLink from "./duels/DuelHomepageAttributeLink";
 import DuelLoadingOverlays from "./duels/DuelLoadingOverlays";
+import DuelVoteHint from "./duels/DuelVoteHint";
 import RecentVotesWidget from "./duels/RecentVotesWidget";
 import TopRisersWidget from "./duels/TopRisersWidget";
 import { useDuelSideWidgets } from "./duels/useDuelSideWidgets";
 import { useDuelAutoNext } from "./duels/useDuelAutoNext";
 import { logEvent } from "@/lib/telemetry";
 import { ensureCsrfToken } from "@/lib/ensureCsrfToken";
-import { useHomepageSectionLoading } from "@/components/homepage/HomepageLoadingContext";
+import { useHomepageSectionLoading, useIsHomepageReady } from "@/components/homepage/HomepageLoadingContext";
 import styles from "./Duel.module.css";
 
 const COUNTDOWN_BAR_H = 7;
@@ -64,6 +65,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     right: number;
   } | null>(null);
   const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
+  const [cardHintLift, setCardHintLift] = useState(false);
+  const cardHintLiftTimerRef = useRef<number | null>(null);
 
   const goNextRef = useRef<() => void>(() => {});
 
@@ -134,6 +137,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   useHomepageSectionLoading("duel", !duelBootstrapped, homepageMode);
 
+  const isHomepageReady = useIsHomepageReady();
+
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 700px)");
     const update = () => setIsCompactDuelLayout(mq.matches);
@@ -201,7 +206,26 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     return () => {
       if (pendingUiTimerRef.current)
         window.clearTimeout(pendingUiTimerRef.current);
+      if (cardHintLiftTimerRef.current)
+        window.clearTimeout(cardHintLiftTimerRef.current);
     };
+  }, []);
+
+  const handleVoteHintVisible = useCallback(() => {
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (prefersReduced) return;
+
+    if (cardHintLiftTimerRef.current) {
+      window.clearTimeout(cardHintLiftTimerRef.current);
+    }
+
+    setCardHintLift(true);
+    cardHintLiftTimerRef.current = window.setTimeout(() => {
+      setCardHintLift(false);
+      cardHintLiftTimerRef.current = null;
+    }, 650);
   }, []);
 
   useEffect(() => {
@@ -381,6 +405,22 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     transition !== "idle" ||
     showReveal;
 
+  const canShowVoteHint =
+    homepageMode &&
+    isHomepageReady &&
+    !!pair &&
+    !loadingPair &&
+    !error &&
+    !showReveal &&
+    !showPendingUi &&
+    !voting &&
+    !skipping &&
+    transition === "idle" &&
+    !showCountdown &&
+    !showImpact &&
+    !showHomepagePairLoading &&
+    !showOverlayLoader;
+
   return (
     <div
       className={`${styles.duelShell}${homepageMode ? ` ${styles.duelHomepageShell}` : ""}`}
@@ -462,6 +502,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                       postVoteRatings={postVoteRatings}
                       barPct={barPct}
                       homepageMode={homepageMode}
+                      hintLiftActive={homepageMode && cardHintLift}
                     />
                   </div>
                 )}
@@ -477,6 +518,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         </div>
 
         <div
+          className={homepageMode ? styles.duelSkipArea : undefined}
           style={{
             height: homepageMode ? 136 : 160,
             display: "flex",
@@ -485,6 +527,12 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             pointerEvents: showOverlayLoader ? "none" : "auto",
           }}
         >
+          {homepageMode && (
+            <DuelVoteHint
+              canShow={canShowVoteHint}
+              onHintVisible={handleVoteHintVisible}
+            />
+          )}
           {showImpact && postVoteRatings ? (
             <div style={{ width: "100%" }}>
               <DuelRevealPanel

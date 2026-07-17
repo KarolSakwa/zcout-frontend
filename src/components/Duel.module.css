@@ -9,6 +9,10 @@
   position: relative;
 }
 
+.duelSkipArea {
+  position: relative;
+}
+
 .duelHomepageShell .duelStageCenter {
   max-width: 527px;
 }

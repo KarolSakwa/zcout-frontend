@@ -79,6 +79,12 @@ export function useHomepageLoading() {
   return context;
 }
 
+/** Returns `isHomepageReady` when inside the provider; defaults to `true` elsewhere. */
+export function useIsHomepageReady(): boolean {
+  const context = useContext(HomepageLoadingContext);
+  return context?.isHomepageReady ?? true;
+}
+
 export function useHomepageSectionLoading(
   section: HomepageLoadingSection,
   isLoading: boolean,
