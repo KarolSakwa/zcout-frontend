@@ -24,6 +24,15 @@ import { useHomepageSectionLoading, useIsHomepageReady } from "@/components/home
 import styles from "./Duel.module.css";
 
 const COUNTDOWN_BAR_H = 7;
+/** Measured HEAD homepage cards-row width at viewport >1721px. */
+const HOMEPAGE_CANONICAL_ROW_PX = 425;
+/** Canonical idle inset on that 425px row (pulls cards toward the loader). */
+const HOMEPAGE_CANONICAL_INSET_PX = 48;
+/** Visual gap between cards at the canonical row (133 track − 2×48 inset). */
+const HOMEPAGE_CANONICAL_CARD_GAP_PX = 37;
+/** Keep a little air around the ~30px loader when the row shrinks. */
+const HOMEPAGE_MIN_CARD_GAP_PX = 36;
+const HOMEPAGE_TRACK_RATIO = (31 * 2 + 71) / HOMEPAGE_CANONICAL_ROW_PX;
 
 type VotePlayerResult = {
   id: number | string;
@@ -65,8 +74,12 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     right: number;
   } | null>(null);
   const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
+  const [homepageRowWidth, setHomepageRowWidth] = useState(
+    HOMEPAGE_CANONICAL_ROW_PX,
+  );
   const [cardHintLift, setCardHintLift] = useState(false);
   const cardHintLiftTimerRef = useRef<number | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
 
   const goNextRef = useRef<() => void>(() => {});
 
@@ -140,6 +153,35 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const isHomepageReady = useIsHomepageReady();
 
   useEffect(() => {
+    if (homepageMode) {
+      const el = shellRef.current;
+      if (!el) return;
+
+      const updateFromWidth = (width: number) => {
+        if (width <= 0) return;
+        // Row is capped at the canonical 425px; track its effective width so
+        // the desktop inset can scale on narrow containers instead of dropping to 0.
+        setHomepageRowWidth(Math.min(width, HOMEPAGE_CANONICAL_ROW_PX));
+      };
+
+      const measure = () => updateFromWidth(el.getBoundingClientRect().width);
+      measure();
+      const raf = window.requestAnimationFrame(measure);
+
+      if (typeof ResizeObserver === "undefined") {
+        return () => window.cancelAnimationFrame(raf);
+      }
+
+      const observer = new ResizeObserver((entries) => {
+        updateFromWidth(entries[0]?.contentRect.width ?? 0);
+      });
+      observer.observe(el);
+      return () => {
+        window.cancelAnimationFrame(raf);
+        observer.disconnect();
+      };
+    }
+
     const mq = window.matchMedia("(max-width: 700px)");
     const update = () => setIsCompactDuelLayout(mq.matches);
 
@@ -147,7 +189,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     mq.addEventListener("change", update);
 
     return () => mq.removeEventListener("change", update);
-  }, []);
+  }, [homepageMode]);
 
   const showReveal = lastWinner !== null;
 
@@ -161,10 +203,38 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         pointerEvents: transition === "idle" && !showReveal ? "auto" : "none",
       };
 
-      const INSET_X = isCompactDuelLayout ? 0 : 48;
-      const PENDING_X = isCompactDuelLayout ? 0 : 2;
-      const EXIT_X = isCompactDuelLayout ? 40 : 90;
-      const ENTER_X = isCompactDuelLayout ? 24 : 50;
+      const homepageScale = Math.min(
+        1,
+        homepageRowWidth / HOMEPAGE_CANONICAL_ROW_PX,
+      );
+      const homepageTrack = homepageRowWidth * HOMEPAGE_TRACK_RATIO;
+      const homepageCardGap = Math.max(
+        HOMEPAGE_CANONICAL_CARD_GAP_PX * homepageScale,
+        HOMEPAGE_MIN_CARD_GAP_PX,
+      );
+      const INSET_X = homepageMode
+        ? Math.max(
+            0,
+            Math.round((homepageTrack - homepageCardGap) / 2),
+          )
+        : isCompactDuelLayout
+          ? 0
+          : HOMEPAGE_CANONICAL_INSET_PX;
+      const PENDING_X = homepageMode
+        ? Math.round(2 * homepageScale)
+        : isCompactDuelLayout
+          ? 0
+          : 2;
+      const EXIT_X = homepageMode
+        ? Math.round(90 * homepageScale)
+        : isCompactDuelLayout
+          ? 40
+          : 90;
+      const ENTER_X = homepageMode
+        ? Math.round(50 * homepageScale)
+        : isCompactDuelLayout
+          ? 24
+          : 50;
 
       if (transition === "exit") {
         return {
@@ -199,7 +269,14 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         filter: "none",
       };
     },
-    [transition, showPendingUi, showReveal, isCompactDuelLayout],
+    [
+      transition,
+      showPendingUi,
+      showReveal,
+      isCompactDuelLayout,
+      homepageMode,
+      homepageRowWidth,
+    ],
   );
 
   useEffect(() => {
@@ -423,6 +500,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   return (
     <div
+      ref={shellRef}
       className={`${styles.duelShell}${homepageMode ? ` ${styles.duelHomepageShell}` : ""}`}
     >
         <DuelCountdownBar

@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "sourceCommit": "e9cd773",
+    "viewportWidth": 1920,
+    "notes": "Measured from HEAD e9cd773 homepage duel geometry at 1920px (pre-responsive duel growth breakpoints)."
+  },
+  "leftCard": {
+    "w": 146
+  },
+  "row": {
+    "w": 425
+  },
+  "center": {
+    "w": 71
+  },
+  "gap": 31
+}

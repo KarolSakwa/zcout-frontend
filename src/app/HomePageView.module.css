@@ -1,24 +1,40 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
+  gap: var(--ui-page-section-gap);
+  padding-block: var(--ui-page-section-gap);
+  padding-inline: 0;
+  min-width: 0;
+}
+
+.container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--ui-page-max-width);
+  margin: 0 auto;
+  padding-inline: var(--ui-page-gutter);
+  min-width: 0;
 }
 
 .rowHero {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 20px;
+  gap: var(--ui-page-section-gap);
   align-items: stretch;
+  min-width: 0;
 }
 
 .rowMain {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: 25px;
-  row-gap: 20px;
-  grid-template-rows: auto auto;
-  margin-top: 10px;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas:
+    "movers duel"
+    "secondary duel";
+  column-gap: var(--ui-page-grid-gap);
+  row-gap: var(--ui-page-section-gap);
+  margin-top: clamp(6px, 1vw, 10px);
+  min-width: 0;
+  width: 100%;
 }
 
 .gridItem {
@@ -26,49 +42,47 @@
 }
 
 .moversCluster {
-  grid-column: 1 / 8;
-  display: flex;
-  flex-direction: row;
-  gap: 25px;
-  align-items: flex-start;
+  grid-area: movers;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-page-grid-gap);
+  align-items: start;
+  width: 100%;
   min-width: 0;
 }
 
 .moversWidget {
-  flex: 1 1 0;
   min-width: 0;
+  width: 100%;
 }
 
 .moversWidget > * {
   box-sizing: border-box;
+  width: 100%;
   max-width: 100%;
 }
 
 .secondaryCluster {
-  grid-column: 1 / 8;
-  display: flex;
-  flex-direction: row;
-  gap: 25px;
+  grid-area: secondary;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--ui-page-grid-gap);
   align-items: stretch;
+  width: 100%;
   min-width: 0;
 }
 
-.recentVotesWidgetSlot {
-  flex: 3 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
+.recentVotesWidgetSlot,
 .nmrWidgetSlot {
-  flex: 2 1 0;
   min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .secondaryCluster > * > * {
   box-sizing: border-box;
+  width: 100%;
   max-width: 100%;
   flex: 1 1 auto;
   min-height: 0;
@@ -79,41 +93,19 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-.colSpan3 {
-  grid-column: span 3;
-}
-
-.colSpan4 {
-  grid-column: span 4;
-}
-
-.colSpan5 {
-  grid-column: span 5;
+  width: 100%;
 }
 
 .colSpan6 {
   grid-column: span 6;
-}
-
-.colSpan7 {
-  grid-column: span 7;
-}
-
-.colSpan12 {
-  grid-column: span 12;
-}
-
-.rowSpan2 {
-  grid-row: span 2;
+  min-width: 0;
 }
 
 .rowRankings {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: 25px;
-  margin-top: 20px;
+  column-gap: var(--ui-page-grid-gap);
+  margin-top: var(--ui-page-section-gap);
   width: 100%;
   min-width: 0;
 }
@@ -124,67 +116,31 @@
 }
 
 .duel {
-  grid-column: 8 / span 5;
-}
-
-.playerCard {
-  display: grid;
-  grid-template-columns: 1fr 272px;
-  gap: 20px;
-  align-items: start;
-}
-
-.playerRadar {
-  height: 221px;
-}
-
-.playerMeta {
-  color: var(--ui-text-muted);
-}
-
-.playerOverall {
-  margin-top: 24px;
-}
-
-.container {
+  grid-area: duel;
+  min-width: 0;
   width: 100%;
-  max-width: 1360px;
-  margin: 0 auto;
+  align-self: start;
 }
 
-@media (max-width: 1200px) {
-  .playerCard {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Single-column main band; keep widget pairs side-by-side */
 @media (max-width: 1024px) {
-  .colSpan3,
-  .colSpan4,
-  .colSpan5,
-  .colSpan6,
-  .colSpan7 {
+  .colSpan6 {
     grid-column: span 12;
   }
 
-  .rowSpan2 {
-    grid-row: span 1;
+  .rowMain {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "duel"
+      "movers"
+      "secondary";
   }
+}
 
-  .duel {
-    grid-column: span 12;
-  }
-
-  .moversCluster {
-    grid-column: span 12;
-    flex-direction: column;
-    gap: 10px;
-  }
-
+/* Stack widget clusters only on narrow phones */
+@media (max-width: 700px) {
+  .moversCluster,
   .secondaryCluster {
-    grid-column: span 12;
-    flex-direction: column;
-    gap: 30px;
-    padding-right: 0;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

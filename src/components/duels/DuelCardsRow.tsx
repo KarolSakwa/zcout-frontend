@@ -4,6 +4,7 @@ import React from 'react';
 import PlayerCard from '../PlayerCard';
 import ZLoader from '../ZLoader';
 import type { PairResponse, RatingsMap } from './duelTypes';
+import duelStyles from '../Duel.module.css';
 
 export default function DuelCardsRow({
   pair,
@@ -44,21 +45,27 @@ export default function DuelCardsRow({
     return null;
   }
 
-  return (
-    <>
-      <div className={`duelCardsRow${homepageMode ? ' duelCardsRowHomepage' : ''}`}>
-        <div className="flex flex-col gap-2" style={cardStyle('left')}>
+  if (homepageMode) {
+    return (
+      <div className={duelStyles.homepageCardsRow} data-hp-duel-row>
+        <div
+          className={duelStyles.homepageCardSlot}
+          style={cardStyle('left')}
+          data-hp-duel-slot="left"
+        >
           {isHomepageLoading ? (
-            <div className="cardPlaceholder" aria-hidden />
+            <div className={duelStyles.homepageCardPlaceholder} aria-hidden />
           ) : (
             <div
-              className={`cardHintLiftWrapper${hintLiftActive ? ' cardHintLiftActive' : ''}`}
+              className={`${duelStyles.homepageHintLiftWrapper}${
+                hintLiftActive ? ` ${duelStyles.homepageHintLiftActive}` : ''
+              }`}
               style={{ ['--glow' as string]: glow }}
             >
               <PlayerCard
                 name={pair!.left.name}
                 position={pair!.left.position}
-                club={pair!.left.club ?? 'â€”'}
+                club={pair!.left.club ?? '—'}
                 color={pair!.left.color ?? 'var(--ui-surface-panel-solid)'}
                 secondaryColor={pair!.left.secondaryColor}
                 avatarSrc={pair!.left.avatarSrc ?? `/players/${pair!.left.id}.png`}
@@ -68,11 +75,77 @@ export default function DuelCardsRow({
                 reveal={showReveal}
                 isWinner={lastWinner === pair!.left.id}
                 glowColor={glow}
-                compact={homepageMode}
-                homepageMode={homepageMode}
+                compact
+                homepageMode
               />
             </div>
           )}
+        </div>
+
+        <div className={duelStyles.homepageCenterSlot} data-hp-duel-slot="center">
+          {showPendingUi ? <ZLoader /> : <div style={{ width: 30, height: 30 }} />}
+        </div>
+
+        <div
+          className={duelStyles.homepageCardSlot}
+          style={cardStyle('right')}
+          data-hp-duel-slot="right"
+        >
+          {isHomepageLoading ? (
+            <div className={duelStyles.homepageCardPlaceholder} aria-hidden />
+          ) : (
+            <div
+              className={`${duelStyles.homepageHintLiftWrapper}${
+                hintLiftActive ? ` ${duelStyles.homepageHintLiftActive}` : ''
+              }`}
+              style={{ ['--glow' as string]: glow }}
+            >
+              <PlayerCard
+                name={pair!.right.name}
+                position={pair!.right.position}
+                club={pair!.right.club ?? '—'}
+                color={pair!.right.color ?? 'var(--ui-surface-panel-solid)'}
+                secondaryColor={pair!.right.secondaryColor}
+                avatarSrc={pair!.right.avatarSrc ?? `/players/${pair!.right.id}.png`}
+                countryIso2={pair!.right.countryIso2}
+                number={pair!.right.number}
+                onClick={() => handleVote(pair!.right.id)}
+                reveal={showReveal}
+                isWinner={lastWinner === pair!.right.id}
+                glowColor={glow}
+                compact
+                homepageMode
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="duelCardsRow">
+        <div className="flex flex-col gap-2" style={cardStyle('left')}>
+          <div
+            className={`cardHintLiftWrapper${hintLiftActive ? ' cardHintLiftActive' : ''}`}
+            style={{ ['--glow' as string]: glow }}
+          >
+            <PlayerCard
+              name={pair!.left.name}
+              position={pair!.left.position}
+              club={pair!.left.club ?? '—'}
+              color={pair!.left.color ?? 'var(--ui-surface-panel-solid)'}
+              secondaryColor={pair!.left.secondaryColor}
+              avatarSrc={pair!.left.avatarSrc ?? `/players/${pair!.left.id}.png`}
+              countryIso2={pair!.left.countryIso2}
+              number={pair!.left.number}
+              onClick={() => handleVote(pair!.left.id)}
+              reveal={showReveal}
+              isWinner={lastWinner === pair!.left.id}
+              glowColor={glow}
+            />
+          </div>
         </div>
 
         <div className="cardCenterSlot">
@@ -84,31 +157,25 @@ export default function DuelCardsRow({
         </div>
 
         <div className="flex flex-col gap-2" style={cardStyle('right')}>
-          {isHomepageLoading ? (
-            <div className="cardPlaceholder" aria-hidden />
-          ) : (
-            <div
-              className={`cardHintLiftWrapper${hintLiftActive ? ' cardHintLiftActive' : ''}`}
-              style={{ ['--glow' as string]: glow }}
-            >
-              <PlayerCard
-                name={pair!.right.name}
-                position={pair!.right.position}
-                club={pair!.right.club ?? 'â€”'}
-                color={pair!.right.color ?? 'var(--ui-surface-panel-solid)'}
-                secondaryColor={pair!.right.secondaryColor}
-                avatarSrc={pair!.right.avatarSrc ?? `/players/${pair!.right.id}.png`}
-                countryIso2={pair!.right.countryIso2}
-                number={pair!.right.number}
-                onClick={() => handleVote(pair!.right.id)}
-                reveal={showReveal}
-                isWinner={lastWinner === pair!.right.id}
-                glowColor={glow}
-                compact={homepageMode}
-                homepageMode={homepageMode}
-              />
-            </div>
-          )}
+          <div
+            className={`cardHintLiftWrapper${hintLiftActive ? ' cardHintLiftActive' : ''}`}
+            style={{ ['--glow' as string]: glow }}
+          >
+            <PlayerCard
+              name={pair!.right.name}
+              position={pair!.right.position}
+              club={pair!.right.club ?? '—'}
+              color={pair!.right.color ?? 'var(--ui-surface-panel-solid)'}
+              secondaryColor={pair!.right.secondaryColor}
+              avatarSrc={pair!.right.avatarSrc ?? `/players/${pair!.right.id}.png`}
+              countryIso2={pair!.right.countryIso2}
+              number={pair!.right.number}
+              onClick={() => handleVote(pair!.right.id)}
+              reveal={showReveal}
+              isWinner={lastWinner === pair!.right.id}
+              glowColor={glow}
+            />
+          </div>
         </div>
       </div>
 
@@ -118,7 +185,7 @@ export default function DuelCardsRow({
           grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr);
           align-items: start;
           gap: 36px;
-          width: min(100%, ${homepageMode ? 500 : 720}px);
+          width: min(100%, 720px);
           margin: 20px auto 0;
           position: relative;
         }
@@ -128,12 +195,6 @@ export default function DuelCardsRow({
           place-items: center;
           align-self: center;
           pointer-events: none;
-        }
-
-        .cardPlaceholder {
-          width: 100%;
-          aspect-ratio: 2 / 3;
-          visibility: hidden;
         }
 
         @media (max-width: 1720px) {
@@ -167,35 +228,6 @@ export default function DuelCardsRow({
             top: 42%;
             transform: translate(-50%, -50%);
             z-index: 5;
-          }
-        }
-        .duelCardsRowHomepage {
-          grid-template-columns: minmax(0, 1fr) 71px minmax(0, 1fr);
-          gap: 31px;
-          width: min(100%, 425px);
-          margin: 17px auto 0;
-        }
-
-        @media (max-width: 1720px) {
-          .duelCardsRowHomepage {
-            grid-template-columns: minmax(0, 1fr) 54px minmax(0, 1fr);
-            gap: 20px;
-            width: min(100%, 561px);
-          }
-        }
-
-        @media (max-width: 1360px) {
-          .duelCardsRowHomepage {
-            grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
-            gap: 17px;
-            width: min(100%, 527px);
-          }
-        }
-
-        @media (max-width: 700px) {
-          .duelCardsRowHomepage {
-            width: 100%;
-            margin: 20px auto 0;
           }
         }
 

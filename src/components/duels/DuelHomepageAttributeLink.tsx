@@ -8,6 +8,7 @@ import {
   attributeDescriptions,
   formatAttributeLabel,
 } from "@/lib/attributeDescriptions";
+import styles from "./DuelHomepageAttributeLink.module.css";
 
 export default function DuelHomepageAttributeLink({
   attribute,
@@ -15,74 +16,22 @@ export default function DuelHomepageAttributeLink({
   attribute: string;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        marginBottom: 10,
-      }}
-    >
+    <div className={styles.attributeWrap}>
       <Tooltip content={attributeDescriptions[attribute] ?? ""}>
-        <Link
-          href="/duels"
-          className="duelHomepageAttributeLink"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            gap: 7,
-            marginBottom: 10,
-            color: "var(--ui-text-muted)",
-            fontSize: 13,
-            fontWeight: 800,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            textDecoration: "none",
-          }}
-        >
-          <>
-            <span
-              style={{
-                color: "var(--ui-text-muted)",
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: "0.12em",
-              }}
-            >
-              WHO&apos;S BETTER AT
-            </span>
-
-            <span
-              style={{
-                color: "var(--ui-text-primary)",
-                fontSize: 17,
-                fontWeight: 900,
-                letterSpacing: "0.08em",
-              }}
-            >
+        <span className={styles.linkShell}>
+          <Link href="/duels" className={styles.link}>
+            <span className={styles.prefix}>WHO&apos;S BETTER AT</span>
+            <span className={styles.label}>
               {formatAttributeLabel(attribute).toUpperCase()}
             </span>
-          </>
-
-          <AttributeIcon
-            attributeKey={attribute}
-            label={attribute}
-            size={19}
-          />
-        </Link>
+            <AttributeIcon
+              attributeKey={attribute}
+              label={attribute}
+              size={19}
+            />
+          </Link>
+        </span>
       </Tooltip>
-
-      <style jsx>{`
-        .duelHomepageAttributeLink {
-          cursor: pointer;
-          transition: opacity 140ms ease;
-        }
-
-        .duelHomepageAttributeLink:hover {
-          opacity: 0.88;
-        }
-      `}</style>
     </div>
   );
 }

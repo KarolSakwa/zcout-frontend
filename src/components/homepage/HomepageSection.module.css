@@ -7,8 +7,13 @@
 .playerNameLink {
   display: block;
   margin: 0;
+  min-width: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
   color: var(--ui-text-primary);
   text-decoration: none;
+  overflow-wrap: anywhere;
   transition: color 140ms ease;
 }
 
@@ -16,13 +21,26 @@
   color: var(--ui-accent-primary);
 }
 
+.playerNameFallback {
+  display: block;
+  margin: 0;
+  min-width: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ui-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.playerNameLong {
+  font-size: 20px;
+}
+
 .playerRadar {
   width: 238px;
   height: 238px;
-}
-
-.playerHeader {
-  margin-bottom: 20px;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .playerContent {
@@ -30,12 +48,16 @@
   grid-template-columns: 1fr 238px;
   gap: 0;
   align-items: stretch;
+  min-width: 0;
+  width: 100%;
 }
 
 .playerLeftColumn {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  min-width: 0;
 }
 
 .playerRightColumn {
@@ -43,33 +65,176 @@
   justify-content: flex-start;
   align-items: center;
   width: 238px;
+  min-width: 0;
+}
+
+.playerHeader {
+  /* Block flow (not flex) so archetype margins collapse like HEAD */
+  min-width: 0;
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.playerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+  row-gap: 4px;
+  /* Archetype already has margin-bottom: 10px; avoid double gap (Tooltip blocks collapse). */
+  margin-top: 0;
+  color: var(--ui-text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  min-width: 0;
+}
+
+.metaPart {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.metaSep {
+  color: rgba(194, 205, 218, 0.45);
 }
 
 .rankBadge {
   position: absolute;
   top: 20px;
   right: 20px;
-
+  z-index: 2;
+  width: fit-content;
+  max-width: 100%;
   padding: 7px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .rankBadge span {
   color: var(--ui-accent-primary);
 }
 
-.playerHeader {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+.overallBlock {
+  min-width: 0;
 }
 
-.playerLeftColumn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+@media (max-width: 700px) {
+  .playerContent {
+    container-type: inline-size;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) max-content max-content minmax(0, 1fr);
+    grid-template-areas:
+      "header header header header"
+      "rank rank rank rank"
+      ". overall radar .";
+    align-items: center;
+    column-gap: clamp(14px, 5vw, 28px);
+    row-gap: 0;
+    padding: 14px;
+    box-sizing: border-box;
+  }
+
+  .playerLeftColumn {
+    display: contents;
+  }
+
+  .playerHeader {
+    grid-area: header;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .playerNameLink,
+  .playerNameFallback {
+    font-size: clamp(16px, 5vw, 20px);
+    line-height: 1.1;
+  }
+
+  .playerNameLong {
+    font-size: clamp(15px, 4.6vw, 18px);
+  }
+
+  .playerMeta {
+    justify-content: center;
+    font-size: 11px;
+  }
+
+  .rankBadge {
+    grid-area: rank;
+    position: static;
+    justify-self: center;
+    align-self: center;
+    width: fit-content;
+    margin: 10px auto 14px;
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+
+  .overallBlock {
+    grid-area: overall;
+  }
+
+  .playerRightColumn {
+    grid-area: radar;
+    width: auto;
+  }
+
+  .playerRadar {
+    /* Keep side-by-side; size from content width so axis labels stay in-panel */
+    width: clamp(145px, 40cqi, 165px);
+    height: clamp(145px, 40cqi, 165px);
+    padding: 4px;
+  }
+}
+
+/* Measured: at 320px radar axis hit-targets (PACE/PHY) overflow ~12px when side-by-side. */
+@media (max-width: 320px) {
+  .playerContent {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "header"
+      "rank"
+      "overall"
+      "radar";
+    justify-items: stretch;
+    column-gap: 0;
+    row-gap: 12px;
+  }
+
+  .overallBlock,
+  .playerRightColumn {
+    justify-self: center;
+  }
+
+  .rankBadge {
+    justify-self: center;
+    margin-bottom: 2px;
+  }
+
+  .playerRadar {
+    width: clamp(145px, 52vw, 165px);
+    height: clamp(145px, 52vw, 165px);
+  }
+}
+
+@supports not (width: 1cqi) {
+  @media (max-width: 700px) {
+    .playerRadar {
+      width: clamp(145px, 40vw, 165px);
+      height: clamp(145px, 40vw, 165px);
+    }
+  }
 }

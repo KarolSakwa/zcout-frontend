@@ -54,11 +54,16 @@
   );
   min-height: 340px;
   padding: 17px 17px 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .duel > :last-child {
   width: 100%;
-  max-width: 646px;
+  max-width: min(100%, 646px);
+  min-width: 0;
 }
 
 .borderTitle {

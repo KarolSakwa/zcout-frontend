@@ -116,6 +116,12 @@
   --ui-grid-gap: 28px;
   --ui-grid-gap-mobile: 22px;
 
+  /* Shared page shell (TopNav + homepage content alignment) */
+  --ui-page-max-width: 1360px;
+  --ui-page-gutter: clamp(14px, 2.5vw, 20px);
+  --ui-page-section-gap: clamp(14px, 2vw, 20px);
+  --ui-page-grid-gap: clamp(14px, 2.2vw, 25px);
+
   --ui-topcard-col-left: 1.18fr;
   --ui-topcard-col-center-min: 210px;
   --ui-topcard-col-center: 0.72fr;

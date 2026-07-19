@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "verify:homepage": "node scripts/verify-homepage-layout.mjs",
+    "verify:homepage:featured": "node scripts/verify-featured-player-layout.mjs",
+    "verify:homepage:duel": "node scripts/verify-homepage-duel-canonical.mjs"
   },
   "dependencies": {
     "echarts": "^6.0.0",
@@ -35,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "^15.5.18",
     "jsdom": "^29.1.1",
+    "playwright": "^1.61.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"

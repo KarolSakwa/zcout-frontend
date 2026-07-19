@@ -41,67 +41,79 @@ export default function FeaturedPlayerSection({ player }: Props) {
   const radarData = player.radar_axes;
   const age = calcAge(player.date_of_birth);
   const playerId = player.id ?? player.player_id;
-  const nameFontSize = player.name.length > 18 ? 20 : 24;
+  const nameClassName =
+    player.name.length > 18 ? styles.playerNameLong : undefined;
+
+  const metaParts = [
+    player.position,
+    player.club?.name,
+    player.country?.name,
+    age != null ? String(age) : null,
+  ].filter((part): part is string => Boolean(part));
 
   return (
     <WidgetPanel variant="card" title="Featured Player" noPadding>
-      <div className={styles.rankBadge}>
-        Rank <span>#{player.rank}</span>
-      </div>
-
-      <div className={styles.playerContent}>
+      <div className={styles.playerContent} data-fp-panel>
         <div className={styles.playerLeftColumn}>
-          <div className={styles.playerHeader}>
-            {playerId != null ? (
-              <Link
-                href={`/players/${playerId}`}
-                className={styles.playerNameLink}
-                style={{
-                  fontSize: nameFontSize,
-                  fontWeight: 800,
-                  lineHeight: 1,
-                }}
-              >
-                {player.name}
-              </Link>
-            ) : (
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: nameFontSize,
-                  fontWeight: 800,
-                  lineHeight: 1,
-                }}
-              >
-                {player.name}
-              </h2>
-            )}
+          <div className={styles.playerHeader} data-fp-header>
+            <div data-fp-name>
+              {playerId != null ? (
+                <Link
+                  href={`/players/${playerId}`}
+                  className={[styles.playerNameLink, nameClassName]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {player.name}
+                </Link>
+              ) : (
+                <h2
+                  className={[styles.playerNameFallback, nameClassName]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {player.name}
+                </h2>
+              )}
+            </div>
 
             {player.archetype ? (
-              <PlayerArchetype label={player.archetype.label} />
+              <div data-fp-archetype>
+                <PlayerArchetype label={player.archetype.label} />
+              </div>
             ) : null}
 
-            <div
-              className={styles.playerMeta}
-              style={{
-                marginTop: 10,
-                fontSize: 12,
-              }}
-            >
-              {player.club?.name} • {player.position} • {player.country?.name}{" "}
-              {age != null ? ` • ${age}` : ""}
-            </div>
+            {metaParts.length > 0 ? (
+              <div className={styles.playerMeta} data-fp-meta>
+                {metaParts.map((part, index) => (
+                  <span key={`${part}-${index}`} className={styles.metaPart}>
+                    {index > 0 ? (
+                      <span className={styles.metaSep} aria-hidden="true">
+                        •
+                      </span>
+                    ) : null}
+                    {part}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
 
-          <FeaturedOverallBlock
-            rating={Math.round(player.overall ?? 0)}
-            exactRating={player.overall}
-            confidence={player.overall_confidence ?? 0}
-            scalePx={51}
-          />
+          <div className={styles.rankBadge} data-fp-rank>
+            Rank <span>#{player.rank}</span>
+          </div>
+
+          <div className={styles.overallBlock} data-fp-overall>
+            <FeaturedOverallBlock
+              rating={Math.round(player.overall ?? 0)}
+              exactRating={player.overall}
+              confidence={player.overall_confidence ?? 0}
+              scalePx={51}
+            />
+          </div>
         </div>
 
-        <div className={styles.playerRightColumn}>
+        <div className={styles.playerRightColumn} data-fp-radar>
           <div className={styles.playerRadar}>
             <PlayerRadarChart
               data={radarData}

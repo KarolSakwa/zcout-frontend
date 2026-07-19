@@ -88,7 +88,11 @@ export default function PlayerCard({
           {homepageMode && homepageName ? (
             <div
               className="name nameHomepage"
-              style={{ fontSize: `${homepageName.fontSizePx}px` }}
+              style={
+                {
+                  ["--hp-name-base" as string]: String(homepageName.fontSizePx),
+                } as React.CSSProperties
+              }
             >
               <span className="nameLine">{homepageName.firstLine}</span>
               {homepageName.secondLine ? (
@@ -300,16 +304,46 @@ export default function PlayerCard({
           transform: translateY(-10px);
         }
 
+        /*
+         * Homepage card content scales from the pre-responsive desktop card
+         * width of 146px (see Duel.module.css homepageCardsRow math).
+         */
+        .card[data-homepage="true"] {
+          container-type: inline-size;
+          container-name: homepage-card;
+        }
+
+        .card[data-homepage="true"] .top {
+          padding: clamp(4px, 4.8cqw, 7px) clamp(5px, 5.5cqw, 8px)
+            clamp(2px, 2.7cqw, 4px);
+          min-height: clamp(22px, 23cqw, 34px);
+        }
+
         .card[data-homepage="true"] .name.nameHomepage {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: flex-start;
-          max-width: calc(100% - 58px);
+          max-width: calc(100% - 40cqw);
           line-height: 1.05;
           letter-spacing: 0.02em;
           white-space: normal;
           overflow: hidden;
+          font-size: clamp(
+            5.5px,
+            calc(var(--hp-name-base, 10) * 1cqw / 1.46),
+            calc(var(--hp-name-base, 10) * 1px)
+          );
+        }
+
+        .card[data-homepage="true"] .number.numberCompact {
+          /* Old desktop: clamp(36px, 3.4vw, 53px) → 53px on 146px card ≈ 36.3cqw */
+          font-size: clamp(18px, 36.3cqw, 53px);
+          -webkit-text-stroke: clamp(1px, 1.4cqw, 2px) rgba(0, 0, 0, 0.52);
+        }
+
+        .card[data-homepage="true"] .mid {
+          transform: translateY(clamp(-8px, -6.8cqw, -4px));
         }
 
         .card[data-homepage="true"] .nameLine {
@@ -321,24 +355,36 @@ export default function PlayerCard({
         }
 
         .card[data-homepage="true"] .flag {
-          left: 7px;
-          top: 9px;
+          left: clamp(4px, 4.8cqw, 7px);
+          top: clamp(5px, 6.2cqw, 9px);
         }
 
         .card[data-homepage="true"] .flagImg {
-          width: 18px;
-          height: 12px;
+          width: clamp(11px, 12.3cqw, 18px);
+          height: clamp(7px, 8.2cqw, 12px);
         }
 
         .card[data-homepage="true"] .posBadge {
-          right: 7px;
-          top: 6px;
-          width: 22px;
-          height: 15px;
+          right: clamp(4px, 4.8cqw, 7px);
+          top: clamp(3px, 4.1cqw, 6px);
+          width: clamp(14px, 15.1cqw, 22px);
+          height: clamp(10px, 10.3cqw, 15px);
+          border-radius: var(--ui-radius-sm);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.38);
         }
 
         .card[data-homepage="true"] .posText {
-          font-size: 6.5px;
+          font-size: clamp(4.5px, 4.5cqw, 6.5px);
+          letter-spacing: 0.03em;
+        }
+
+        .card[data-homepage="true"] .bottom {
+          padding: clamp(4px, 5.5cqw, 8px) clamp(5px, 6.8cqw, 10px);
+        }
+
+        .card[data-homepage="true"] .club.clubCompact {
+          font-size: clamp(5px, 5.5cqw, 8px);
+          letter-spacing: 0.03em;
         }
 
         .nameLong {

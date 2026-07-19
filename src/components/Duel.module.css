@@ -7,28 +7,136 @@
 
 .duelHomepageShell {
   position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+  container-name: homepage-duel;
 }
 
 .duelSkipArea {
   position: relative;
 }
 
+/*
+ * Canonical homepage stage from HEAD viewport >1721px only.
+ * Do NOT restore HEAD's 1720/1360 stage growth (714 / 595).
+ */
 .duelHomepageShell .duelStageCenter {
   max-width: 527px;
+  width: 100%;
+  min-width: 0;
 }
 
-@media (max-width: 1720px) {
+@media (max-width: 700px) {
   .duelHomepageShell .duelStageCenter {
-    max-width: 714px;
+    max-width: 100%;
   }
 }
 
-@media (max-width: 1360px) {
-  .duelHomepageShell .duelStageCenter {
-    max-width: 595px;
+/*
+ * Canonical homepage cards row — measured from HEAD @ 1920px (>1721):
+ *   row 425 | card 146 | center 71 | gap 31 | cols "146px 71px 146px"
+ * Cards must never exceed that max; only shrink when the row is narrower.
+ */
+.homepageCardsRow {
+  --hp-row-max: 425px;
+  --hp-card-max: 146px;
+  --hp-center-max: 71px;
+  --hp-gap-max: 31px;
+  --hp-center-min: 36px;
+  --hp-gap-min: 8px;
+
+  --hp-gap: clamp(var(--hp-gap-min), 7.294%, var(--hp-gap-max));
+  --hp-center: clamp(var(--hp-center-min), 16.706%, var(--hp-center-max));
+  --hp-card: min(
+    var(--hp-card-max),
+    calc((100% - var(--hp-center) - 2 * var(--hp-gap)) / 2)
+  );
+
+  display: grid;
+  grid-template-columns:
+    minmax(0, var(--hp-card))
+    var(--hp-center)
+    minmax(0, var(--hp-card));
+  align-items: start;
+  column-gap: var(--hp-gap);
+  justify-content: center;
+  width: min(100%, var(--hp-row-max));
+  margin: 17px auto 0;
+  position: relative;
+  min-width: 0;
+}
+
+.homepageCardsRow > .homepageCardSlot {
+  min-width: 0;
+  width: 100%;
+}
+
+.homepageCardsRow > .homepageCenterSlot {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.homepageCardPlaceholder {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  visibility: hidden;
+}
+
+.homepageHintLiftWrapper {
+  width: 100%;
+  position: relative;
+  min-width: 0;
+}
+
+.homepageHintLiftWrapper.homepageHintLiftActive {
+  animation: duelCardHintLift 620ms ease-out;
+}
+
+.homepageHintLiftWrapper.homepageHintLiftActive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--ui-radius-xl) + 2px);
+  pointer-events: none;
+  animation: duelCardHintGlow 620ms ease-out;
+}
+
+@keyframes duelCardHintLift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  45% {
+    transform: translateY(-4px);
   }
 }
 
+@keyframes duelCardHintGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+
+  45% {
+    box-shadow: 0 0 18px 6px
+      color-mix(in srgb, var(--glow) 38%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homepageHintLiftWrapper.homepageHintLiftActive,
+  .homepageHintLiftWrapper.homepageHintLiftActive::after {
+    animation: none;
+  }
+}
+
+/* /duels page stage — unchanged HEAD viewport behavior */
 .duelStageOuter {
   position: relative;
   width: 100%;
@@ -46,7 +154,7 @@
 }
 
 @media (max-width: 1720px) {
-  .duelStageCenter {
+  .duelShell:not(.duelHomepageShell) .duelStageCenter {
     --duel-widget-width: 280px;
     --duel-widget-offset: 20px;
     max-width: 840px;
@@ -54,7 +162,7 @@
 }
 
 @media (max-width: 1360px) {
-  .duelStageCenter {
+  .duelShell:not(.duelHomepageShell) .duelStageCenter {
     --duel-widget-width: 240px;
     --duel-widget-offset: 12px;
     max-width: 700px;
@@ -62,11 +170,11 @@
 }
 
 @media (max-width: 700px) {
-  .duelStageOuter {
+  .duelShell:not(.duelHomepageShell) .duelStageOuter {
     max-width: 100%;
   }
 
-  .duelStageCenter {
+  .duelShell:not(.duelHomepageShell) .duelStageCenter {
     max-width: 390px;
     width: 100%;
     overflow: visible;

@@ -8,13 +8,16 @@
 }
 
 .inner {
-  max-width: 1100px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--ui-page-max-width);
   margin: 0 auto;
-  padding: 10px 16px;
+  padding: 10px var(--ui-page-gutter);
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 18px;
+  min-width: 0;
 }
 
 .rightTools {
@@ -171,12 +174,12 @@
 
 @media (max-width: 700px) {
   .inner {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas:
       "brand menu"
       "tools tools";
     gap: 10px 12px;
-    padding: 10px 14px 12px;
+    padding: 10px var(--ui-page-gutter) 12px;
   }
 
   .brand {

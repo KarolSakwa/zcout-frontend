@@ -48,7 +48,7 @@ export default async function HomePageView() {
           <WidgetPanel
             variant="duel"
             title="Current Duel"
-            className={`${styles.gridItem} ${styles.colSpan5} ${styles.rowSpan2} ${styles.duel}`}
+            className={`${styles.gridItem} ${styles.duel}`}
           >
             <DuelWidgetSection />
           </WidgetPanel>

@@ -43,3 +43,6 @@ next-env.d.ts
 # cursor
 ai_context.md
 /design-references
+
+# local layout verification screenshots (not fixtures)
+/scripts/fp-layout-artifacts/
