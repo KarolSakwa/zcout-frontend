@@ -226,3 +226,62 @@
     padding: 1px 6px;
   }
 }
+
+/* Narrow phones: hide DATABASE, tighten nav so DUELS never overlaps logo */
+@media (max-width: 430px) {
+  .inner {
+    gap: 8px 10px;
+  }
+
+  .itemDatabase {
+    display: none;
+  }
+
+  .menu {
+    gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: stretch;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    flex-shrink: 0;
+  }
+
+  .item {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 6px 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .inner {
+    gap: 6px 8px;
+  }
+
+  .menu {
+    gap: 5px;
+  }
+
+  .item {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 320px) {
+  .menu {
+    gap: 4px;
+  }
+
+  .item {
+    font-size: 8px;
+    letter-spacing: 0.02em;
+  }
+}

@@ -21,7 +21,7 @@ export default function TopNav() {
   return (
     <header className={styles.topnav}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.brand} aria-label="Zcout">
+        <Link href="/" className={styles.brand} data-nav-brand aria-label="Zcout">
           <Image
             src="/logo.png"
             alt="Zcout"
@@ -38,7 +38,12 @@ export default function TopNav() {
 
             if (it.disabled) {
               return (
-                <span key={it.href} className={`${styles.item} ${styles.disabledItem}`} aria-disabled="true">
+                <span
+                  key={it.href}
+                  className={`${styles.item} ${styles.disabledItem} ${styles.itemDatabase}`}
+                  data-nav-item="database"
+                  aria-disabled="true"
+                >
                   {it.label}
                   <span className={styles.soonBadge}>{it.badge}</span>
                 </span>
@@ -46,7 +51,12 @@ export default function TopNav() {
             }
 
             return (
-              <Link key={it.href} href={it.href} className={`${styles.item} ${active ? styles.active : ''}`}>
+              <Link
+                key={it.href}
+                href={it.href}
+                className={`${styles.item} ${active ? styles.active : ''}`}
+                data-nav-item={it.label.toLowerCase().replace(/\s+/g, '-')}
+              >
                 {it.label}
               </Link>
             );
@@ -54,7 +64,7 @@ export default function TopNav() {
         </nav>
 
         <div className={styles.rightTools}>
-          <div className={styles.search}>
+          <div className={styles.search} data-nav-search>
             <GlobalSearch />
           </div>
 

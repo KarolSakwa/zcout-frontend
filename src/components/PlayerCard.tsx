@@ -1,6 +1,6 @@
 "use client";
 
-import React, { type CSSProperties } from "react";
+import React, { useEffect, useState, type CSSProperties } from "react";
 import { getHomepagePlayerNameDisplay } from "@/lib/homepagePlayerName";
 import Image from "next/image";
 
@@ -47,7 +47,23 @@ export default function PlayerCard({
       : normalizedName.length >= 18
         ? "nameLong"
         : "";
-  const homepageName = homepageMode ? getHomepagePlayerNameDisplay(name) : null;
+  const [narrowMobile, setNarrowMobile] = useState(false);
+
+  useEffect(() => {
+    if (!homepageMode) return;
+    const mq = window.matchMedia("(max-width: 430px)");
+    const update = () => setNarrowMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [homepageMode]);
+
+  const homepageName = homepageMode
+    ? getHomepagePlayerNameDisplay(name, {
+        maxLines: narrowMobile ? 3 : 2,
+        narrowMobile,
+      })
+    : null;
 
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
   const specialFlags: Record<string, string> = {
@@ -88,6 +104,7 @@ export default function PlayerCard({
           {homepageMode && homepageName ? (
             <div
               className="name nameHomepage"
+              data-hp-card-name
               style={
                 {
                   ["--hp-name-base" as string]: String(homepageName.fontSizePx),
@@ -97,6 +114,9 @@ export default function PlayerCard({
               <span className="nameLine">{homepageName.firstLine}</span>
               {homepageName.secondLine ? (
                 <span className="nameLine">{homepageName.secondLine}</span>
+              ) : null}
+              {homepageName.thirdLine ? (
+                <span className="nameLine">{homepageName.thirdLine}</span>
               ) : null}
             </div>
           ) : (
@@ -109,16 +129,16 @@ export default function PlayerCard({
             </div>
           )}
 
-          <div className="posBadge" aria-label="Pozycja">
+          <div className="posBadge" aria-label="Pozycja" data-hp-card-pos>
             <span className="posText">{position ?? "--"}</span>
           </div>
 
           {flagSrc ? (
-            <div className="flag" aria-hidden>
+            <div className="flag" aria-hidden data-hp-card-flag>
               <Image
                 src={flagSrc}
-                width={22}
-                height={14}
+                width={narrowMobile && homepageMode ? 14 : 22}
+                height={narrowMobile && homepageMode ? 9 : 14}
                 alt=""
                 draggable={false}
                 className="flagImg"
@@ -378,6 +398,49 @@ export default function PlayerCard({
           letter-spacing: 0.03em;
         }
 
+        @media (max-width: 430px) {
+          .card[data-homepage="true"] .name.nameHomepage {
+            width: calc(100% - 48cqw);
+            max-width: calc(100% - 48cqw);
+            margin-inline: 24cqw;
+            padding-inline: 0;
+            box-sizing: border-box;
+            line-height: 1.08;
+            font-size: clamp(
+              6px,
+              calc(var(--hp-name-base, 10) * 1.12 * 1cqw / 1.46),
+              calc(var(--hp-name-base, 10) * 1.12 * 1px)
+            );
+          }
+
+          .card[data-homepage="true"] .nameLine {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            text-overflow: clip;
+          }
+
+          .card[data-homepage="true"] .flag {
+            left: clamp(3px, 3.4cqw, 5px);
+            top: clamp(4px, 4.3cqw, 6px);
+          }
+
+          .card[data-homepage="true"] .flagImg {
+            width: clamp(8px, 8.6cqw, 13px) !important;
+            height: clamp(5px, 5.7cqw, 8px) !important;
+          }
+
+          .card[data-homepage="true"] .posBadge {
+            right: clamp(3px, 3.4cqw, 5px);
+            top: clamp(2px, 2.9cqw, 4px);
+            width: clamp(10px, 10.6cqw, 15px) !important;
+            height: clamp(7px, 7.2cqw, 11px) !important;
+          }
+
+          .card[data-homepage="true"] .posText {
+            font-size: clamp(3px, 3.2cqw, 4.5px) !important;
+          }
+        }
+
         .card[data-homepage="true"] .bottom {
           padding: clamp(4px, 5.5cqw, 8px) clamp(5px, 6.8cqw, 10px);
         }
@@ -619,8 +682,17 @@ export default function PlayerCard({
             height: 29px;
           }
 
+          .card[data-homepage="true"] .posBadge {
+            width: clamp(14px, 15.1cqw, 22px);
+            height: clamp(10px, 10.3cqw, 15px);
+          }
+
           .posText {
             font-size: 10px;
+          }
+
+          .card[data-homepage="true"] .posText {
+            font-size: clamp(4.5px, 4.5cqw, 6.5px);
           }
         }
 
@@ -650,19 +722,19 @@ export default function PlayerCard({
             font-size: 9px;
           }
 
-          .posBadge {
+          .card:not([data-homepage="true"]) .posBadge {
             right: 6px;
             top: 7px;
             width: 32px;
             height: 28px;
           }
 
-          .flag {
+          .card:not([data-homepage="true"]) .flag {
             left: 7px;
             top: 10px;
           }
 
-          .flagImg {
+          .card:not([data-homepage="true"]) .flagImg {
             width: 18px;
             height: 12px;
           }

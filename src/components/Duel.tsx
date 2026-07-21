@@ -596,11 +596,15 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         </div>
 
         <div
-          className={homepageMode ? styles.duelSkipArea : undefined}
+          className={
+            homepageMode
+              ? `${styles.duelSkipArea} ${styles.duelSkipAreaHomepage}`
+              : styles.duelSkipArea
+          }
           style={{
             height: homepageMode ? 136 : 160,
             display: "flex",
-            alignItems: "center",
+            alignItems: homepageMode ? undefined : "center",
             justifyContent: "center",
             pointerEvents: showOverlayLoader ? "none" : "auto",
           }}

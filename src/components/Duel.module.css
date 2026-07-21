@@ -18,6 +18,18 @@
   position: relative;
 }
 
+.duelSkipAreaHomepage {
+  box-sizing: border-box;
+  align-items: center;
+}
+
+@media (max-width: 430px) {
+  .duelSkipAreaHomepage {
+    align-items: flex-end;
+    padding-bottom: 8px;
+  }
+}
+
 /*
  * Canonical homepage stage from HEAD viewport >1721px only.
  * Do NOT restore HEAD's 1720/1360 stage growth (714 / 595).

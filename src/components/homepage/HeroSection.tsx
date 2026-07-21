@@ -1,4 +1,5 @@
 import GlobalSearch from '@/components/GlobalSearch';
+import styles from './HeroSection.module.css';
 
 export default function HeroSection() {
   return (
@@ -33,12 +34,7 @@ export default function HeroSection() {
         Real opinions. Live ratings. Always evolving.
       </p>
 
-      <div
-        style={{
-          marginTop: '27px',
-          maxWidth: '510px',
-        }}
-      >
+      <div className={styles.heroSearch} data-hero-search>
         <GlobalSearch />
       </div>
     </section>

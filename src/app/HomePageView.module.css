@@ -143,4 +143,9 @@
   .secondaryCluster {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* Match border-to-border gap Featured Player → Current Duel to hero → FP rhythm */
+  .rowMain {
+    margin-top: calc(var(--ui-page-section-gap) * 2);
+  }
 }

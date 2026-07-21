@@ -76,7 +76,7 @@ export default function DuelRevealPanel({
 
   return (
     <div
-      className="revealPanel"
+      className={`revealPanel${homepageMode ? " revealPanelHomepage" : ""}`}
       style={{ cursor: inspectHover ? "help" : "default" }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
@@ -167,15 +167,11 @@ export default function DuelRevealPanel({
         ) : null}
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          placeItems: "center",
-          marginTop: homepageMode ? 8 : 14,
-        }}
-      >
+      <div className="nextWrap">
         <button
           type="button"
+          className="nextBtn"
+          data-hp-duel-next
           onClick={goNext}
           disabled={nextDisabled}
           onMouseEnter={() => setNextHover(true)}
@@ -183,29 +179,18 @@ export default function DuelRevealPanel({
           onFocus={() => setNextHover(true)}
           onBlur={() => setNextHover(false)}
           style={{
-            height: 34,
-            padding: "0 14px",
-            textTransform: "uppercase",
-            fontSize: 12,
-            borderRadius: "var(--ui-radius-pill)",
             border: nextIsHover
               ? "1px solid rgba(156, 192, 248, 0.74)"
               : "1px solid rgba(138, 176, 238, 0.62)",
             background: nextIsHover
               ? "rgba(118, 160, 234, 0.96)"
               : "rgba(104, 146, 222, 0.92)",
-            color: "#f4f8ff",
-            fontWeight: 700,
-            letterSpacing: "0.01em",
             boxShadow: nextIsHover
               ? "0 10px 20px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.14)"
               : "0 8px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.10)",
             opacity: nextDisabled ? 0.55 : 1,
             cursor: nextDisabled ? "not-allowed" : "pointer",
-            userSelect: "none",
             transform: nextIsHover ? "translateY(-1px)" : "translateY(0px)",
-            transition:
-              "transform 140ms ease, background 140ms ease, box-shadow 140ms ease, border-color 140ms ease, opacity 140ms ease",
           }}
         >
           Next →
@@ -226,6 +211,31 @@ export default function DuelRevealPanel({
           gap: 12px;
         }
 
+        .nextWrap {
+          display: grid;
+          place-items: center;
+          margin-top: ${homepageMode ? 8 : 14}px;
+        }
+
+        .nextBtn {
+          height: 34px;
+          padding: 0 14px;
+          text-transform: uppercase;
+          font-size: 12px;
+          border-radius: var(--ui-radius-pill);
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          color: #f4f8ff;
+          user-select: none;
+          cursor: pointer;
+          transition:
+            transform 140ms ease,
+            background 140ms ease,
+            box-shadow 140ms ease,
+            border-color 140ms ease,
+            opacity 140ms ease;
+        }
+
         @media (max-width: 700px) {
           .revealPanel {
             max-width: none;
@@ -236,6 +246,28 @@ export default function DuelRevealPanel({
 
           .revealPanelInner {
             width: 100%;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .revealPanelHomepage {
+            margin: 0;
+            padding: 0 8px;
+          }
+
+          .revealPanelHomepage .revealPanelInner {
+            gap: 8px;
+          }
+
+          .revealPanelHomepage .nextWrap {
+            margin-top: 4px;
+          }
+
+          .revealPanelHomepage .nextBtn {
+            height: 28px;
+            padding: 0 10px;
+            font-size: 10px;
+            letter-spacing: 0.04em;
           }
         }
       `}</style>

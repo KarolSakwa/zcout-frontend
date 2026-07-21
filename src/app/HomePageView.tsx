@@ -49,6 +49,7 @@ export default async function HomePageView() {
             variant="duel"
             title="Current Duel"
             className={`${styles.gridItem} ${styles.duel}`}
+            data-hp-duel-panel
           >
             <DuelWidgetSection />
           </WidgetPanel>

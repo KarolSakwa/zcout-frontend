@@ -19,7 +19,7 @@ type WidgetPanelProps = {
   id?: string;
   ariaLabelledBy?: string;
   style?: React.CSSProperties;
-};
+} & React.HTMLAttributes<HTMLElement>;
 
 export default function WidgetPanel({
   variant,
@@ -35,6 +35,7 @@ export default function WidgetPanel({
   id,
   ariaLabelledBy,
   style,
+  ...rest
 }: WidgetPanelProps) {
   const useBorderTitle =
     borderTitle ??
@@ -63,6 +64,7 @@ export default function WidgetPanel({
       className={panelClassName}
       aria-labelledby={ariaLabelledBy ?? titleId}
       style={style}
+      {...rest}
     >
       {useBorderTitle && title ? (
         <span className={styles.borderTitle} id={titleId}>
