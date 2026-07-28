@@ -1,0 +1,67 @@
+.wrap {
+  max-width: 720px;
+  margin: 4px auto 30px;
+  gap: 14px;
+  display: grid;
+  place-items: center;
+}
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
+  opacity: 0.82;
+}
+
+.attributeBlock {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  cursor: help;
+}
+
+.iconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ui-radius-pill);
+  display: grid;
+  place-items: center;
+  background: var(--ui-accent-primary-soft);
+  border: 1px solid var(--ui-border-accent);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.label {
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-text-primary);
+  font-size: 16px;
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+}
+
+.rule {
+  width: 160px;
+  height: 2px;
+  border-radius: var(--ui-radius-pill);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--ui-accent-primary),
+    transparent
+  );
+  opacity: 0.68;
+}
+
+@media (max-width: 700px) {
+  .wrap {
+    margin: 0 auto 14px;
+    gap: 10px;
+  }
+
+  .attributeBlock {
+    gap: 10px;
+  }
+}

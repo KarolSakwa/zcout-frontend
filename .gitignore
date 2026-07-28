@@ -46,3 +46,5 @@ ai_context.md
 
 # local layout verification screenshots (not fixtures)
 /scripts/fp-layout-artifacts/
+scripts/output/
+tmp/

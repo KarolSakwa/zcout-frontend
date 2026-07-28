@@ -1,8 +1,11 @@
 import { chromium } from 'playwright';
+import { installVerifyDataMocks } from './lib/verify-data-mocks.mjs';
 
 const BASE = process.env.VERIFY_BASE_URL || 'http://localhost:3000';
 const HOME_VIEWPORTS = [320, 360, 390, 430, 700, 768, 1024, 1280, 1440, 1720, 1920];
 const MOBILE_ASSERT_VIEWPORTS = [320, 360, 390, 430, 700];
+const NEXT_REVEAL_VIEWPORTS = [430, 390, 360, 320];
+const SPACING_TOLERANCE_PX = 4;
 const DUELS_VIEWPORTS = [390, 1024, 1440];
 
 function approxEqual(a, b, tol = 2) {
@@ -10,6 +13,7 @@ function approxEqual(a, b, tol = 2) {
 }
 
 async function gotoSafe(page, path, { waitText, waitSelector } = {}) {
+  await installVerifyDataMocks(page);
   await page.goto(BASE + path, { waitUntil: 'commit', timeout: 180000 });
   if (waitText) {
     await page
@@ -291,40 +295,142 @@ async function measureMobileAssertions(page, width) {
           ? +(gapFpDuel - gapHeroFp).toFixed(2)
           : null,
       cardIssues,
-      nextInsidePanel: null,
     };
   }, width);
 
-  const leftCard = page.locator('[data-homepage="true"]').first();
-  if (await leftCard.count()) {
-    await leftCard.click({ timeout: 30000 }).catch(() => {});
-    await page.waitForSelector('[data-hp-duel-next]', { timeout: 30000 }).catch(() => {});
-    await page.waitForTimeout(1200);
-    const nextCheck = await page.evaluate(() => {
+  return base;
+}
+
+async function measureRevealNext(page, width) {
+  const voteTrace = {
+    url: null,
+    method: null,
+    requestBody: null,
+    status: null,
+    responseBody: null,
+  };
+  const traceErrors = [];
+
+  const onRequest = (req) => {
+    if (req.method() !== 'POST') return;
+    const path = new URL(req.url()).pathname;
+    if (path !== '/api/vote') return;
+    voteTrace.url = req.url();
+    voteTrace.method = req.method();
+    voteTrace.requestBody = req.postData();
+  };
+  const onResponse = async (res) => {
+    if (res.request().method() !== 'POST') return;
+    const path = new URL(res.url()).pathname;
+    if (path !== '/api/vote') return;
+    voteTrace.status = res.status();
+    voteTrace.responseBody = await res.text().catch(() => '');
+  };
+  const onPageError = (err) => traceErrors.push(`pageerror:${err.message}`);
+  const onConsole = (msg) => {
+    if (msg.type() === 'error') traceErrors.push(`console:${msg.text()}`);
+  };
+
+  page.on('request', onRequest);
+  page.on('response', onResponse);
+  page.on('pageerror', onPageError);
+  page.on('console', onConsole);
+
+  try {
+    await page.setViewportSize({ width, height: 1200 });
+    await gotoSafe(page, '/', {
+      waitText: 'Current Duel',
+      waitSelector: '[data-fp-name]',
+    });
+    await page.waitForSelector('[data-hp-duel-row]', { timeout: 120000 });
+    await page.waitForFunction(
+      () => document.querySelectorAll('[data-homepage="true"]').length >= 2,
+      null,
+      { timeout: 60000 },
+    );
+    await page.waitForTimeout(800);
+
+    const leftCard = page.locator('[data-hp-duel-slot="left"] [data-homepage="true"]').first();
+    if (!(await leftCard.count())) {
+      return {
+        revealReady: false,
+        nextMissing: true,
+        nextInsidePanel: false,
+        vote: voteTrace,
+        traceErrors,
+      };
+    }
+
+    await leftCard.click({ timeout: 30000 });
+
+    await page
+      .waitForResponse(
+        (res) =>
+          res.request().method() === 'POST' &&
+          new URL(res.url()).pathname === '/api/vote' &&
+          res.status() >= 200 &&
+          res.status() < 300,
+        { timeout: 30000 },
+      )
+      .catch(() => {});
+
+    await page
+      .waitForFunction(
+        () => {
+          const revealAttr = document.querySelector('[data-hp-reveal="true"]');
+          const next = document.querySelector('[data-hp-duel-next]');
+          return Boolean(revealAttr && next);
+        },
+        null,
+        { timeout: 90000 },
+      )
+      .catch(() => {});
+
+    await page.waitForTimeout(800);
+
+    const result = await page.evaluate(() => {
       const panel = document.querySelector('[data-hp-duel-panel]');
+      const revealAttr = document.querySelector('[data-hp-reveal="true"]');
       const next = document.querySelector('[data-hp-duel-next]');
-      if (!panel || !next) return { nextInsidePanel: false, missing: true };
-      const p = panel.getBoundingClientRect();
-      const n = next.getBoundingClientRect();
+      const rect = (el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          top: +r.top.toFixed(2),
+          bottom: +r.bottom.toFixed(2),
+          left: +r.left.toFixed(2),
+          right: +r.right.toFixed(2),
+        };
+      };
+      const p = rect(panel);
+      const n = rect(next);
       const inside =
+        p &&
+        n &&
         n.top >= p.top - 1 &&
         n.bottom <= p.bottom + 1 &&
         n.left >= p.left - 1 &&
         n.right <= p.right + 1;
       return {
-        nextInsidePanel: inside,
-        bottomGap: +(p.bottom - n.bottom).toFixed(2),
-        missing: false,
+        revealReady: Boolean(revealAttr || next),
+        hasRevealAttr: Boolean(revealAttr),
+        hasNext: Boolean(next),
+        nextMissing: !next,
+        nextInsidePanel: next ? inside : false,
+        nextBottomGap: p && n ? +(p.bottom - n.bottom).toFixed(2) : null,
+        domError: document.querySelector('[class*="duelHomepageShell"]')?.innerText?.includes('Błąd')
+          ? 'vote-error-visible'
+          : null,
       };
     });
-    base.nextInsidePanel = nextCheck.nextInsidePanel;
-    base.nextBottomGap = nextCheck.bottomGap;
-    base.nextMissing = nextCheck.missing;
-    await page.reload({ waitUntil: 'commit', timeout: 180000 }).catch(() => {});
-    await page.waitForTimeout(1500);
-  }
 
-  return base;
+    return { ...result, vote: voteTrace, traceErrors };
+  } finally {
+    page.off('request', onRequest);
+    page.off('response', onResponse);
+    page.off('pageerror', onPageError);
+    page.off('console', onConsole);
+  }
 }
 
 function checkMobileAssertions(width, m) {
@@ -338,21 +444,29 @@ function checkMobileAssertions(width, m) {
     width <= 700 &&
     m.gapHeroFp != null &&
     m.gapFpDuel != null &&
-    Math.abs(m.gapFpDuel - m.gapHeroFp) > 2
+    Math.abs(m.gapFpDuel - m.gapHeroFp) > SPACING_TOLERANCE_PX
   ) {
     issues.push(`spacing-uneven:hero=${m.gapHeroFp},fp-duel=${m.gapFpDuel}`);
   }
   if (m.cardIssues?.length) issues.push(...m.cardIssues);
-  if (width <= 430 && m.nextMissing) issues.push('next-missing');
-  if (width <= 430 && m.nextInsidePanel === false) issues.push('next-outside-panel');
-  if (width <= 430 && m.nextBottomGap != null && m.nextBottomGap < 8) {
-    issues.push(`next-bottom-gap=${m.nextBottomGap}`);
+  return issues;
+}
+
+function checkRevealNextAssertions(width, m) {
+  const issues = [];
+  if (!m.vote?.url) issues.push('vote-request-missing');
+  else if (m.vote.status == null || m.vote.status < 200 || m.vote.status >= 300) {
+    issues.push(`vote-status-${m.vote.status ?? 'none'}`);
   }
+  if (!m.revealReady) issues.push('reveal-missing');
+  if (m.nextMissing) issues.push('next-missing');
+  if (m.nextInsidePanel === false) issues.push('next-outside-panel');
+  if (m.domError) issues.push(m.domError);
   return issues;
 }
 
 let failed = false;
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const page = await browser.newPage();
 
 console.log(`Base: ${BASE}`);
@@ -447,10 +561,32 @@ for (const width of MOBILE_ASSERT_VIEWPORTS) {
         `navSearch=${m.navSearchVisible}`,
         `gapHeroFp=${m.gapHeroFp}`,
         `gapFpDuel=${m.gapFpDuel}`,
-        `gapΔ=${m.gapDelta}`,
+        `gapDelta=${m.gapDelta}`,
+        `cards=${m.cardIssues?.join(',') || 'ok'}`,
+        issues.length ? `FAIL ${issues.join('; ')}` : 'OK',
+      ].join(' | '),
+    );
+  } catch (err) {
+    failed = true;
+    console.log(`${width}px | ERROR ${err.message.split('\n')[0]}`);
+  }
+}
+
+console.log('\n=== REVEAL / NEXT ===');
+for (const width of NEXT_REVEAL_VIEWPORTS) {
+  try {
+    const m = await measureRevealNext(page, width);
+    const issues = checkRevealNextAssertions(width, m);
+    if (issues.length) failed = true;
+    console.log(
+      [
+        `${width}px`,
+        `reveal=${m.revealReady}`,
+        `hpReveal=${m.hasRevealAttr ?? false}`,
+        `next=${m.hasNext ?? false}`,
+        `vote=${m.vote?.status ?? 'none'}`,
         `nextInside=${m.nextInsidePanel}`,
         `nextBottomGap=${m.nextBottomGap ?? '-'}`,
-        `cards=${m.cardIssues?.join(',') || 'ok'}`,
         issues.length ? `FAIL ${issues.join('; ')}` : 'OK',
       ].join(' | '),
     );

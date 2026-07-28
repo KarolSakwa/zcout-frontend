@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, type CSSProperties } from "react";
+import React, { type CSSProperties } from "react";
 import { getHomepagePlayerNameDisplay } from "@/lib/homepagePlayerName";
 import Image from "next/image";
 
@@ -20,6 +20,8 @@ type PlayerCardProps = {
   revealFooter?: React.ReactNode;
   compact?: boolean;
   homepageMode?: boolean;
+  /** Full /duels page cards — container-query scaling, isolated from homepage. */
+  duelsPage?: boolean;
 };
 
 export default function PlayerCard({
@@ -37,6 +39,7 @@ export default function PlayerCard({
   revealFooter,
   compact = false,
   homepageMode = false,
+  duelsPage = false,
 }: PlayerCardProps) {
   const state = reveal ? (isWinner ? "winner" : "loser") : "idle";
 
@@ -47,22 +50,8 @@ export default function PlayerCard({
       : normalizedName.length >= 18
         ? "nameLong"
         : "";
-  const [narrowMobile, setNarrowMobile] = useState(false);
-
-  useEffect(() => {
-    if (!homepageMode) return;
-    const mq = window.matchMedia("(max-width: 430px)");
-    const update = () => setNarrowMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, [homepageMode]);
-
   const homepageName = homepageMode
-    ? getHomepagePlayerNameDisplay(name, {
-        maxLines: narrowMobile ? 3 : 2,
-        narrowMobile,
-      })
+    ? getHomepagePlayerNameDisplay(name, { maxLines: 2, narrowMobile: false })
     : null;
 
   const iso = countryIso2 ? String(countryIso2).toUpperCase() : null;
@@ -90,6 +79,7 @@ export default function PlayerCard({
       data-state={state}
       data-compact={compact ? "true" : undefined}
       data-homepage={homepageMode ? "true" : undefined}
+      data-duels-page={duelsPage ? "true" : undefined}
       role="button"
       tabIndex={0}
       onClick={onClick}
@@ -101,50 +91,120 @@ export default function PlayerCard({
 
       <div className="inner">
         <div className="top">
-          {homepageMode && homepageName ? (
-            <div
-              className="name nameHomepage"
-              data-hp-card-name
-              style={
-                {
-                  ["--hp-name-base" as string]: String(homepageName.fontSizePx),
-                } as React.CSSProperties
-              }
-            >
-              <span className="nameLine">{homepageName.firstLine}</span>
-              {homepageName.secondLine ? (
-                <span className="nameLine">{homepageName.secondLine}</span>
-              ) : null}
-              {homepageName.thirdLine ? (
-                <span className="nameLine">{homepageName.thirdLine}</span>
-              ) : null}
-            </div>
+          {homepageMode || duelsPage ? (
+            <>
+              <div className="topDesktop">
+                {homepageMode && homepageName ? (
+                  <div
+                    className="name nameHomepage"
+                    data-hp-card-name
+                    style={
+                      {
+                        ["--hp-name-base" as string]: String(homepageName.fontSizePx),
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span className="nameLine">{homepageName.firstLine}</span>
+                    {homepageName.secondLine ? (
+                      <span className="nameLine">{homepageName.secondLine}</span>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div
+                    className={["name", compact ? "nameCompact" : "", nameLengthClass]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {normalizedName}
+                  </div>
+                )}
+
+                <div className="posBadge" aria-label="Pozycja" data-hp-card-pos>
+                  <span className="posText">{position ?? "--"}</span>
+                </div>
+
+                {flagSrc ? (
+                  <div className="flag" aria-hidden data-hp-card-flag>
+                    <Image
+                      src={flagSrc}
+                      width={22}
+                      height={14}
+                      alt=""
+                      draggable={false}
+                      className="flagImg"
+                    />
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="mobileCardTopRow topMobile" data-card-top-row>
+                <div className="mobileFlagSlot" data-card-flag aria-hidden>
+                  {flagSrc ? (
+                    <Image
+                      src={flagSrc}
+                      width={22}
+                      height={14}
+                      alt=""
+                      draggable={false}
+                      className="flagImg"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className="flagPlaceholder" aria-hidden />
+                  )}
+                </div>
+                <div className="mobileNameSlot" data-card-name>
+                  {homepageMode ? (
+                    <div className="name nameHomepage">{normalizedName}</div>
+                  ) : (
+                    <div
+                      className={["name", compact ? "nameCompact" : "", nameLengthClass]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {normalizedName}
+                    </div>
+                  )}
+                </div>
+                <div className="mobilePositionSlot" data-card-position-badge>
+                  <div
+                    className="posBadge"
+                    aria-label="Pozycja"
+                    {...(homepageMode ? { "data-hp-card-pos": true } : {})}
+                  >
+                    <span className="posText">{position ?? "--"}</span>
+                  </div>
+                </div>
+              </div>
+            </>
           ) : (
-            <div
-              className={["name", compact ? "nameCompact" : "", nameLengthClass]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {normalizedName}
-            </div>
+            <>
+              <div
+                className={["name", compact ? "nameCompact" : "", nameLengthClass]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {normalizedName}
+              </div>
+
+              <div className="posBadge" aria-label="Pozycja" data-hp-card-pos>
+                <span className="posText">{position ?? "--"}</span>
+              </div>
+
+              {flagSrc ? (
+                <div className="flag" aria-hidden data-hp-card-flag>
+                  <Image
+                    src={flagSrc}
+                    width={22}
+                    height={14}
+                    alt=""
+                    draggable={false}
+                    className="flagImg"
+                  />
+                </div>
+              ) : null}
+            </>
           )}
-
-          <div className="posBadge" aria-label="Pozycja" data-hp-card-pos>
-            <span className="posText">{position ?? "--"}</span>
-          </div>
-
-          {flagSrc ? (
-            <div className="flag" aria-hidden data-hp-card-flag>
-              <Image
-                src={flagSrc}
-                width={narrowMobile && homepageMode ? 14 : 22}
-                height={narrowMobile && homepageMode ? 9 : 14}
-                alt=""
-                draggable={false}
-                className="flagImg"
-              />
-            </div>
-          ) : null}
         </div>
 
         <div className="mid">
@@ -154,7 +214,10 @@ export default function PlayerCard({
         </div>
 
         <div className="bottom">
-          <div className={compact ? "club clubCompact" : "club"}>
+          <div
+            className={compact ? "club clubCompact" : "club"}
+            data-card-club
+          >
             {String(club ?? "—").toUpperCase()}
           </div>
         </div>
@@ -398,49 +461,6 @@ export default function PlayerCard({
           letter-spacing: 0.03em;
         }
 
-        @media (max-width: 430px) {
-          .card[data-homepage="true"] .name.nameHomepage {
-            width: calc(100% - 48cqw);
-            max-width: calc(100% - 48cqw);
-            margin-inline: 24cqw;
-            padding-inline: 0;
-            box-sizing: border-box;
-            line-height: 1.08;
-            font-size: clamp(
-              6px,
-              calc(var(--hp-name-base, 10) * 1.12 * 1cqw / 1.46),
-              calc(var(--hp-name-base, 10) * 1.12 * 1px)
-            );
-          }
-
-          .card[data-homepage="true"] .nameLine {
-            white-space: normal;
-            overflow-wrap: anywhere;
-            text-overflow: clip;
-          }
-
-          .card[data-homepage="true"] .flag {
-            left: clamp(3px, 3.4cqw, 5px);
-            top: clamp(4px, 4.3cqw, 6px);
-          }
-
-          .card[data-homepage="true"] .flagImg {
-            width: clamp(8px, 8.6cqw, 13px) !important;
-            height: clamp(5px, 5.7cqw, 8px) !important;
-          }
-
-          .card[data-homepage="true"] .posBadge {
-            right: clamp(3px, 3.4cqw, 5px);
-            top: clamp(2px, 2.9cqw, 4px);
-            width: clamp(10px, 10.6cqw, 15px) !important;
-            height: clamp(7px, 7.2cqw, 11px) !important;
-          }
-
-          .card[data-homepage="true"] .posText {
-            font-size: clamp(3px, 3.2cqw, 4.5px) !important;
-          }
-        }
-
         .card[data-homepage="true"] .bottom {
           padding: clamp(4px, 5.5cqw, 8px) clamp(5px, 6.8cqw, 10px);
         }
@@ -472,6 +492,66 @@ export default function PlayerCard({
           border-radius: var(--ui-radius-xs);
           border: 0;
           outline: 0;
+        }
+
+        .mobileCardTopRow {
+          display: none;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 3px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .topDesktop {
+          display: contents;
+        }
+
+        .mobileFlagSlot,
+        .mobilePositionSlot {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .mobileNameSlot {
+          min-width: 0;
+          width: 100%;
+        }
+
+        .mobileCardTopRow .flag,
+        .mobileCardTopRow .posBadge {
+          position: static;
+          left: auto;
+          right: auto;
+          top: auto;
+          margin: 0;
+        }
+
+        .mobileCardTopRow .flagImg {
+          height: var(--mobile-card-meta-height);
+          width: auto !important;
+        }
+
+        .mobileCardTopRow .posBadge {
+          height: var(--mobile-card-meta-height);
+          min-height: var(--mobile-card-meta-height);
+          width: auto;
+          min-width: 0;
+          padding: 0 3px;
+          box-sizing: border-box;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: var(--ui-radius-sm);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.38);
+        }
+
+        .flagPlaceholder {
+          display: block;
+          width: calc(var(--mobile-card-meta-height) * 1.5);
+          height: var(--mobile-card-meta-height);
         }
 
         .posBadge {
@@ -697,60 +777,301 @@ export default function PlayerCard({
         }
 
         @media (max-width: 700px) {
-          .top {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .top {
             padding: 8px 7px 4px;
             min-height: 48px;
           }
 
-          .name {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .name {
             font-size: 13px;
             max-width: calc(100% - 58px);
             line-height: 1.02;
             -webkit-line-clamp: 2;
           }
 
-          .card[data-compact="true"] .name {
+          .card[data-compact="true"]:not([data-homepage="true"]):not([data-duels-page="true"]) .name {
             font-size: 11px;
             max-width: calc(100% - 64px);
           }
 
-          .card[data-compact="true"] .name.nameLong {
+          .card[data-compact="true"]:not([data-homepage="true"]):not([data-duels-page="true"]) .name.nameLong {
             font-size: 10px;
           }
 
-          .card[data-compact="true"] .name.nameVeryLong {
+          .card[data-compact="true"]:not([data-homepage="true"]):not([data-duels-page="true"]) .name.nameVeryLong {
             font-size: 9px;
           }
 
-          .card:not([data-homepage="true"]) .posBadge {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .posBadge {
             right: 6px;
             top: 7px;
             width: 32px;
             height: 28px;
           }
 
-          .card:not([data-homepage="true"]) .flag {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .flag {
             left: 7px;
             top: 10px;
           }
 
-          .card:not([data-homepage="true"]) .flagImg {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .flagImg {
             width: 18px;
             height: 12px;
           }
 
-          .club {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .club {
             font-size: 10px;
             max-width: 96%;
           }
 
-          .mid {
+          .card:not([data-homepage="true"]):not([data-duels-page="true"]) .mid {
             height: 58%;
             transform: translateY(-8px);
           }
 
-          .card[data-compact="true"] .mid {
+          .card[data-compact="true"]:not([data-homepage="true"]):not([data-duels-page="true"]) .mid {
             transform: translateY(-12px);
+          }
+        }
+
+        /* Homepage mobile — shared top row grid */
+        @media (max-width: 700px) {
+          .card[data-homepage="true"] {
+            --hp-club-size: clamp(5px, 5.5cqw, 8px);
+            /* Same top-row meta height mechanism as /duels */
+            --hp-card-meta-height: 8.4px;
+          }
+
+          .card[data-homepage="true"] .topDesktop {
+            display: none;
+          }
+
+          .card[data-homepage="true"] .topMobile {
+            display: grid;
+          }
+
+          .card[data-homepage="true"] .top {
+            padding: 2px 6px 2px;
+            min-height: 0;
+            display: block;
+            position: relative;
+            z-index: 1;
+          }
+
+          .card[data-homepage="true"] .mobileNameSlot .name.nameHomepage {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 7px !important;
+            line-height: 1.08;
+            letter-spacing: 0.025em;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: break-word;
+            overflow: hidden;
+          }
+
+          .card[data-homepage="true"] .mobileCardTopRow .posBadge {
+            height: var(--hp-card-meta-height) !important;
+            min-height: var(--hp-card-meta-height) !important;
+            max-height: var(--hp-card-meta-height) !important;
+            width: auto !important;
+            min-width: 0 !important;
+            padding: 0 4px !important;
+            border-width: var(--ui-border-width-thin) !important;
+            box-sizing: border-box !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: static !important;
+            right: auto !important;
+            top: auto !important;
+          }
+
+          .card[data-homepage="true"] .mobileCardTopRow img,
+          .card[data-homepage="true"] .mobileCardTopRow :global(.flagImg) {
+            height: var(--hp-card-meta-height) !important;
+            width: auto !important;
+            max-width: none !important;
+            display: block !important;
+          }
+
+          .card[data-homepage="true"] .mobileCardTopRow .flagPlaceholder {
+            width: calc(var(--hp-card-meta-height) * 1.57) !important;
+            height: var(--hp-card-meta-height) !important;
+          }
+
+          .card[data-homepage="true"] .mobilePositionSlot .posText {
+            font-size: 5.5px;
+            line-height: 1;
+            letter-spacing: 0.02em;
+          }
+
+          .card[data-homepage="true"] .club.clubCompact {
+            font-size: var(--hp-club-size, clamp(5px, 5.5cqw, 8px));
+          }
+
+          .card[data-homepage="true"] .number.numberCompact {
+            font-size: clamp(16px, 34cqw, 50px);
+          }
+
+          .card[data-homepage="true"] .mid {
+            position: absolute;
+            inset: 0;
+            height: auto;
+            display: grid;
+            place-items: center;
+            transform: none;
+            z-index: 0;
+            pointer-events: none;
+          }
+
+          .card[data-homepage="true"] .mid .number {
+            pointer-events: auto;
+          }
+
+          .card[data-homepage="true"] .bottom {
+            z-index: 1;
+          }
+        }
+
+        /* /duels desktop ≥1201 — baseline absolute top row (e9cd773) */
+        @media (min-width: 701px) {
+          .card[data-duels-page="true"] .topDesktop {
+            display: contents;
+          }
+
+          .card[data-duels-page="true"] .topMobile {
+            display: none;
+          }
+
+          .card[data-duels-page="true"] .top {
+            padding: 9px 9px 6px;
+            min-height: 44px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+          }
+        }
+
+        /* /duels ≤1200 — compact grid top row */
+        @media (max-width: 700px) {
+          .card[data-duels-page="true"] {
+            /* 60% of measured rendered flag img height 14px at 390/1440 */
+            --duels-card-meta-height: 8.4px;
+          }
+
+          .card[data-duels-page="true"] .topDesktop {
+            display: none;
+          }
+
+          .card[data-duels-page="true"] .topMobile {
+            display: grid;
+          }
+
+          .card[data-duels-page="true"] .top {
+            padding: 9px 9px 6px;
+            min-height: 0;
+            display: block;
+          }
+
+          .card[data-duels-page="true"] .mobileCardTopRow img,
+          .card[data-duels-page="true"] .mobileCardTopRow :global(.flagImg) {
+            height: var(--duels-card-meta-height) !important;
+            width: auto !important;
+            max-width: none !important;
+            display: block !important;
+          }
+
+          .card[data-duels-page="true"] .mobileCardTopRow .flagPlaceholder {
+            width: calc(var(--duels-card-meta-height) * 1.57) !important;
+            height: var(--duels-card-meta-height) !important;
+          }
+
+          .card[data-duels-page="true"] .mobileCardTopRow .posBadge {
+            height: var(--duels-card-meta-height) !important;
+            min-height: var(--duels-card-meta-height) !important;
+            max-height: var(--duels-card-meta-height) !important;
+            width: auto !important;
+            min-width: 0 !important;
+            padding: 0 4px !important;
+            border-width: var(--ui-border-width-thin) !important;
+            box-sizing: border-box !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: static !important;
+            right: auto !important;
+            top: auto !important;
+          }
+
+          .card[data-duels-page="true"] .mobilePositionSlot .posText {
+            font-size: 5.5px;
+            line-height: 1;
+            letter-spacing: 0.02em;
+          }
+        }
+
+        @media (min-width: 701px) and (max-width: 1200px) {
+          .card[data-duels-page="true"] .topDesktop .name,
+          .card[data-duels-page="true"] .topDesktop .name.nameLong,
+          .card[data-duels-page="true"] .topDesktop .name.nameVeryLong {
+            max-width: calc(100% - 64px);
+            font-size: clamp(11px, 4.6cqw, 13px);
+            line-height: 1.05;
+            -webkit-line-clamp: 2;
+          }
+        }
+
+        @media (min-width: 1201px) and (max-width: 1360px) {
+          .card[data-duels-page="true"] .flag {
+            left: 8px;
+            top: 10px;
+          }
+
+          .card[data-duels-page="true"] .flag :global(.flagImg) {
+            width: 20px !important;
+            height: 13px !important;
+          }
+        }
+
+        /* /duels mobile — name/club fonts only */
+        @media (max-width: 700px) {
+          .card[data-duels-page="true"] .top {
+            padding: 8px 6px 4px;
+          }
+
+          .card[data-duels-page="true"] .mobileNameSlot .name,
+          .card[data-duels-page="true"] .mobileNameSlot .name.nameLong,
+          .card[data-duels-page="true"] .mobileNameSlot .name.nameVeryLong {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 8px !important;
+            line-height: 1.08;
+            letter-spacing: 0.025em;
+            white-space: normal;
+            word-break: normal;
+            overflow-wrap: break-word;
+            overflow: hidden;
+          }
+
+          .card[data-duels-page="true"] .club {
+            font-size: 7px !important;
+          }
+
+          .card[data-duels-page="true"] .number {
+            font-size: calc(clamp(52px, 5.8vw, 82px) - 2px);
           }
         }
 

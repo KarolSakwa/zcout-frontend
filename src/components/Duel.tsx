@@ -74,6 +74,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     right: number;
   } | null>(null);
   const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
+  const [widgetsStacked, setWidgetsStacked] = useState(false);
   const [homepageRowWidth, setHomepageRowWidth] = useState(
     HOMEPAGE_CANONICAL_ROW_PX,
   );
@@ -182,13 +183,20 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       };
     }
 
-    const mq = window.matchMedia("(max-width: 700px)");
-    const update = () => setIsCompactDuelLayout(mq.matches);
+    const mqCompact = window.matchMedia("(max-width: 700px)");
+    const mqStacked = window.matchMedia("(max-width: 1200px)");
+    const updateCompact = () => setIsCompactDuelLayout(mqCompact.matches);
+    const updateStacked = () => setWidgetsStacked(mqStacked.matches);
 
-    update();
-    mq.addEventListener("change", update);
+    updateCompact();
+    updateStacked();
+    mqCompact.addEventListener("change", updateCompact);
+    mqStacked.addEventListener("change", updateStacked);
 
-    return () => mq.removeEventListener("change", update);
+    return () => {
+      mqCompact.removeEventListener("change", updateCompact);
+      mqStacked.removeEventListener("change", updateStacked);
+    };
   }, [homepageMode]);
 
   const showReveal = lastWinner !== null;
@@ -212,29 +220,44 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         HOMEPAGE_CANONICAL_CARD_GAP_PX * homepageScale,
         HOMEPAGE_MIN_CARD_GAP_PX,
       );
+      const isDuelsMobile = !homepageMode && isCompactDuelLayout;
+      const isDuelsDesktopWide =
+        !homepageMode && !isCompactDuelLayout && !widgetsStacked;
       const INSET_X = homepageMode
         ? Math.max(
             0,
             Math.round((homepageTrack - homepageCardGap) / 2),
           )
-        : isCompactDuelLayout
-          ? 0
-          : HOMEPAGE_CANONICAL_INSET_PX;
+        : isDuelsDesktopWide
+          ? HOMEPAGE_CANONICAL_INSET_PX
+          : isDuelsMobile
+            ? 10
+            : isCompactDuelLayout || widgetsStacked
+              ? 0
+              : HOMEPAGE_CANONICAL_INSET_PX;
       const PENDING_X = homepageMode
         ? Math.round(2 * homepageScale)
-        : isCompactDuelLayout
-          ? 0
-          : 2;
+        : isDuelsDesktopWide
+          ? 2
+          : isDuelsMobile
+            ? 8
+            : isCompactDuelLayout || widgetsStacked
+              ? 0
+              : 2;
       const EXIT_X = homepageMode
         ? Math.round(90 * homepageScale)
-        : isCompactDuelLayout
-          ? 40
-          : 90;
+        : isDuelsDesktopWide
+          ? 90
+          : isCompactDuelLayout || widgetsStacked
+            ? 40
+            : 90;
       const ENTER_X = homepageMode
         ? Math.round(50 * homepageScale)
-        : isCompactDuelLayout
-          ? 24
-          : 50;
+        : isDuelsDesktopWide
+          ? 50
+          : isCompactDuelLayout || widgetsStacked
+            ? 24
+            : 50;
 
       if (transition === "exit") {
         return {
@@ -274,6 +297,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       showPendingUi,
       showReveal,
       isCompactDuelLayout,
+      widgetsStacked,
       homepageMode,
       homepageRowWidth,
     ],
@@ -498,180 +522,220 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     !showHomepagePairLoading &&
     !showOverlayLoader;
 
+  const sideWidgets = !homepageMode ? (
+    <>
+      <TopRisersWidget
+        items={topMoverItems}
+        mode={topMoversMode}
+        docked={widgetsStacked}
+        embedded={widgetsStacked}
+      />
+      <RecentVotesWidget
+        items={recentVotes}
+        latestItemId={latestRecentVoteId}
+        docked={widgetsStacked}
+        embedded={widgetsStacked}
+      />
+    </>
+  ) : null;
+
+  const duelMain = (
+    <>
+      <div
+        style={{
+          filter: overlayBlur ? "blur(4px) saturate(0.9)" : "none",
+          opacity: overlayBlur ? 0.55 : 1,
+          transition: "filter 180ms ease, opacity 180ms ease",
+          pointerEvents: overlayBlur ? "none" : "auto",
+        }}
+      >
+        <div className={styles.duelStageOuter}>
+          <div className={styles.duelStageCenter}>
+            {!homepageMode && !widgetsStacked ? sideWidgets : null}
+
+            <div
+              style={{
+                filter: showDelayedNextPending ? "blur(2px)" : "none",
+                opacity: showDelayedNextPending ? 0.5 : 1,
+                transition: "filter 180ms ease, opacity 180ms ease",
+              }}
+            >
+              {homepageMode ? (
+                <DuelHomepageAttributeLink
+                  attribute={String(pair?.attribute ?? attribute)}
+                />
+              ) : (
+                <div>
+                  <DuelAttributeHeader
+                    attribute={String(pair?.attribute ?? attribute)}
+                  />
+                </div>
+              )}
+
+              {error && (
+                <div
+                  style={{
+                    maxWidth: 996,
+                    margin: "0 auto 12px",
+                    padding: "12px 14px",
+                    borderRadius: "var(--ui-radius-md)",
+                    border: "1px solid var(--ui-border-subtle)",
+                    background: "var(--ui-surface-soft)",
+                    color: "var(--ui-text-primary)",
+                    whiteSpace: "pre-wrap",
+                    boxShadow: "var(--ui-shadow-panel-soft)",
+                  }}
+                >
+                  {error}
+                </div>
+              )}
+
+              {(pair ||
+                showHomepagePairLoading ||
+                (!homepageMode && loadingPair)) && (
+                <div style={{ position: "relative" }}>
+                  <DuelCardsRow
+                    pair={pair}
+                    loading={
+                      homepageMode ? showHomepagePairLoading : loadingPair
+                    }
+                    cardStyle={cardStyle}
+                    showPendingUi={showPendingUi}
+                    showReveal={showReveal}
+                    lastWinner={lastWinner}
+                    glow={glow}
+                    handleVote={handleVote}
+                    showImpact={showImpact}
+                    postVoteRatings={postVoteRatings}
+                    barPct={barPct}
+                    homepageMode={homepageMode}
+                    hintLiftActive={homepageMode && cardHintLift}
+                  />
+                </div>
+              )}
+            </div>
+
+            <DuelLoadingOverlays
+              placement="stage"
+              homepageMode={homepageMode}
+              showDelayedNextPending={showDelayedNextPending}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={
+          homepageMode
+            ? `${styles.duelSkipArea} ${styles.duelSkipAreaHomepage}`
+            : undefined
+        }
+        style={
+          homepageMode
+            ? {
+                display: "flex",
+                flexDirection: "column",
+                alignItems:
+                  !(showImpact && postVoteRatings) ? "center" : undefined,
+                justifyContent:
+                  !(showImpact && postVoteRatings) ? "center" : "center",
+                pointerEvents: showOverlayLoader ? "none" : "auto",
+              }
+            : {
+                height: 160,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                pointerEvents: showOverlayLoader ? "none" : "auto",
+              }
+        }
+        data-duels-skip={!homepageMode ? true : undefined}
+        data-hp-reveal={homepageMode && showImpact && postVoteRatings ? "true" : undefined}
+      >
+        {homepageMode && (
+          <DuelVoteHint
+            canShow={canShowVoteHint}
+            onHintVisible={handleVoteHintVisible}
+          />
+        )}
+        {showImpact && postVoteRatings ? (
+          <div style={{ width: "100%" }}>
+            <DuelRevealPanel
+              pair={pair!}
+              onMouseEnter={pauseAutoNext}
+              onMouseLeave={resumeAutoNext}
+              duelVotePct={duelVotePct}
+              lastWinner={lastWinner}
+              nextDisabled={nextDisabled}
+              nextIsHover={nextIsHover}
+              setNextHover={setNextHover}
+              goNext={goNext}
+              showImpact={showImpact}
+              postVoteRatings={postVoteRatings}
+              glow={glow}
+              barPct={barPct}
+              homepageMode={homepageMode}
+            />
+          </div>
+        ) : (
+          pair && (
+            <button
+              type="button"
+              onClick={handleSkip}
+              disabled={skipDisabled}
+              style={{
+                minWidth: 190,
+                padding: "10px 22px",
+                borderRadius: "var(--ui-radius-md)",
+                border: "1px solid var(--ui-border-accent)",
+                color: "var(--ui-accent-primary)",
+                background:
+                  "linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))",
+                boxShadow:
+                  "0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)",
+                backdropFilter: "blur(7px)",
+                WebkitBackdropFilter: "blur(7px)",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                cursor: skipDisabled ? "default" : "pointer",
+                opacity: skipDisabled ? 0.45 : 1,
+              }}
+            >
+              Skip
+            </button>
+          )
+        )}
+      </div>
+
+      {!homepageMode && widgetsStacked ? (
+        <div className={styles.duelPageStackedWidgets}>{sideWidgets}</div>
+      ) : null}
+    </>
+  );
+
   return (
     <div
       ref={shellRef}
       className={`${styles.duelShell}${homepageMode ? ` ${styles.duelHomepageShell}` : ""}`}
+      data-duels-page={!homepageMode ? "true" : undefined}
     >
-        <DuelCountdownBar
-          show={showCountdown}
-          progress={autoNextProgress}
-          paused={autoNextPaused}
-          height={COUNTDOWN_BAR_H}
-        />
+      <DuelCountdownBar
+        show={showCountdown}
+        progress={autoNextProgress}
+        paused={autoNextPaused}
+        height={COUNTDOWN_BAR_H}
+      />
 
-        <div
-          style={{
-            filter: overlayBlur ? "blur(4px) saturate(0.9)" : "none",
-            opacity: overlayBlur ? 0.55 : 1,
-            transition: "filter 180ms ease, opacity 180ms ease",
-            pointerEvents: overlayBlur ? "none" : "auto",
-          }}
-        >
-          <div className={styles.duelStageOuter}>
-            <div className={styles.duelStageCenter}>
-              {!homepageMode && (
-                <>
-                  <TopRisersWidget items={topMoverItems} mode={topMoversMode} />
-                  <RecentVotesWidget
-                    items={recentVotes}
-                    latestItemId={latestRecentVoteId}
-                  />
-                </>
-              )}
+      {duelMain}
 
-              <div
-                style={{
-                  filter: showDelayedNextPending ? "blur(2px)" : "none",
-                  opacity: showDelayedNextPending ? 0.5 : 1,
-                  transition: "filter 180ms ease, opacity 180ms ease",
-                }}
-              >
-                {homepageMode ? (
-                  <DuelHomepageAttributeLink
-                    attribute={String(pair?.attribute ?? attribute)}
-                  />
-                ) : (
-                  <DuelAttributeHeader
-                    attribute={String(pair?.attribute ?? attribute)}
-                  />
-                )}
-
-                {error && (
-                  <div
-                    style={{
-                      maxWidth: 996,
-                      margin: "0 auto 12px",
-                      padding: "12px 14px",
-                      borderRadius: "var(--ui-radius-md)",
-                      border: "1px solid var(--ui-border-subtle)",
-                      background: "var(--ui-surface-soft)",
-                      color: "var(--ui-text-primary)",
-                      whiteSpace: "pre-wrap",
-                      boxShadow: "var(--ui-shadow-panel-soft)",
-                    }}
-                  >
-                    {error}
-                  </div>
-                )}
-
-                {(pair || showHomepagePairLoading) && (
-                  <div style={{ position: "relative" }}>
-                    <DuelCardsRow
-                      pair={pair}
-                      loading={showHomepagePairLoading}
-                      cardStyle={cardStyle}
-                      showPendingUi={showPendingUi}
-                      showReveal={showReveal}
-                      lastWinner={lastWinner}
-                      glow={glow}
-                      handleVote={handleVote}
-                      showImpact={showImpact}
-                      postVoteRatings={postVoteRatings}
-                      barPct={barPct}
-                      homepageMode={homepageMode}
-                      hintLiftActive={homepageMode && cardHintLift}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <DuelLoadingOverlays
-                placement="stage"
-                homepageMode={homepageMode}
-                showDelayedNextPending={showDelayedNextPending}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={
-            homepageMode
-              ? `${styles.duelSkipArea} ${styles.duelSkipAreaHomepage}`
-              : styles.duelSkipArea
-          }
-          style={{
-            height: homepageMode ? 136 : 160,
-            display: "flex",
-            alignItems: homepageMode ? undefined : "center",
-            justifyContent: "center",
-            pointerEvents: showOverlayLoader ? "none" : "auto",
-          }}
-        >
-          {homepageMode && (
-            <DuelVoteHint
-              canShow={canShowVoteHint}
-              onHintVisible={handleVoteHintVisible}
-            />
-          )}
-          {showImpact && postVoteRatings ? (
-            <div style={{ width: "100%" }}>
-              <DuelRevealPanel
-                pair={pair!}
-                onMouseEnter={pauseAutoNext}
-                onMouseLeave={resumeAutoNext}
-                duelVotePct={duelVotePct}
-                lastWinner={lastWinner}
-                nextDisabled={nextDisabled}
-                nextIsHover={nextIsHover}
-                setNextHover={setNextHover}
-                goNext={goNext}
-                showImpact={showImpact}
-                postVoteRatings={postVoteRatings}
-                glow={glow}
-                barPct={barPct}
-                homepageMode={homepageMode}
-              />
-            </div>
-          ) : (
-            pair && (
-              <button
-                type="button"
-                onClick={handleSkip}
-                disabled={skipDisabled}
-                style={{
-                  minWidth: 190,
-                  padding: "10px 22px",
-                  borderRadius: "var(--ui-radius-md)",
-                  border: "1px solid var(--ui-border-accent)",
-                  color: "var(--ui-accent-primary)",
-                  background:
-                    "linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))",
-                  boxShadow:
-                    "0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)",
-                  backdropFilter: "blur(7px)",
-                  WebkitBackdropFilter: "blur(7px)",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.28em",
-                  textTransform: "uppercase",
-                  cursor: skipDisabled ? "default" : "pointer",
-                  opacity: skipDisabled ? 0.45 : 1,
-                }}
-              >
-                Skip
-              </button>
-            )
-          )}
-        </div>
-
-        <DuelLoadingOverlays
-          placement="shell"
-          homepageMode={homepageMode}
-          showHomepagePairLoading={showHomepagePairLoading}
-          showOverlayLoader={showOverlayLoader}
-        />
+      <DuelLoadingOverlays
+        placement="shell"
+        homepageMode={homepageMode}
+        showHomepagePairLoading={showHomepagePairLoading}
+        showOverlayLoader={showOverlayLoader}
+      />
     </div>
   );
 }

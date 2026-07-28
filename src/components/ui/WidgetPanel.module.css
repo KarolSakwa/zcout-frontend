@@ -42,8 +42,9 @@
 
 .duel {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
   align-self: start;
   border: 1px solid var(--ui-border-subtle);
   border-radius: var(--ui-radius-xl);
@@ -64,6 +65,10 @@
   width: 100%;
   max-width: min(100%, 646px);
   min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .borderTitle {

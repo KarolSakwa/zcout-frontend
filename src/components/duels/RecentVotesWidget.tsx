@@ -54,11 +54,16 @@ export default function RecentVotesWidget({
   items,
   latestItemId,
   embedded = false,
+  /** Parent CSS grid/flex owns placement (used by /duels page layout). */
+  docked = false,
 }: {
   items: RecentVoteItem[];
   latestItemId: string | null;
   embedded?: boolean;
+  docked?: boolean;
 }) {
+  const useFloatingAbsolute = !embedded && !docked;
+
   return (
     <WidgetPanel
       as="aside"
@@ -68,10 +73,10 @@ export default function RecentVotesWidget({
       title="Last votes"
       headerMeta={<LiveMeta embedded={embedded} />}
       className={embedded ? 'recentVotesWidgetEmbedded' : 'recentVotesWidget'}
+      data-duels-widget={docked || useFloatingAbsolute ? 'votes' : undefined}
       style={
-        embedded
-          ? undefined
-          : {
+        useFloatingAbsolute
+          ? {
               position: 'absolute',
               top: 'clamp(210px, 20vh, 300px)',
               transform: 'none',
@@ -79,6 +84,7 @@ export default function RecentVotesWidget({
               width: 'var(--duel-widget-width, 318px)',
               zIndex: 20,
             }
+          : undefined
       }
     >
       <div
@@ -218,12 +224,6 @@ export default function RecentVotesWidget({
           100% {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-
-        @media (max-width: 1240px) {
-          .recentVotesWidget {
-            display: none;
           }
         }
       `}</style>

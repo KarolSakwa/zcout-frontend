@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
+import { installVerifyDataMocks } from './lib/verify-data-mocks.mjs';
 
 const BASE = process.env.VERIFY_BASE_URL || 'http://localhost:3000';
 const VIEWPORTS = [
@@ -19,6 +20,7 @@ function overlaps(a, b) {
 }
 
 async function gotoHome(page) {
+  await installVerifyDataMocks(page);
   await page.goto(BASE + '/', { waitUntil: 'commit', timeout: 180000 });
 }
 
@@ -95,7 +97,7 @@ async function waitLoaded(page) {
   await page.waitForTimeout(1500);
 }
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, channel: 'chrome' });
 const page = await browser.newPage();
 let failed = false;
 const jumpPairs = [

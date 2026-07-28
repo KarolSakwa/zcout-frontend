@@ -226,11 +226,11 @@ export default async function RankingsPage({
           gkAttributeOptions={meta?.gk_attributes ?? []}
         />
 
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
+        <div className={styles.tableWrap} data-rankings-table-wrap>
+          <table className={styles.table} data-rankings-table>
             <thead className={styles.thead}>
               <tr>
-                <th>
+                <th className={styles.rankColumn} data-rankings-col="rank">
                   <RankingsSortLink
                     href={buildSortHref({
                       attributeKey,
@@ -247,7 +247,7 @@ export default async function RankingsPage({
                   </RankingsSortLink>
                 </th>
 
-                <th>
+                <th className={styles.playerColumn} data-rankings-col="player">
                   <RankingsSortLink
                     href={buildSortHref({
                       attributeKey,
@@ -264,7 +264,7 @@ export default async function RankingsPage({
                   </RankingsSortLink>
                 </th>
 
-                <th>
+                <th className={styles.clubColumn} data-rankings-col="club">
                   <RankingsSortLink
                     href={buildSortHref({
                       attributeKey,
@@ -281,7 +281,7 @@ export default async function RankingsPage({
                   </RankingsSortLink>
                 </th>
 
-                <th>
+                <th className={styles.positionColumn} data-rankings-col="position">
                   <RankingsSortLink
                     href={buildSortHref({
                       attributeKey,
@@ -298,7 +298,7 @@ export default async function RankingsPage({
                   </RankingsSortLink>
                 </th>
 
-                <th className={styles.centerHeader}>
+                <th className={`${styles.centerHeader} ${styles.ratingColumn}`} data-rankings-col="rating">
                   <RankingsSortLink
                     href={buildSortHref({
                       attributeKey,
@@ -315,7 +315,7 @@ export default async function RankingsPage({
                   </RankingsSortLink>
                 </th>
 
-                <th className={styles.centerHeader}>
+                <th className={`${styles.centerHeader} ${styles.trendColumn}`} data-rankings-col="trend">
                   <RankingsSortLink
                     href={buildSortHref({
                       attributeKey,
@@ -328,7 +328,8 @@ export default async function RankingsPage({
                     active={activeSort === 'trend'}
                     dir={activeDir}
                   >
-                    TREND 7D
+                    <span className={styles.headerLabelFull}>TREND 7D</span>
+                    <span className={styles.headerLabelShort}>TREND</span>
                   </RankingsSortLink>
                 </th>
               </tr>
@@ -340,21 +341,30 @@ export default async function RankingsPage({
 
                 return (
                   <tr key={it.player.id} className={styles.row}>
-                    <td className={styles.rankCell}>{it.rank}</td>
-
-                    <td className={styles.playerCell}>
-                      <Link className={styles.playerLink} href={`/players/${it.player.id}`}>
-                        {it.player.name}
-                      </Link>
+                    <td className={`${styles.rankCell} ${styles.rankColumn}`} data-rankings-col="rank">
+                      {it.rank}
                     </td>
 
-                    <td className={styles.clubCell}>
+                    <td className={`${styles.playerCell} ${styles.playerColumn}`} data-rankings-col="player">
+                      <div className={styles.playerCellInner}>
+                        <Link className={styles.playerLink} href={`/players/${it.player.id}`}>
+                          {it.player.name}
+                        </Link>
+                        <span className={styles.playerPosBadge} data-rankings-pos-badge>
+                          {it.pos}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className={`${styles.clubCell} ${styles.clubColumn}`} data-rankings-col="club">
                       <span className={styles.clubText}>{it.player.club.name}</span>
                     </td>
 
-                    <td className={styles.posCell}>{it.pos}</td>
+                    <td className={`${styles.posCell} ${styles.positionColumn}`} data-rankings-col="position">
+                      {it.pos}
+                    </td>
 
-                    <td className={styles.ratingCell}>
+                    <td className={`${styles.ratingCell} ${styles.ratingColumn}`} data-rankings-col="rating">
                       <div
                         style={{
                           width: '100%',
@@ -374,7 +384,7 @@ export default async function RankingsPage({
                       </div>
                     </td>
 
-                    <td className={styles.trendCell}>
+                    <td className={`${styles.trendCell} ${styles.trendColumn}`} data-rankings-col="trend">
                       {trend === null ? '—' : trend > 0 ? `+${trend.toFixed(2)}` : trend.toFixed(2)}
                     </td>
                   </tr>

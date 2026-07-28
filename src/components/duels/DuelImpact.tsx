@@ -71,7 +71,7 @@ export default function DuelImpact({
               <RatingWithConfidence
                 rating={displayAfter}
                 confidence={0}
-                fontSize={15}
+                fontSize={homepageMode ? 14 : 15}
                 decimals={2}
                 align="start"
                 expand={false}
@@ -91,7 +91,7 @@ export default function DuelImpact({
                   background:
                     "color-mix(in srgb, var(--ui-accent-primary) 18%, transparent)",
                   color: "var(--ui-accent-primary)",
-                  fontSize: 10,
+                  fontSize: homepageMode ? 9 : 10,
                   fontWeight: 900,
                   letterSpacing: "0.04em",
                   lineHeight: 1,
@@ -133,7 +133,7 @@ export default function DuelImpact({
               <RatingWithConfidence
                 rating={displayAfter}
                 confidence={0}
-                fontSize={15}
+                fontSize={homepageMode ? 14 : 15}
                 decimals={2}
                 align="start"
                 expand={false}
@@ -153,7 +153,7 @@ export default function DuelImpact({
                   background:
                     "color-mix(in srgb, var(--ui-accent-primary) 18%, transparent)",
                   color: "var(--ui-accent-primary)",
-                  fontSize: 10,
+                  fontSize: homepageMode ? 9 : 10,
                   fontWeight: 900,
                   letterSpacing: "0.04em",
                   lineHeight: 1,
@@ -183,7 +183,7 @@ export default function DuelImpact({
           color: isPositive
             ? "color-mix(in srgb, var(--ui-accent-success) 82%, white)"
             : "color-mix(in srgb, var(--ui-danger) 82%, white)",
-          fontSize: 11,
+          fontSize: homepageMode ? 10 : 11,
           fontWeight: 900,
           letterSpacing: "0.03em",
           lineHeight: 1,
@@ -207,11 +207,11 @@ export default function DuelImpact({
 
         @media (max-width: 700px) {
           .impact {
-            min-height: 58px;
+            min-height: ${homepageMode ? 48 : 58}px;
             flex-direction: column;
             justify-content: center;
-            gap: 5px;
-            padding: 7px 6px;
+            gap: ${homepageMode ? 4 : 5}px;
+            padding: ${homepageMode ? "5px 5px" : "7px 6px"};
           }
         }
       `}</style>

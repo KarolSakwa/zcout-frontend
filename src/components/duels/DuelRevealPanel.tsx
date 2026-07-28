@@ -83,10 +83,11 @@ export default function DuelRevealPanel({
     >
       <div className="revealPanelInner">
         <div
+          className="verdictLabel"
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: -10,
+            marginBottom: homepageMode ? 7 : -10,
             fontSize: 10,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
@@ -114,7 +115,7 @@ export default function DuelRevealPanel({
             className="impactGrid"
             style={{
               width: "100%",
-              minHeight: 46,
+              minHeight: homepageMode ? 40 : 46,
               display: "grid",
               gridTemplateColumns: "minmax(0, 1fr) 1px minmax(0, 1fr)",
               alignItems: "center",
@@ -208,7 +209,7 @@ export default function DuelRevealPanel({
           margin: 0 auto;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: ${homepageMode ? 10 : 12}px;
         }
 
         .nextWrap {
@@ -247,16 +248,23 @@ export default function DuelRevealPanel({
           .revealPanelInner {
             width: 100%;
           }
-        }
 
-        @media (max-width: 430px) {
           .revealPanelHomepage {
             margin: 0;
             padding: 0 8px;
           }
 
           .revealPanelHomepage .revealPanelInner {
-            gap: 8px;
+            gap: 6px;
+          }
+
+          .revealPanelHomepage .verdictLabel {
+            margin-bottom: 7px;
+            font-size: 9px;
+          }
+
+          .revealPanelHomepage .impactGrid {
+            min-height: 40px !important;
           }
 
           .revealPanelHomepage .nextWrap {
@@ -268,6 +276,12 @@ export default function DuelRevealPanel({
             padding: 0 10px;
             font-size: 10px;
             letter-spacing: 0.04em;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .revealPanelHomepage .revealPanelInner {
+            gap: 6px;
           }
         }
       `}</style>

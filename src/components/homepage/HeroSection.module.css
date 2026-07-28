@@ -1,9 +1,40 @@
+.heroTitle {
+  margin: 0;
+  font-size: 37px;
+  line-height: 1.05;
+  font-weight: 800;
+  max-width: 595px;
+}
+
+.heroAccent {
+  color: var(--ui-accent-primary);
+}
+
+.heroDescription {
+  margin-top: 17px;
+  max-width: 442px;
+  color: var(--ui-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .heroSearch {
   margin-top: 27px;
   max-width: 510px;
 }
 
 @media (max-width: 700px) {
+  .heroTitle {
+    /* ~60% of the 37px mobile size (22.2px cap) */
+    font-size: clamp(18px, 5.6vw, 22.2px);
+    line-height: 1.05;
+  }
+
+  .heroDescription {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
   .heroSearch {
     display: none;
   }

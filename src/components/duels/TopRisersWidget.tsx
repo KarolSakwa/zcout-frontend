@@ -31,13 +31,17 @@ export default function TopRisersWidget({
   items,
   mode,
   embedded = false,
+  /** Parent CSS grid/flex owns placement (used by /duels page layout). */
+  docked = false,
 }: {
   items: TopRiserItem[];
   mode: WidgetMode;
   embedded?: boolean;
+  docked?: boolean;
 }) {
   const title = mode === 'risers' ? 'Top risers' : 'Top fallers';
   const deltaColor = mode === 'risers' ? 'var(--ui-accent-primary)' : 'var(--ui-accent-faller)';
+  const useFloatingAbsolute = !embedded && !docked;
 
   return (
     <WidgetPanel
@@ -51,10 +55,10 @@ export default function TopRisersWidget({
         </div>
       }
       className={embedded ? 'topRisersWidgetEmbedded' : 'topRisersWidget'}
+      data-duels-widget={docked || useFloatingAbsolute ? 'risers' : undefined}
       style={
-        embedded
-          ? undefined
-          : {
+        useFloatingAbsolute
+          ? {
               position: 'absolute',
               top: 'clamp(210px, 20vh, 300px)',
               transform: 'none',
@@ -62,6 +66,7 @@ export default function TopRisersWidget({
               width: 'var(--duel-widget-width, 318px)',
               zIndex: 20,
             }
+          : undefined
       }
     >
       <div
@@ -204,12 +209,6 @@ export default function TopRisersWidget({
         .topRiserPlayerLink:hover {
           color: var(--ui-accent-primary) !important;
           text-shadow: 0 0 10px rgba(92, 163, 255, 0.18);
-        }
-
-        @media (max-width: 1240px) {
-          .topRisersWidget {
-            display: none;
-          }
         }
       `}</style>
     </WidgetPanel>

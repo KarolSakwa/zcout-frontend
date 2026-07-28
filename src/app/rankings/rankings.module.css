@@ -65,10 +65,13 @@
   box-shadow: var(--ui-shadow-panel-soft);
   position: relative;
   z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
 }
 
@@ -102,6 +105,18 @@
   font-weight: 650;
 }
 
+.playerCellInner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.playerPosBadge {
+  display: none;
+}
+
 .clubCell {
   color: var(--ui-text-muted);
 }
@@ -119,6 +134,14 @@
   text-align: center;
   font-variant-numeric: tabular-nums;
   color: var(--ui-text-primary);
+}
+
+.headerLabelFull {
+  display: inline;
+}
+
+.headerLabelShort {
+  display: none;
 }
 
 .confCell {
@@ -280,6 +303,10 @@
   color: var(--ui-text-primary);
   text-decoration: none;
   font-weight: 650;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .playerLink:hover {
@@ -431,13 +458,128 @@
     width: 100%;
     min-width: 0;
   }
+}
 
-  .tableWrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+/* Medium: hide CLUB, keep POSITION + RATING + TREND */
+@media (max-width: 1023px) {
+  .table {
+    table-layout: fixed;
   }
 
-  .table {
-    min-width: 760px;
+  .table th,
+  .table td {
+    box-sizing: border-box;
+  }
+
+  .clubColumn {
+    display: none;
+  }
+
+  .playerColumn {
+    width: auto;
+  }
+
+  .rankColumn,
+  .rankCell {
+    width: 40px;
+  }
+
+  .positionColumn,
+  .posCell {
+    width: 56px;
+  }
+
+  .ratingColumn,
+  .ratingCell {
+    width: 80px;
+  }
+
+  .trendColumn,
+  .trendCell {
+    width: 72px;
+  }
+
+  .thead th {
+    padding: 11px 8px;
+  }
+
+  .row td {
+    padding: 11px 8px;
+  }
+}
+
+/* Mobile: hide CLUB + POSITION column; show pos badge; shorten TREND */
+@media (max-width: 480px) {
+  .positionColumn {
+    display: none;
+  }
+
+  .thead th {
+    padding: 9px 6px;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  .row td {
+    padding: 9px 6px;
+  }
+
+  .rankColumn,
+  .rankCell {
+    width: 34px;
+    padding-left: 6px;
+    padding-right: 4px;
+  }
+
+  .ratingColumn,
+  .ratingCell {
+    width: 72px;
+  }
+
+  .trendColumn,
+  .trendCell {
+    width: 64px;
+  }
+
+  .playerColumn,
+  .playerCell {
+    width: auto;
+  }
+
+  .headerLabelFull {
+    display: none;
+  }
+
+  .headerLabelShort {
+    display: inline;
+  }
+
+  .playerPosBadge {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    max-width: 2.6em;
+    padding: 1px 5px;
+    border-radius: var(--ui-radius-md);
+    border: var(--ui-border-width-thin) solid var(--ui-border-subtle);
+    background: color-mix(in srgb, var(--ui-surface-soft-2) 80%, transparent);
+    color: var(--ui-text-secondary);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .playerCellInner {
+    gap: 6px;
+  }
+
+  .headerSortArrow {
+    margin-left: 3px;
   }
 }
