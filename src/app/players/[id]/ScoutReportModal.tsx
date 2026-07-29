@@ -64,6 +64,7 @@ export default function ScoutReportModal({
       return;
     }
 
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -81,7 +82,7 @@ export default function ScoutReportModal({
     return () => {
       window.cancelAnimationFrame(raf);
       document.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = '';
+      document.body.style.overflow = previousOverflow;
     };
   }, [isMounted, requestClose]);
 

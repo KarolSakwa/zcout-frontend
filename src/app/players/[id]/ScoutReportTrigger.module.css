@@ -2,9 +2,13 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(4, 8, 14, 0.28);
   backdrop-filter: blur(0px);
   opacity: 0;
@@ -22,8 +26,12 @@
 
 .panel {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
   overflow: hidden;
   width: min(940px, 100%);
+  max-height: calc(100dvh - 40px);
   border-radius: 18px;
   border: 1px solid rgba(84, 146, 255, 0.14);
   background: linear-gradient(180deg, rgba(24, 29, 38, 0.98) 0%, rgba(12, 16, 24, 0.98) 100%);
@@ -54,6 +62,7 @@
 .header {
   position: relative;
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: flex-start;
   margin-bottom: 16px;
@@ -104,7 +113,12 @@
 }
 
 .body {
+  flex: 1 1 auto;
+  min-height: 0;
   margin-top: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .reportStatus {
@@ -457,11 +471,13 @@
 
 @media (max-width: 760px) {
   .overlay {
+    align-items: flex-start;
     padding: 12px;
   }
 
   .panel {
     width: 100%;
+    max-height: calc(100dvh - 24px);
     padding: 14px 14px 16px;
     border-radius: 16px;
   }
@@ -526,17 +542,4 @@
     font-size: 0.86rem;
     color: rgba(255, 120, 120, 0.92);
   }
-
-  .overlay {
-    align-items: start;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px;
-  }
-
-  .panel {
-    max-height: none;
-    overflow: visible;
-  }
-  
 }

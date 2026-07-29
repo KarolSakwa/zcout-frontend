@@ -709,11 +709,17 @@
     padding: 16px 12px 30px;
   }
 
+  .profileNav {
+    display: none;
+  }
+
   .topCard {
     padding: 12px 13px 13px;
+    overflow: hidden;
   }
 
   .topCardHeader {
+    display: block;
     padding-bottom: 10px;
     margin-bottom: 10px;
   }
@@ -723,76 +729,10 @@
   }
 
   .topCardReport {
+    width: 100%;
     min-height: 34px;
     padding: 0 12px;
     font-size: 0.78rem;
-  }
-
-  .topCardMain {
-    grid-template-columns: 36px minmax(0, 1fr) 36px;
-  }
-
-  .switchRail {
-    width: 36px;
-    font-size: 1.15rem;
-  }
-
-  .playerMeta {
-    font-size: 0.88rem;
-  }
-
-  .attributePanelHeader {
-    min-height: 32px;
-    padding: 0 10px;
-    font-size: 0.82rem;
-  }
-
-  .attributeRow {
-    grid-template-columns: minmax(0, 1fr) minmax(142px, 50%);
-    min-height: 39px;
-    padding: 0 11px;
-  }
-
-  .attributeIcon {
-    width: 15px;
-    height: 15px;
-    flex-basis: 15px;
-  }
-
-  .attributeName {
-    font-size: 0.92rem;
-  }
-
-  .attributeValue {
-    font-size: 1.04rem;
-  }
-
-  .attributeMetricCluster {
-    grid-template-columns: 16px 32px 3px;
-    column-gap: 1px;
-  }
-
-  .attributeDeltaSlot {
-    width: 16px;
-    min-width: 16px;
-    margin-right: 3px;
-  }
-
-  .overallMetricCluster {
-    grid-template-columns: 18px auto 6px;
-    gap: 2px;
-  }
-
-  .profileNav {
-    width: 34px;
-    height: 72px;
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 560px) {
-  .profileNav {
-    display: none;
   }
 
   .topCardMain {
@@ -818,6 +758,7 @@
   .topCardCenter {
     grid-area: overall;
     justify-content: flex-end;
+    padding-left: 0;
   }
 
   .topCardRight {
@@ -839,7 +780,8 @@
   .playerName {
     font-size: 1.55rem;
     line-height: 0.95;
-    max-width: 9.5ch;
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 
   .playerMeta {
@@ -872,15 +814,49 @@
     padding: 0;
   }
 
-  .topCardHeader {
-    display: block;
+  .attributePanelHeader {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 0.82rem;
   }
 
-  .topCardReport {
-    width: 100%;
+  .attributeRow {
+    grid-template-columns: minmax(0, 1fr) minmax(142px, 50%);
+    min-height: 39px;
+    padding: 0 11px;
   }
 
   .attributeColumn + .attributeColumn {
     border-top: 0;
+  }
+
+  .attributeIcon {
+    width: 15px;
+    height: 15px;
+    flex-basis: 15px;
+  }
+
+  .attributeName {
+    font-size: 0.92rem;
+  }
+
+  .attributeValue {
+    font-size: 1.04rem;
+  }
+
+  .attributeMetricCluster {
+    grid-template-columns: 16px 32px 3px;
+    column-gap: 1px;
+  }
+
+  .attributeDeltaSlot {
+    width: 16px;
+    min-width: 16px;
+    margin-right: 3px;
+  }
+
+  .overallMetricCluster {
+    grid-template-columns: 18px auto 6px;
+    gap: 2px;
   }
 }
