@@ -834,23 +834,30 @@ export default function PlayerCard({
           }
         }
 
-        /* Homepage mobile — shared top row grid */
+        /* Shared mobile skin — homepage + /duels (≤700px) */
         @media (max-width: 700px) {
-          .card[data-homepage="true"] {
-            --hp-club-size: clamp(5px, 5.5cqw, 8px);
-            /* Same top-row meta height mechanism as /duels */
-            --hp-card-meta-height: 8.4px;
+          .card[data-homepage="true"],
+          .card[data-duels-page="true"] {
+            --mobile-club-size: clamp(5px, 5.5cqw, 8px);
+            --mobile-card-meta-height: 8.4px;
           }
 
-          .card[data-homepage="true"] .topDesktop {
+          .card[data-duels-page="true"] {
+            container-type: inline-size;
+          }
+
+          .card[data-homepage="true"] .topDesktop,
+          .card[data-duels-page="true"] .topDesktop {
             display: none;
           }
 
-          .card[data-homepage="true"] .topMobile {
+          .card[data-homepage="true"] .topMobile,
+          .card[data-duels-page="true"] .topMobile {
             display: grid;
           }
 
-          .card[data-homepage="true"] .top {
+          .card[data-homepage="true"] .top,
+          .card[data-duels-page="true"] .top {
             padding: 2px 6px 2px;
             min-height: 0;
             display: block;
@@ -858,7 +865,12 @@ export default function PlayerCard({
             z-index: 1;
           }
 
-          .card[data-homepage="true"] .mobileNameSlot .name.nameHomepage {
+          .card[data-homepage="true"] .mobileNameSlot .name,
+          .card[data-homepage="true"] .mobileNameSlot .name.nameLong,
+          .card[data-homepage="true"] .mobileNameSlot .name.nameVeryLong,
+          .card[data-duels-page="true"] .mobileNameSlot .name,
+          .card[data-duels-page="true"] .mobileNameSlot .name.nameLong,
+          .card[data-duels-page="true"] .mobileNameSlot .name.nameVeryLong {
             display: -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 3;
@@ -876,10 +888,11 @@ export default function PlayerCard({
             overflow: hidden;
           }
 
-          .card[data-homepage="true"] .mobileCardTopRow .posBadge {
-            height: var(--hp-card-meta-height) !important;
-            min-height: var(--hp-card-meta-height) !important;
-            max-height: var(--hp-card-meta-height) !important;
+          .card[data-homepage="true"] .mobileCardTopRow .posBadge,
+          .card[data-duels-page="true"] .mobileCardTopRow .posBadge {
+            height: var(--mobile-card-meta-height) !important;
+            min-height: var(--mobile-card-meta-height) !important;
+            max-height: var(--mobile-card-meta-height) !important;
             width: auto !important;
             min-width: 0 !important;
             padding: 0 4px !important;
@@ -894,33 +907,40 @@ export default function PlayerCard({
           }
 
           .card[data-homepage="true"] .mobileCardTopRow img,
-          .card[data-homepage="true"] .mobileCardTopRow :global(.flagImg) {
-            height: var(--hp-card-meta-height) !important;
+          .card[data-homepage="true"] .mobileCardTopRow :global(.flagImg),
+          .card[data-duels-page="true"] .mobileCardTopRow img,
+          .card[data-duels-page="true"] .mobileCardTopRow :global(.flagImg) {
+            height: var(--mobile-card-meta-height) !important;
             width: auto !important;
             max-width: none !important;
             display: block !important;
           }
 
-          .card[data-homepage="true"] .mobileCardTopRow .flagPlaceholder {
-            width: calc(var(--hp-card-meta-height) * 1.57) !important;
-            height: var(--hp-card-meta-height) !important;
+          .card[data-homepage="true"] .mobileCardTopRow .flagPlaceholder,
+          .card[data-duels-page="true"] .mobileCardTopRow .flagPlaceholder {
+            width: calc(var(--mobile-card-meta-height) * 1.57) !important;
+            height: var(--mobile-card-meta-height) !important;
           }
 
-          .card[data-homepage="true"] .mobilePositionSlot .posText {
+          .card[data-homepage="true"] .mobilePositionSlot .posText,
+          .card[data-duels-page="true"] .mobilePositionSlot .posText {
             font-size: 5.5px;
             line-height: 1;
             letter-spacing: 0.02em;
           }
 
-          .card[data-homepage="true"] .club.clubCompact {
-            font-size: var(--hp-club-size, clamp(5px, 5.5cqw, 8px));
+          .card[data-homepage="true"] .club.clubCompact,
+          .card[data-duels-page="true"] .club {
+            font-size: var(--mobile-club-size, clamp(5px, 5.5cqw, 8px));
           }
 
-          .card[data-homepage="true"] .number.numberCompact {
+          .card[data-homepage="true"] .number.numberCompact,
+          .card[data-duels-page="true"] .number {
             font-size: clamp(16px, 34cqw, 50px);
           }
 
-          .card[data-homepage="true"] .mid {
+          .card[data-homepage="true"] .mid,
+          .card[data-duels-page="true"] .mid {
             position: absolute;
             inset: 0;
             height: auto;
@@ -931,11 +951,13 @@ export default function PlayerCard({
             pointer-events: none;
           }
 
-          .card[data-homepage="true"] .mid .number {
+          .card[data-homepage="true"] .mid .number,
+          .card[data-duels-page="true"] .mid .number {
             pointer-events: auto;
           }
 
-          .card[data-homepage="true"] .bottom {
+          .card[data-homepage="true"] .bottom,
+          .card[data-duels-page="true"] .bottom {
             z-index: 1;
           }
         }
@@ -959,64 +981,6 @@ export default function PlayerCard({
           }
         }
 
-        /* /duels ≤1200 — compact grid top row */
-        @media (max-width: 700px) {
-          .card[data-duels-page="true"] {
-            /* 60% of measured rendered flag img height 14px at 390/1440 */
-            --duels-card-meta-height: 8.4px;
-          }
-
-          .card[data-duels-page="true"] .topDesktop {
-            display: none;
-          }
-
-          .card[data-duels-page="true"] .topMobile {
-            display: grid;
-          }
-
-          .card[data-duels-page="true"] .top {
-            padding: 9px 9px 6px;
-            min-height: 0;
-            display: block;
-          }
-
-          .card[data-duels-page="true"] .mobileCardTopRow img,
-          .card[data-duels-page="true"] .mobileCardTopRow :global(.flagImg) {
-            height: var(--duels-card-meta-height) !important;
-            width: auto !important;
-            max-width: none !important;
-            display: block !important;
-          }
-
-          .card[data-duels-page="true"] .mobileCardTopRow .flagPlaceholder {
-            width: calc(var(--duels-card-meta-height) * 1.57) !important;
-            height: var(--duels-card-meta-height) !important;
-          }
-
-          .card[data-duels-page="true"] .mobileCardTopRow .posBadge {
-            height: var(--duels-card-meta-height) !important;
-            min-height: var(--duels-card-meta-height) !important;
-            max-height: var(--duels-card-meta-height) !important;
-            width: auto !important;
-            min-width: 0 !important;
-            padding: 0 4px !important;
-            border-width: var(--ui-border-width-thin) !important;
-            box-sizing: border-box !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            position: static !important;
-            right: auto !important;
-            top: auto !important;
-          }
-
-          .card[data-duels-page="true"] .mobilePositionSlot .posText {
-            font-size: 5.5px;
-            line-height: 1;
-            letter-spacing: 0.02em;
-          }
-        }
-
         @media (min-width: 701px) and (max-width: 1200px) {
           .card[data-duels-page="true"] .topDesktop .name,
           .card[data-duels-page="true"] .topDesktop .name.nameLong,
@@ -1037,41 +1001,6 @@ export default function PlayerCard({
           .card[data-duels-page="true"] .flag :global(.flagImg) {
             width: 20px !important;
             height: 13px !important;
-          }
-        }
-
-        /* /duels mobile — name/club fonts only */
-        @media (max-width: 700px) {
-          .card[data-duels-page="true"] .top {
-            padding: 8px 6px 4px;
-          }
-
-          .card[data-duels-page="true"] .mobileNameSlot .name,
-          .card[data-duels-page="true"] .mobileNameSlot .name.nameLong,
-          .card[data-duels-page="true"] .mobileNameSlot .name.nameVeryLong {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3;
-            width: 100%;
-            min-width: 0;
-            max-width: 100%;
-            box-sizing: border-box;
-            text-align: center;
-            font-size: 8px !important;
-            line-height: 1.08;
-            letter-spacing: 0.025em;
-            white-space: normal;
-            word-break: normal;
-            overflow-wrap: break-word;
-            overflow: hidden;
-          }
-
-          .card[data-duels-page="true"] .club {
-            font-size: 7px !important;
-          }
-
-          .card[data-duels-page="true"] .number {
-            font-size: calc(clamp(52px, 5.8vw, 82px) - 2px);
           }
         }
 
