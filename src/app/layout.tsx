@@ -16,10 +16,7 @@ const ratingFont = IBM_Plex_Sans_Condensed({
 
 export const metadata = {
   title: 'Zcout',
-  description: 'Zcout',
-  icons: {
-    icon: '/favicon.png',
-  },
+  description: 'Zcout'
 }
 
 // export const metadata: Metadata = {
