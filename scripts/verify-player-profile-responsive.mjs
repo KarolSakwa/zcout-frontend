@@ -147,94 +147,195 @@ async function testModal(page, { width, height }) {
 
   const reportBtn = page.getByRole('button', { name: /scout report/i }).first();
   await reportBtn.click({ timeout: 30000 });
+  await page.waitForSelector('[data-scout-report-overlay]', { timeout: 30000 });
   await page.getByRole('button', { name: 'Submit' }).waitFor({ timeout: 30000 });
-  await page.waitForTimeout(400);
+  await page.waitForFunction(
+    () => {
+      const overlay = document.querySelector('[data-scout-report-overlay]');
+      return overlay && getComputedStyle(overlay).opacity === '1';
+    },
+    null,
+    { timeout: 5000 },
+  );
+  await page.waitForTimeout(220);
 
-  const beforeClose = await page.evaluate(() => {
-    const submit = [...document.querySelectorAll('button')].find(
-      (el) => el.textContent?.trim() === 'Submit',
-    );
-    const body = submit?.parentElement?.parentElement ?? null;
-    const panel = body?.parentElement ?? null;
-    const header = panel?.firstElementChild ?? null;
-    const panelStyle = panel ? getComputedStyle(panel) : null;
-    const bodyStyle = body ? getComputedStyle(body) : null;
+  const measureModal = () =>
+    page.evaluate(() => {
+      const overlay = document.querySelector('[data-scout-report-overlay]');
+      const panel = document.querySelector('[data-scout-report-panel]');
+      const header = document.querySelector('[data-scout-report-header]');
+      const scrollBody = document.querySelector('[data-scout-report-scroll-body]');
+      const footer = document.querySelector('[data-scout-report-footer]');
+      const submit = footer?.querySelector('button');
+      const attributeCards = scrollBody?.querySelectorAll('[class*="attributeCard"]') ?? [];
+      const lastAttribute = attributeCards[attributeCards.length - 1] ?? null;
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
 
-    return {
-      bodyOverflow: document.body.style.overflow,
-      panelDisplay: panelStyle?.display ?? null,
-      panelFlexDir: panelStyle?.flexDirection ?? null,
-      bodyOverflowY: bodyStyle?.overflowY ?? null,
-      bodyScrollable: body ? body.scrollHeight > body.clientHeight + 1 : false,
-      headerVisible: header ? header.getBoundingClientRect().height > 0 : false,
-      panelBox: panel ? panel.getBoundingClientRect() : null,
-      bodyClientH: body?.clientHeight ?? 0,
-      bodyScrollH: body?.scrollHeight ?? 0,
-      hasSubmit: Boolean(submit),
-    };
-  });
+      const box = (el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          top: Math.round(r.top * 100) / 100,
+          bottom: Math.round(r.bottom * 100) / 100,
+          left: Math.round(r.left * 100) / 100,
+          right: Math.round(r.right * 100) / 100,
+        };
+      };
 
+      const fitsIn = (inner, outer, pad = 1) => {
+        if (!inner || !outer) return false;
+        return (
+          inner.top >= outer.top - pad &&
+          inner.bottom <= outer.bottom + pad &&
+          inner.left >= outer.left - pad &&
+          inner.right <= outer.right + pad
+        );
+      };
+
+      const overlayBox = box(overlay);
+      const panelBox = box(panel);
+      const headerBox = box(header);
+      const footerBox = box(footer);
+      const submitBox = box(submit);
+      const viewportBox = { top: 0, bottom: viewport.height, left: 0, right: viewport.width };
+      const panelViewportSlop = 12;
+      const scrollStyle = scrollBody ? getComputedStyle(scrollBody) : null;
+      const panelStyle = panel ? getComputedStyle(panel) : null;
+      const panelInViewport = fitsIn(panelBox, viewportBox, panelViewportSlop);
+
+      return {
+        bodyOverflow: document.body.style.overflow,
+        pageScrollY: window.scrollY,
+        horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+        overlayInBody: overlay?.parentElement === document.body,
+        overlayTop: overlayBox?.top ?? null,
+        overlayBottom: overlayBox?.bottom ?? null,
+        viewportHeight: viewport.height,
+        panelTop: panelBox?.top ?? null,
+        panelBottom: panelBox?.bottom ?? null,
+        panelInViewport,
+        panelDisplay: panelStyle?.display ?? null,
+        panelFlexDir: panelStyle?.flexDirection ?? null,
+        scrollOverflowY: scrollStyle?.overflowY ?? null,
+        scrollTop: scrollBody?.scrollTop ?? 0,
+        scrollable: scrollBody ? scrollBody.scrollHeight > scrollBody.clientHeight + 1 : false,
+        submitAtOpen: fitsIn(submitBox, viewportBox, 2),
+        submitInPanel: fitsIn(submitBox, panelBox, 2),
+        headerInPanel: fitsIn(headerBox, panelBox, 2),
+        footerInPanel: fitsIn(footerBox, panelBox, 2),
+        headerBox,
+        footerBox,
+        submitBox,
+        lastAttributeBox: box(lastAttribute),
+        hasSubmit: Boolean(submit),
+        hasScrollBody: Boolean(scrollBody),
+        hasOverlay: Boolean(overlay),
+      };
+    });
+
+  const atOpen = await measureModal();
   const issues = [];
-  if (beforeClose.bodyOverflow !== 'hidden') issues.push(`body-overflow=${beforeClose.bodyOverflow}`);
-  if (!beforeClose.hasSubmit) issues.push('submit-missing');
-  if (beforeClose.panelDisplay !== 'flex') issues.push(`panel-display=${beforeClose.panelDisplay}`);
-  if (beforeClose.panelFlexDir !== 'column') issues.push(`panel-flex=${beforeClose.panelFlexDir}`);
-  if (beforeClose.bodyOverflowY !== 'auto') issues.push(`body-overflow-y=${beforeClose.bodyOverflowY}`);
-  if (!beforeClose.bodyScrollable) issues.push('body-not-scrollable');
-  if (!beforeClose.headerVisible) issues.push('header-missing');
+
+  if (!atOpen.hasOverlay) issues.push('overlay-missing');
+  if (!atOpen.overlayInBody) issues.push('overlay-not-in-body');
+  if (atOpen.overlayTop == null || Math.abs(atOpen.overlayTop) > 2) {
+    issues.push(`overlay-top=${atOpen.overlayTop}`);
+  }
+  if (
+    atOpen.overlayBottom == null ||
+    Math.abs(atOpen.overlayBottom - atOpen.viewportHeight) > 2
+  ) {
+    issues.push(`overlay-bottom=${atOpen.overlayBottom} viewport=${atOpen.viewportHeight}`);
+  }
+  if (!atOpen.panelInViewport) issues.push('panel-outside-viewport');
+  if (atOpen.bodyOverflow !== 'hidden') issues.push(`body-overflow=${atOpen.bodyOverflow}`);
+  if (atOpen.pageScrollY > 1) issues.push(`page-scroll-y=${atOpen.pageScrollY}`);
+  if (atOpen.horizontalOverflow) issues.push('horizontal-overflow');
+  if (!atOpen.hasSubmit) issues.push('submit-missing');
+  if (!atOpen.hasScrollBody) issues.push('scroll-body-missing');
+  if (atOpen.panelDisplay !== 'flex') issues.push(`panel-display=${atOpen.panelDisplay}`);
+  if (atOpen.panelFlexDir !== 'column') issues.push(`panel-flex=${atOpen.panelFlexDir}`);
+  if (atOpen.scrollOverflowY !== 'auto') issues.push(`scroll-overflow-y=${atOpen.scrollOverflowY}`);
+  if (!atOpen.submitAtOpen) issues.push('submit-not-visible-at-open');
+  if (atOpen.scrollTop !== 0) issues.push(`scroll-top-not-zero=${atOpen.scrollTop}`);
+  if (!atOpen.headerInPanel) issues.push('header-outside-panel');
+  if (!atOpen.footerInPanel) issues.push('footer-outside-panel');
+
+  const headerTopAtOpen = atOpen.headerBox?.top ?? 0;
+  const footerBottomAtOpen = atOpen.footerBox?.bottom ?? 0;
 
   const scrollResult = await page.evaluate(() => {
-    const submit = [...document.querySelectorAll('button')].find(
-      (el) => el.textContent?.trim() === 'Submit',
-    );
-    const body = submit?.parentElement?.parentElement ?? null;
-    if (!body) return { scrolled: false, scrollTop: 0 };
-    const max = body.scrollHeight - body.clientHeight;
-    body.scrollTop = max;
-    return { scrolled: body.scrollTop > 8, scrollTop: body.scrollTop, max };
+    const scrollBody = document.querySelector('[data-scout-report-scroll-body]');
+    if (!scrollBody) return { scrolled: false, scrollTop: 0 };
+    const max = scrollBody.scrollHeight - scrollBody.clientHeight;
+    scrollBody.scrollTop = max;
+    return { scrolled: scrollBody.scrollTop > 8, scrollTop: scrollBody.scrollTop, max };
   });
 
-  if (!scrollResult.scrolled) issues.push('scroll-top-unchanged');
+  if (!scrollResult.scrolled && atOpen.scrollable) issues.push('scroll-top-unchanged');
 
-  const submitVisible = await page.evaluate(() => {
-    const submit = [...document.querySelectorAll('button')].find(
-      (el) => el.textContent?.trim() === 'Submit',
+  const afterScroll = await measureModal();
+
+  if (Math.abs((afterScroll.headerBox?.top ?? 0) - headerTopAtOpen) > 1) {
+    issues.push('header-moved-on-scroll');
+  }
+  if (Math.abs((afterScroll.footerBox?.bottom ?? 0) - footerBottomAtOpen) > 1) {
+    issues.push('footer-moved-on-scroll');
+  }
+  if (!afterScroll.submitAtOpen) issues.push('submit-not-visible-after-scroll');
+
+  const lastAttrVisible = await page.evaluate(() => {
+    const panel = document.querySelector('[data-scout-report-panel]');
+    const scrollBody = document.querySelector('[data-scout-report-scroll-body]');
+    const footer = document.querySelector('[data-scout-report-footer]');
+    const attributeCards = scrollBody?.querySelectorAll('[class*="attributeCard"]') ?? [];
+    const lastAttribute = attributeCards[attributeCards.length - 1];
+    if (!lastAttribute || !panel || !footer) return false;
+
+    const lastRect = lastAttribute.getBoundingClientRect();
+    const footerRect = footer.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+
+    return (
+      lastRect.bottom <= footerRect.top + 1 &&
+      lastRect.top >= panelRect.top &&
+      lastRect.bottom <= panelRect.bottom + 1
     );
-    const body = submit?.parentElement?.parentElement ?? null;
-    const panel = body?.parentElement ?? null;
-    if (!submit || !panel) return false;
-    const r = submit.getBoundingClientRect();
-    const panelR = panel.getBoundingClientRect();
-    return r.top >= panelR.top && r.bottom <= panelR.bottom + 1;
   });
 
-  if (!submitVisible) issues.push('submit-not-visible-after-scroll');
+  if (!lastAttrVisible) issues.push('last-attribute-obscured');
 
   await page.keyboard.press('Escape');
-  await page.waitForTimeout(400);
+  await page
+    .waitForSelector('[data-scout-report-overlay]', { state: 'detached', timeout: 5000 })
+    .catch(() => {});
+  await page
+    .waitForFunction(() => document.body.style.overflow !== 'hidden', null, { timeout: 5000 })
+    .catch(() => {});
 
   const afterClose = await page.evaluate(() => ({
     bodyOverflow: document.body.style.overflow,
-    submitOpen: Boolean(
-      [...document.querySelectorAll('button')].find((el) => el.textContent?.trim() === 'Submit'),
-    ),
+    submitOpen: Boolean(document.querySelector('[data-scout-report-footer]')),
   }));
 
   if (afterClose.bodyOverflow === 'hidden') issues.push('body-overflow-not-restored');
   if (afterClose.submitOpen) issues.push('modal-still-open');
 
-  await reportBtn.click({ timeout: 30000 }).catch(() => {});
-  await page.getByRole('button', { name: 'Submit' }).waitFor({ timeout: 10000 }).catch(() => {});
-  await page.locator('button', { hasText: '×' }).click({ timeout: 10000 }).catch(async () => {
-    await page.keyboard.press('Escape');
-  });
-  await page.waitForTimeout(300);
-
   return {
     issues,
-    bodyScrollable: beforeClose.bodyScrollable,
+    scrollable: atOpen.scrollable,
     scrollTop: scrollResult.scrollTop,
-    submitVisible,
+    submitAtOpen: atOpen.submitAtOpen,
+    overlayTop: atOpen.overlayTop,
+    overlayBottom: atOpen.overlayBottom,
+    viewportHeight: atOpen.viewportHeight,
+    overlayInBody: atOpen.overlayInBody,
+    panelTop: atOpen.panelTop,
+    panelBottom: atOpen.panelBottom,
+    panelInViewport: atOpen.panelInViewport,
   };
 }
 
@@ -270,7 +371,7 @@ try {
     const result = await testModal(page, vp);
     const status = result.issues.length ? `FAIL ${result.issues.join(', ')}` : 'OK';
     console.log(
-      `${vp.width}x${vp.height} | scrollable=${result.bodyScrollable} | scrollTop=${result.scrollTop} | submit=${result.submitVisible} | ${status}`,
+      `${vp.width}x${vp.height} | overlay=${result.overlayTop}-${result.overlayBottom}/${result.viewportHeight} body=${result.overlayInBody} | panel=${result.panelTop}-${result.panelBottom} inViewport=${result.panelInViewport} | submitAtOpen=${result.submitAtOpen} | ${status}`,
     );
     if (result.issues.length) failed += 1;
   }

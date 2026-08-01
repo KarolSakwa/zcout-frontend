@@ -7,7 +7,7 @@
   justify-content: center;
   box-sizing: border-box;
   padding: 20px;
-  overflow-y: auto;
+  overflow: hidden;
   overscroll-behavior: contain;
   background: rgba(4, 8, 14, 0.28);
   backdrop-filter: blur(0px);
@@ -39,7 +39,7 @@
     0 32px 90px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.03) inset;
   color: #e7e7e7;
-  padding: 18px 20px 20px;
+  padding: 18px 20px 0;
   transform: translateY(10px) scale(0.975);
   opacity: 0;
   transition:
@@ -62,10 +62,10 @@
 .header {
   position: relative;
   display: flex;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   justify-content: center;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .headerCenter {
@@ -112,13 +112,23 @@
   transform: translateY(-1px);
 }
 
-.body {
+.scrollBody {
   flex: 1 1 auto;
   min-height: 0;
-  margin-top: 10px;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+
+.footerActions {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  margin-top: 0;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(12, 16, 24, 0.98) 0%, rgba(12, 16, 24, 1) 100%);
 }
 
 .reportStatus {
@@ -384,12 +394,6 @@
   color: rgba(231, 231, 231, 0.9);
 }
 
-.footerActions {
-  display: flex;
-  justify-content: center;
-  margin-top: 18px;
-}
-
 .submitButton {
   min-width: 220px;
   height: 40px;
@@ -478,7 +482,7 @@
   .panel {
     width: 100%;
     max-height: calc(100dvh - 24px);
-    padding: 14px 14px 16px;
+    padding: 14px 14px 0;
     border-radius: 16px;
   }
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import ZLoader from '@/components/ZLoader';
 import Button from '@/components/ui/Button';
 import buttonStyles from '@/components/ui/Button.module.css';
@@ -50,6 +51,13 @@ export default function ScoutReportModal({
   onSubmit,
 }: ScoutReportModalProps) {
   const [visible, setVisible] = useState(false);
+  const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      setPortalHost(document.body);
+    }
+  }, []);
 
   const requestClose = useCallback(() => {
     if (isSubmitting) return;
@@ -96,18 +104,23 @@ export default function ScoutReportModal({
     return () => window.clearTimeout(timeout);
   }, [isMounted, visible, onExitComplete]);
 
-  if (!isMounted) {
+  if (!isMounted || !portalHost) {
     return null;
   }
 
-  return (
+  const showFormFooter =
+    !requiresAuth && !isLoadingModalAttributes && !attributesError;
+
+  return createPortal(
     <div
       className={[styles.overlay, visible ? styles.overlayVisible : ''].join(' ')}
       onClick={requestClose}
+      data-scout-report-overlay
     >
       <div
         className={[styles.panel, visible ? styles.panelVisible : ''].join(' ')}
         onClick={(event) => event.stopPropagation()}
+        data-scout-report-panel
       >
         {isSubmitting ? (
           <div className={styles.submittingOverlay}>
@@ -117,7 +130,7 @@ export default function ScoutReportModal({
           </div>
         ) : null}
 
-        <div className={styles.header}>
+        <div className={styles.header} data-scout-report-header>
           <div className={styles.headerCenter}>
             <div className={styles.reportTitle}>Scout Report</div>
             <div className={styles.reportMeta}>{playerMeta}</div>
@@ -132,7 +145,7 @@ export default function ScoutReportModal({
           </button>
         </div>
 
-        <div className={styles.body}>
+        <div className={styles.scrollBody} data-scout-report-scroll-body>
           {requiresAuth ? (
             <div className={styles.authGate}>
               <div className={styles.authGateTitle}>
@@ -158,7 +171,7 @@ export default function ScoutReportModal({
               <ZLoader />
             </div>
           ) : attributesError ? (
-            <div>{attributesError}</div>
+            <div className={styles.reportStatusError}>{attributesError}</div>
           ) : (
             <>
               <div className={styles.attributeList}>
@@ -178,23 +191,26 @@ export default function ScoutReportModal({
               </div>
 
               {submitError ? <div className={styles.submitError}>{submitError}</div> : null}
-
-              <div className={styles.footerActions}>
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="md"
-                  className={styles.submitButton}
-                  disabled={!hasActions || isSubmitting}
-                  onClick={onSubmit}
-                >
-                  Submit
-                </Button>
-              </div>
             </>
           )}
         </div>
+
+        {showFormFooter ? (
+          <div className={styles.footerActions} data-scout-report-footer>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              className={styles.submitButton}
+              disabled={!hasActions || isSubmitting}
+              onClick={onSubmit}
+            >
+              Submit
+            </Button>
+          </div>
+        ) : null}
       </div>
-    </div>
+    </div>,
+    portalHost,
   );
 }
