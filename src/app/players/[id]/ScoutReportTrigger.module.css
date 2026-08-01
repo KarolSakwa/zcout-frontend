@@ -2,9 +2,13 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   padding: 20px;
+  overflow: hidden;
+  overscroll-behavior: contain;
   background: rgba(4, 8, 14, 0.28);
   backdrop-filter: blur(0px);
   opacity: 0;
@@ -22,8 +26,12 @@
 
 .panel {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
   overflow: hidden;
   width: min(940px, 100%);
+  max-height: calc(100dvh - 40px);
   border-radius: 18px;
   border: 1px solid rgba(84, 146, 255, 0.14);
   background: linear-gradient(180deg, rgba(24, 29, 38, 0.98) 0%, rgba(12, 16, 24, 0.98) 100%);
@@ -31,7 +39,7 @@
     0 32px 90px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.03) inset;
   color: #e7e7e7;
-  padding: 18px 20px 20px;
+  padding: 18px 20px 0;
   transform: translateY(10px) scale(0.975);
   opacity: 0;
   transition:
@@ -54,9 +62,10 @@
 .header {
   position: relative;
   display: flex;
+  flex: 0 0 auto;
   justify-content: center;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .headerCenter {
@@ -103,8 +112,23 @@
   transform: translateY(-1px);
 }
 
-.body {
-  margin-top: 10px;
+.scrollBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+}
+
+.footerActions {
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  margin-top: 0;
+  padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(12, 16, 24, 0.98) 0%, rgba(12, 16, 24, 1) 100%);
 }
 
 .reportStatus {
@@ -370,12 +394,6 @@
   color: rgba(231, 231, 231, 0.9);
 }
 
-.footerActions {
-  display: flex;
-  justify-content: center;
-  margin-top: 18px;
-}
-
 .submitButton {
   min-width: 220px;
   height: 40px;
@@ -457,12 +475,14 @@
 
 @media (max-width: 760px) {
   .overlay {
+    align-items: flex-start;
     padding: 12px;
   }
 
   .panel {
     width: 100%;
-    padding: 14px 14px 16px;
+    max-height: calc(100dvh - 24px);
+    padding: 14px 14px 0;
     border-radius: 16px;
   }
 
@@ -526,17 +546,4 @@
     font-size: 0.86rem;
     color: rgba(255, 120, 120, 0.92);
   }
-
-  .overlay {
-    align-items: start;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px;
-  }
-
-  .panel {
-    max-height: none;
-    overflow: visible;
-  }
-  
 }

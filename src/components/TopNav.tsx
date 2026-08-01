@@ -34,7 +34,7 @@ export default function TopNav() {
 
         <nav className={styles.menu} aria-label="Main">
           {ITEMS.map((it) => {
-            const active = pathname === it.href || pathname.startsWith(`${it.href}/`);
+            const active = pathname === it.href || pathname?.startsWith(`${it.href}/`) === true;
 
             if (it.disabled) {
               return (
