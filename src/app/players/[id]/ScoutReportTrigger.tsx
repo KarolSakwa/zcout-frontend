@@ -11,6 +11,7 @@ import { logEvent } from '@/lib/telemetry';
 import ScoutReportModal from './ScoutReportModal';
 import { useScoutReportDrafts } from './useScoutReportDrafts';
 import { useScoutReportSubmit } from './useScoutReportSubmit';
+import { ensureBrowserAnonId } from '@/lib/anonId/browser';
 
 export type ScoutReportAttribute = {
   id: number;
@@ -36,40 +37,6 @@ type ScoutReportTriggerProps = {
   attributes: ScoutReportAttribute[];
   className?: string;
 };
-
-const ANON_KEY = 'zcout_anon_id';
-
-function readCookie(name: string): string | null {
-  const parts = document.cookie.split(';').map((s) => s.trim());
-  const hit = parts.find((p) => p.startsWith(`${name}=`));
-  if (!hit) return null;
-  return decodeURIComponent(hit.substring(name.length + 1));
-}
-
-function writeCookie(name: string, value: string, maxAgeSeconds: number) {
-  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
-}
-
-function ensureAnonId(): string | null {
-  if (typeof window === 'undefined') return null;
-
-  const fromLs = window.localStorage.getItem(ANON_KEY);
-  if (fromLs) {
-    writeCookie(ANON_KEY, fromLs, 31536000);
-    return fromLs;
-  }
-
-  const fromCookie = readCookie(ANON_KEY);
-  if (fromCookie) {
-    window.localStorage.setItem(ANON_KEY, fromCookie);
-    return fromCookie;
-  }
-
-  const id = crypto.randomUUID();
-  window.localStorage.setItem(ANON_KEY, id);
-  writeCookie(ANON_KEY, id, 31536000);
-  return id;
-}
 
 export default function ScoutReportTrigger({
   playerId,
@@ -225,7 +192,7 @@ export default function ScoutReportTrigger({
 
   useEffect(() => {
     setIsHydrated(true);
-    ensureAnonId();
+    ensureBrowserAnonId();
   }, []);
 
   useEffect(() => {

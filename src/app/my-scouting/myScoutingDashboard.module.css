@@ -1,0 +1,441 @@
+.dashboard {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.primaryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+  min-width: 0;
+}
+
+.summaryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  width: 100%;
+}
+
+.recentColumn {
+  min-width: 0;
+  width: 100%;
+}
+
+.header {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-accent-primary);
+}
+
+.anonMeta {
+  display: grid;
+  gap: 6px;
+  max-width: 560px;
+}
+
+.tempLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ui-text-dim);
+}
+
+.anonCopy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ui-text-dim);
+}
+
+.signInLink {
+  color: var(--ui-accent-primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.signInLink:hover {
+  text-decoration: underline;
+}
+
+.statCards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.statCards > span,
+.statCardSlot {
+  display: block;
+  min-width: 0;
+}
+
+.statCardSlot > span {
+  display: block !important;
+  width: 100%;
+}
+
+.statCardSlot .statCard {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.statCard {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  min-height: 88px;
+  border-radius: var(--ui-radius-lg);
+  border: 1px solid var(--ui-border-subtle);
+  background: color-mix(in srgb, var(--ui-surface-elevated) 78%, transparent);
+  box-shadow: var(--ui-shadow-panel-soft);
+}
+
+.statIcon {
+  color: var(--ui-accent-primary);
+  display: flex;
+  align-items: center;
+}
+
+.statIconImage,
+.statIconSvg {
+  display: block;
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ui-text-dim);
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ui-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.nextUnlockPanel,
+.recentPanel,
+.yourImpactPanel {
+  min-width: 0;
+}
+
+.nextUnlockBody {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 8px 6px 4px;
+  text-align: center;
+}
+
+.nextUnlockLabel,
+.yourImpactLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ui-text-dim);
+}
+
+.nextUnlockTitle {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--ui-text-primary);
+}
+
+.nextUnlockIcon {
+  color: var(--ui-accent-primary);
+  opacity: 0.92;
+}
+
+.nextUnlockCounter {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--ui-accent-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.nextUnlockTrack {
+  width: min(100%, 220px);
+  height: 6px;
+  border-radius: var(--ui-radius-meter-tight);
+  background-color: var(--ui-metric-track-bg, rgba(255, 255, 255, 0.06));
+  background-image: none;
+  border: 1px solid var(--ui-metric-track-border, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+}
+
+.nextUnlockFill {
+  height: 100%;
+  border-radius: var(--ui-radius-meter-tight);
+  background-color: var(--ui-accent-primary);
+  background-image: none;
+  transition: width 180ms ease;
+}
+
+.recentPanel {
+  min-width: 0;
+}
+
+.emptyFeed {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--ui-text-dim);
+}
+
+.contributionList {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+}
+
+.contributionRow {
+  display: grid;
+  gap: 8px;
+  padding: 12px 0;
+  min-height: 64px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.contributionRow:first-child {
+  border-top: none;
+  padding-top: 4px;
+}
+
+.contributionTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.contributionMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.contributionType {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ui-accent-primary);
+  white-space: nowrap;
+}
+
+.contributionTime {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ui-text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.scoutReportIconWrap {
+  color: var(--ui-accent-primary);
+  display: inline-flex;
+}
+
+.duelPlayers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.duelPlayerGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.duelPlayer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(232, 240, 252, 0.78);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.duelPlayerSelected {
+  color: rgba(232, 240, 252, 0.95);
+  font-weight: 700;
+}
+
+.duelStar {
+  color: var(--ui-accent-primary);
+  font-weight: 800;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.duelPlayerName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+
+.duelDelta {
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.duelVs {
+  color: rgba(170, 184, 205, 0.52);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.deltaPositive {
+  color: var(--ui-positive);
+}
+
+.deltaNegative {
+  color: var(--ui-negative);
+}
+
+.deltaNeutral {
+  color: var(--ui-text-dim);
+}
+
+.scoutReportOverallText {
+  font-size: 12px;
+  color: var(--ui-text-dim);
+}
+
+.scoutReportPlayers {
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.scoutReportPlayers .scoutReportOverallText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: min(100%, 240px);
+}
+
+.yourImpactBody {
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yourImpactLabel {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.yourImpactLock {
+  color: var(--ui-accent-primary);
+  opacity: 0.85;
+}
+
+@media (min-width: 1200px) {
+  .primaryGrid {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+    column-gap: 14px;
+    row-gap: 0;
+  }
+
+  .summaryColumn {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1199px) and (min-width: 768px) {
+  .statCards {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .title {
+    font-size: 24px;
+  }
+
+  .statCards {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .statCards > span,
+  .statCards > article {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .statCard {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .duelPlayers {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .duelPlayers .duelPlayerName {
+    max-width: 120px;
+  }
+
+  .scoutReportPlayers {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .yourImpactBody {
+    min-height: 108px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nextUnlockFill {
+    transition: none;
+  }
+}

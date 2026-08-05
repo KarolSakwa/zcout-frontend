@@ -4,6 +4,7 @@ import './globals.css';
 import TopNav from '../components/TopNav';
 import RouteOverlayLoader from '@/components/RouteOverlayLoader';
 import AuthProvider from '@/components/AuthProvider';
+import { ScoutingProgressProvider } from '@/components/scouting/ScoutingProgressProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,11 +34,13 @@ export default function RootLayout({
     <html lang="en" data-theme="cool-slate">
       <body className={`${inter.className} ${ratingFont.variable}`}>
         <AuthProvider>
-          <TopNav />
-          <Suspense fallback={null}>
-            <RouteOverlayLoader />
-          </Suspense>
-          {children}
+          <ScoutingProgressProvider>
+            <TopNav />
+            <Suspense fallback={null}>
+              <RouteOverlayLoader />
+            </Suspense>
+            {children}
+          </ScoutingProgressProvider>
         </AuthProvider>
       </body>
     </html>

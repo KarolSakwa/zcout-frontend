@@ -5,6 +5,12 @@ vi.mock('@/lib/telemetry', () => ({
   logEvent: vi.fn(),
 }));
 
+vi.mock('@/components/scouting/ScoutingProgressProvider', () => ({
+  useScoutingProgress: () => ({
+    updateFromResponse: vi.fn(),
+  }),
+}));
+
 import type { ScoutReportAttribute } from './ScoutReportTrigger';
 import {
   dispatchScoutReportFailed,

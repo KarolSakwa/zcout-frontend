@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  applyAnonCookiesToResponse,
+  resolveServerAnonId,
+} from '@/lib/anonId/server';
+import { buildUpstreamAnonHeaders } from '@/lib/anonId/proxy';
 
-const API_BASE = process.env.API_BASE ?? process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080';
+const API_BASE =
+  process.env.API_BASE ??
+  process.env.NEXT_PUBLIC_API_BASE ??
+  'http://localhost:8080';
 
 const ATTR_MAP: Record<string, string> = {
   DRI: 'dribbling',
@@ -15,26 +23,14 @@ export async function GET(req: NextRequest) {
     url.searchParams.set('attribute', mapped);
   }
 
-  let anon = req.headers.get('x-zcout-anon')?.trim() ?? '';
-
-  if (!anon) {
-    anon = req.cookies.get('zcout_anon')?.value ?? '';
-  }
-
-  if (!anon) {
-    anon = crypto.randomUUID();
-  }
-
-  const needSetCookie = !anon;
-  if (!anon) anon = crypto.randomUUID();
-
+  const resolved = resolveServerAnonId(req);
   const backendUrl = `${API_BASE}/api/duels/next${url.search}`;
 
   const res = await fetch(backendUrl, {
     method: 'GET',
     headers: {
       Accept: 'application/json',
-      'X-Zcout-Anon': anon,
+      ...buildUpstreamAnonHeaders(resolved),
     },
     cache: 'no-store',
   });
@@ -46,8 +42,8 @@ export async function GET(req: NextRequest) {
     headers: { 'Content-Type': res.headers.get('content-type') ?? 'application/json' },
   });
 
-  if (needSetCookie) {
-    out.cookies.set('zcout_anon', anon, { path: '/', maxAge: 60 * 60 * 24 * 365 * 2, sameSite: 'lax' });
+  if (resolved.canonical) {
+    applyAnonCookiesToResponse(out, resolved.canonical);
   }
 
   return out;

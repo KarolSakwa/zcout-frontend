@@ -37,6 +37,8 @@
   --ui-accent-primary-soft: color-mix(in srgb, var(--theme-accent-warm) 14%, transparent);
   --ui-accent-success: var(--theme-accent-green);
   --ui-accent-success-soft: color-mix(in srgb, var(--theme-accent-green) 22%, transparent);
+  --ui-positive: var(--ui-accent-success);
+  --ui-negative: var(--theme-danger);
 
   --ui-action-primary-bg-1: var(--ui-accent-primary);
   --ui-action-primary-bg-2: color-mix(in srgb, var(--ui-accent-primary) 72%, black);

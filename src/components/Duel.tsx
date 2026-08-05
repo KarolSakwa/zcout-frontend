@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type {
   RatingsMap,
   VoteApiResponse,
@@ -20,6 +20,22 @@ import { useDuelSideWidgets } from "./duels/useDuelSideWidgets";
 import { useDuelAutoNext } from "./duels/useDuelAutoNext";
 import { logEvent } from "@/lib/telemetry";
 import { ensureCsrfToken } from "@/lib/ensureCsrfToken";
+import { useScoutingProgress } from "@/components/scouting/ScoutingProgressProvider";
+import ScoutingProgressBar from "@/components/scouting/ScoutingProgressBar";
+import ScoutingProgressStartedHint from "@/components/scouting/ScoutingProgressStartedHint";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  readPersistenceFlag,
+  scoutingProgressStartedHintKey,
+} from "@/lib/scoutingUiPersistence";
+import { ensureBrowserAnonId } from "@/lib/anonId/browser";
+import {
+  shouldShowDuelActions,
+  shouldShowScoutingStartedHint,
+} from "@/lib/duelScoutingUi";
+import type { DuelVoteWithScoutingProgress } from "@/lib/scoutingTypes";
+import { isScoutingProgress } from "@/lib/scoutingTypes";
+import type { ScoutingProgress } from "@/lib/scoutingTypes";
 import { useHomepageSectionLoading, useIsHomepageReady } from "@/components/homepage/HomepageLoadingContext";
 import styles from "./Duel.module.css";
 
@@ -33,6 +49,40 @@ const HOMEPAGE_CANONICAL_CARD_GAP_PX = 37;
 /** Keep a little air around the ~30px loader when the row shrinks. */
 const HOMEPAGE_MIN_CARD_GAP_PX = 36;
 const HOMEPAGE_TRACK_RATIO = (31 * 2 + 71) / HOMEPAGE_CANONICAL_ROW_PX;
+const HOMEPAGE_GRID_GAP_MAX = 31;
+const HOMEPAGE_GRID_GAP_MIN = 8;
+const HOMEPAGE_GRID_CENTER_MAX = 71;
+const HOMEPAGE_GRID_CENTER_MIN = 36;
+const HOMEPAGE_CARD_MAX = 146;
+
+/** Neutral card span: 2 × card width + visual gap (excludes reveal center spacer). */
+function computeHomepageNeutralSpanPx(rowWidth: number): number {
+  const effectiveRow = Math.max(
+    0,
+    Math.min(rowWidth, HOMEPAGE_CANONICAL_ROW_PX),
+  );
+  if (effectiveRow <= 0) return 0;
+
+  const scale = Math.min(1, effectiveRow / HOMEPAGE_CANONICAL_ROW_PX);
+  const gridGap = Math.max(
+    HOMEPAGE_GRID_GAP_MIN,
+    Math.min(HOMEPAGE_GRID_GAP_MAX, effectiveRow * 0.07294),
+  );
+  const center = Math.max(
+    HOMEPAGE_GRID_CENTER_MIN,
+    Math.min(HOMEPAGE_GRID_CENTER_MAX, effectiveRow * 0.16706),
+  );
+  const card = Math.min(
+    HOMEPAGE_CARD_MAX,
+    (effectiveRow - center - 2 * gridGap) / 2,
+  );
+  const neutralGap = Math.max(
+    HOMEPAGE_MIN_CARD_GAP_PX,
+    HOMEPAGE_CANONICAL_CARD_GAP_PX * scale,
+  );
+
+  return Math.round(2 * card + neutralGap);
+}
 
 type VotePlayerResult = {
   id: number | string;
@@ -54,6 +104,13 @@ type DuelProps = {
 };
 
 export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
+  const { updateFromResponse, progress: scoutingProgress } = useScoutingProgress();
+  const { user } = useAuth();
+  const [frozenScoutingProgress, setFrozenScoutingProgress] =
+    useState<ScoutingProgress | null>(null);
+  const scoutingProgressRef = useRef(scoutingProgress);
+  scoutingProgressRef.current = scoutingProgress;
+  const [pendingScoutingHint, setPendingScoutingHint] = useState(false);
   const [voting, setVoting] = useState(false);
   const [duelBootstrapped, setDuelBootstrapped] = useState(false);
 
@@ -80,6 +137,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   );
   const [cardHintLift, setCardHintLift] = useState(false);
   const cardHintLiftTimerRef = useRef<number | null>(null);
+  const [homepageNeutralSpanPx, setHomepageNeutralSpanPx] = useState<number | null>(
+    null,
+  );
   const shellRef = useRef<HTMLDivElement | null>(null);
 
   const goNextRef = useRef<() => void>(() => {});
@@ -95,6 +155,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     setImpactVisible(false);
     setBarPct({});
     setDuelVotePct(null);
+    setFrozenScoutingProgress(null);
 
     setShowPendingUi(false);
     if (pendingUiTimerRef.current)
@@ -165,7 +226,12 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         setHomepageRowWidth(Math.min(width, HOMEPAGE_CANONICAL_ROW_PX));
       };
 
-      const measure = () => updateFromWidth(el.getBoundingClientRect().width);
+      const measure = () => {
+        const row = el.querySelector('[data-hp-duel-row]');
+        const width =
+          row?.getBoundingClientRect().width ?? el.getBoundingClientRect().width;
+        updateFromWidth(width);
+      };
       measure();
       const raf = window.requestAnimationFrame(measure);
 
@@ -173,10 +239,14 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         return () => window.cancelAnimationFrame(raf);
       }
 
-      const observer = new ResizeObserver((entries) => {
-        updateFromWidth(entries[0]?.contentRect.width ?? 0);
+      const observer = new ResizeObserver(() => {
+        measure();
       });
       observer.observe(el);
+      const row = el.querySelector('[data-hp-duel-row]');
+      if (row) {
+        observer.observe(row);
+      }
       return () => {
         window.cancelAnimationFrame(raf);
         observer.disconnect();
@@ -198,6 +268,59 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       mqStacked.removeEventListener("change", updateStacked);
     };
   }, [homepageMode]);
+
+  useEffect(() => {
+    if (!homepageMode) return;
+    setHomepageNeutralSpanPx(null);
+  }, [homepageMode, pair?.pair_id]);
+
+  useLayoutEffect(() => {
+    if (!homepageMode || !shellRef.current) return;
+    if (lastWinner !== null || transition !== "idle" || showPendingUi) return;
+
+    const leftSlot = shellRef.current.querySelector('[data-hp-duel-slot="left"]');
+    const slotTransform = leftSlot ? getComputedStyle(leftSlot).transform : "none";
+    const insetMatch = slotTransform.match(
+      /matrix\([^,]+,[^,]+,[^,]+,[^,]+,([^,]+),/,
+    );
+    const insetX = insetMatch ? Math.abs(parseFloat(insetMatch[1])) : 0;
+    if (insetX < 1) return;
+
+    const leftCard = shellRef.current.querySelector(
+      '[data-hp-duel-slot="left"] [data-homepage="true"]',
+    );
+    const rightCard = shellRef.current.querySelector(
+      '[data-hp-duel-slot="right"] [data-homepage="true"]',
+    );
+    if (!leftCard || !rightCard) return;
+
+    const row = shellRef.current.querySelector('[data-hp-duel-row]');
+    const rowWidth = row?.getBoundingClientRect().width ?? 0;
+
+    const span =
+      rightCard.getBoundingClientRect().right -
+      leftCard.getBoundingClientRect().left;
+
+    if (rowWidth > 0 && span > rowWidth * 0.88) return;
+
+    if (span > 0) {
+      setHomepageNeutralSpanPx(span);
+    }
+  }, [
+    homepageMode,
+    homepageRowWidth,
+    lastWinner,
+    transition,
+    showPendingUi,
+    pair,
+  ]);
+
+  const homepageProgressWidth = homepageMode
+    ? homepageNeutralSpanPx ??
+      computeHomepageNeutralSpanPx(
+        homepageRowWidth > 0 ? homepageRowWidth : HOMEPAGE_CANONICAL_ROW_PX,
+      )
+    : undefined;
 
   const showReveal = lastWinner !== null;
 
@@ -356,6 +479,10 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       setVoting(true);
       setError(null);
 
+      if (scoutingProgressRef.current) {
+        setFrozenScoutingProgress(scoutingProgressRef.current);
+      }
+
       setLastWinner(winnerId);
       setImpactVisible(false);
       setPostVoteRatings(null);
@@ -412,10 +539,28 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           throw new Error(`Vote failed: ${res.status} ${text.slice(0, 200)}`);
         }
 
-        const data = (await res.json()) as VoteApiResponse & {
+        const data = (await res.json()) as VoteApiResponse &
+          DuelVoteWithScoutingProgress & {
           players?: VotePlayerResult[];
           popularity?: VotePopularity | null;
         };
+
+        if (isScoutingProgress(data.scouting_progress)) {
+          updateFromResponse(data.scouting_progress, 'duel_vote');
+
+          if (
+            !user &&
+            data.scouting_progress.contributions === 1
+          ) {
+            const anonId = ensureBrowserAnonId();
+            if (
+              anonId &&
+              !readPersistenceFlag(scoutingProgressStartedHintKey(anonId))
+            ) {
+              setPendingScoutingHint(true);
+            }
+          }
+        }
 
         logEvent("vote_submitted", {
           duel_id: data.duel_id ?? null,
@@ -467,6 +612,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Błąd zapisu głosu";
         setError(msg);
+        setLastWinner(null);
+        setFrozenScoutingProgress(null);
         setShowPendingUi(false);
         if (pendingUiTimerRef.current)
           window.clearTimeout(pendingUiTimerRef.current);
@@ -485,6 +632,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       lastWinner,
       goNext,
       setError,
+      updateFromResponse,
+      user,
     ],
   );
 
@@ -521,6 +670,34 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     !showImpact &&
     !showHomepagePairLoading &&
     !showOverlayLoader;
+
+  const showDuelActions = shouldShowDuelActions({
+    pair,
+    showImpact,
+    showOverlayLoader,
+    showHomepagePairLoading,
+    transition,
+    skipping,
+  });
+
+  const progressBarOverride = frozenScoutingProgress ?? undefined;
+
+  const canShowScoutingStartedHint = shouldShowScoutingStartedHint({
+    pair,
+    showImpact,
+    showReveal,
+    showOverlayLoader,
+    showHomepagePairLoading,
+    transition,
+    voting,
+    skipping,
+    pendingScoutingHint,
+    isLoggedIn: !!user,
+    loadingPair,
+    error,
+    showPendingUi,
+    showCountdown,
+  });
 
   const sideWidgets = !homepageMode ? (
     <>
@@ -644,6 +821,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             : {
                 height: 160,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 pointerEvents: showOverlayLoader ? "none" : "auto",
@@ -658,6 +836,30 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             onHintVisible={handleVoteHintVisible}
           />
         )}
+        <ScoutingProgressStartedHint
+          canShow={canShowScoutingStartedHint}
+          onDismiss={() => setPendingScoutingHint(false)}
+        />
+        {homepageMode && showDuelActions ? (
+          <div
+            className={styles.homepageProgressOverlay}
+            style={{ width: homepageProgressWidth }}
+          >
+            <ScoutingProgressBar
+              variant="compact"
+              compactLayout="fluid"
+              progressOverride={progressBarOverride}
+            />
+          </div>
+        ) : null}
+        {showDuelActions && !homepageMode ? (
+          <div className={styles.duelPageActionsProgress}>
+            <ScoutingProgressBar
+              variant="default"
+              progressOverride={progressBarOverride}
+            />
+          </div>
+        ) : null}
         {showImpact && postVoteRatings ? (
           <div style={{ width: "100%" }}>
             <DuelRevealPanel
@@ -678,7 +880,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             />
           </div>
         ) : (
-          pair && (
+          showDuelActions && (
             <button
               type="button"
               onClick={handleSkip}

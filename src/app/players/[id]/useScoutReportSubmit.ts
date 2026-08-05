@@ -1,7 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useScoutingProgress } from '@/components/scouting/ScoutingProgressProvider';
 import { logEvent } from '@/lib/telemetry';
+import type { ScoutingProgress } from '@/lib/scoutingTypes';
+import { isScoutingProgress } from '@/lib/scoutingTypes';
 import type { ScoutReportAttribute } from './ScoutReportTrigger';
 
 export type ScoutReportSubmitPayload = {
@@ -155,6 +158,7 @@ export async function runScoutReportSubmit({
   refreshRouter,
   setSubmitError,
   setSuccessToast,
+  onScoutingProgressUpdate,
 }: {
   playerId: number;
   activeAttributes: ScoutReportAttribute[];
@@ -174,6 +178,7 @@ export async function runScoutReportSubmit({
   refreshRouter: () => void;
   setSubmitError: (message: string) => void;
   setSuccessToast: (message: string) => void;
+  onScoutingProgressUpdate?: (progress: ScoutingProgress) => void;
 }) {
   const res = await submitRequest(payload);
 
@@ -199,6 +204,10 @@ export async function runScoutReportSubmit({
       kind: 'validation' as const,
       message: parseSubmitValidationMessage(data, res.status),
     };
+  }
+
+  if (isScoutingProgress(data?.scouting_progress)) {
+    onScoutingProgressUpdate?.(data.scouting_progress);
   }
 
   logEvent('scout_report_submitted', {
@@ -263,6 +272,7 @@ export function useScoutReportSubmit({
       cache: 'no-store',
     }),
 }: UseScoutReportSubmitOptions) {
+  const { updateFromResponse } = useScoutingProgress();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -321,6 +331,9 @@ export function useScoutReportSubmit({
           setSuccessToastMessage(message);
           setShowSuccessToast(true);
         },
+        onScoutingProgressUpdate: (progress) => {
+          updateFromResponse(progress, 'scout_report');
+        },
       });
     } catch {
       if (Object.keys(justSubmittedRatings).length > 0) {
@@ -347,6 +360,7 @@ export function useScoutReportSubmit({
     remainingAttributesCount,
     resetDrafts,
     submitRequest,
+    updateFromResponse,
   ]);
 
   return {

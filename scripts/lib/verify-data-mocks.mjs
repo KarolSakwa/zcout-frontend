@@ -89,7 +89,7 @@ function mockOrigin() {
   return new URL(base).origin;
 }
 
-async function installCsrfSupport(page) {
+export async function installCsrfSupport(page) {
   const base = process.env.VERIFY_BASE_URL || 'http://localhost:3000';
   const { hostname } = new URL(base);
 
@@ -118,7 +118,83 @@ async function installCsrfSupport(page) {
   });
 }
 
-export async function installVerifyDataMocks(page, { delayDuelsMs = 0 } = {}) {
+export function buildScoutingProgressResponse({
+  contributions = 7,
+  unlocked = false,
+  myScoutingUnlock = 25,
+  yourImpactUnlock = 125,
+} = {}) {
+  const stage2Length = yourImpactUnlock - myScoutingUnlock;
+  const isUnlocked = unlocked || contributions >= myScoutingUnlock;
+
+  let stageProgress;
+  let stageTarget;
+
+  if (!isUnlocked) {
+    stageProgress = contributions;
+    stageTarget = myScoutingUnlock;
+  } else {
+    stageProgress = Math.min(
+      Math.max(0, contributions - myScoutingUnlock),
+      stage2Length,
+    );
+    stageTarget = stage2Length;
+  }
+
+  return {
+    scouting_progress: {
+      contributions,
+      my_scouting_unlocked: isUnlocked,
+      progress_target: stageTarget,
+      stage_progress: stageProgress,
+      stage_target: stageTarget,
+      next_unlock: isUnlocked ? 'your_impact' : 'my_scouting',
+    },
+  };
+}
+
+export function buildMyScoutingResponse({
+  contributions = 30,
+  unlocked = true,
+  stats = { duels: 18, players_rated: 14, scout_reports: 0 },
+  recentContributions = [],
+} = {}) {
+  const progress = buildScoutingProgressResponse({ contributions, unlocked })
+    .scouting_progress;
+
+  return {
+    scouting_progress: progress,
+    stats,
+    recent_contributions: recentContributions,
+  };
+}
+
+export async function installMyScoutingMock(page, response) {
+  await page.route('**/api/my-scouting**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(response ?? buildMyScoutingResponse()),
+    }),
+  );
+}
+
+export async function installScoutingProgressMock(page, response) {
+  await page.route('**/api/scouting/progress**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(response ?? buildScoutingProgressResponse()),
+    }),
+  );
+}
+
+export async function installVerifyDataMocks(page, {
+  delayDuelsMs = 0,
+  scoutingProgress,
+  skipScoutingProgressMock = false,
+  skipVoteMock = false,
+} = {}) {
   await installCsrfSupport(page);
 
   await page.route('**/api/duels/next**', async (route) => {
@@ -148,6 +224,10 @@ export async function installVerifyDataMocks(page, { delayDuelsMs = 0 } = {}) {
       await route.fallback();
       return;
     }
+    if (skipVoteMock) {
+      await route.continue();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -167,6 +247,9 @@ export async function installVerifyDataMocks(page, { delayDuelsMs = 0 } = {}) {
   await page.route('**/api/log-event**', (route) =>
     route.fulfill({ status: 202, contentType: 'application/json', body: '{}' }),
   );
+  if (!skipScoutingProgressMock) {
+    await installScoutingProgressMock(page, scoutingProgress);
+  }
 }
 
 const SCOUT_ATTR_KEYS = [
@@ -320,4 +403,22 @@ export async function installPlayerProfileMocks(page) {
   await page.route('**/api/log-event**', (route) =>
     route.fulfill({ status: 202, contentType: 'application/json', body: '{}' }),
   );
+}
+
+/** Wait until homepage cards are in neutral inset and layout has settled. */
+export async function waitForHomepageNeutralProgressAlignment(page, timeout = 60000) {
+  await page.waitForSelector('[data-scouting-progress-bar]', { timeout });
+  await page.waitForFunction(
+    () => {
+      const leftSlot = document.querySelector('[data-hp-duel-slot="left"]');
+      if (!leftSlot) return false;
+      const transform = getComputedStyle(leftSlot).transform;
+      const match = transform.match(/matrix\([^,]+,[^,]+,[^,]+,[^,]+,([^,]+),/);
+      const insetX = match ? Math.abs(parseFloat(match[1])) : 0;
+      return insetX >= 1;
+    },
+    undefined,
+    { timeout },
+  );
+  await page.waitForTimeout(800);
 }

@@ -1,0 +1,104 @@
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--ui-border-subtle);
+  background: rgba(7, 14, 28, 0.96);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  display: grid;
+  gap: 10px;
+  z-index: 60;
+}
+
+.userName {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userEmail {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuItem,
+.menuLink,
+.menuButton {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ui-border-subtle);
+  background: var(--ui-surface-soft);
+  color: var(--ui-accent-primary);
+  font-size: 11px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.menuLink:hover,
+.menuButton:hover {
+  opacity: 1;
+}
+
+.menuButtonLocked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.menuButtonLocked:focus-visible {
+  outline: 2px solid var(--ui-accent-primary);
+  outline-offset: 2px;
+}
+
+.progressSlot {
+  display: grid;
+  gap: 6px;
+}
+
+.accountButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border-subtle);
+  background: var(--ui-surface-soft);
+  color: var(--ui-accent-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: var(--ui-shadow-panel-soft);
+}
+
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.loginLink {
+  color: var(--ui-accent-primary);
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.loginLink:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

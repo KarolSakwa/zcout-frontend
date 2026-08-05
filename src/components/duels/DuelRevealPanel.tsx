@@ -87,7 +87,7 @@ export default function DuelRevealPanel({
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: homepageMode ? 7 : -10,
+            marginBottom: homepageMode ? -2 : -10,
             fontSize: 10,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
@@ -259,7 +259,7 @@ export default function DuelRevealPanel({
           }
 
           .revealPanelHomepage .verdictLabel {
-            margin-bottom: 7px;
+            margin-bottom: -2px;
             font-size: 9px;
           }
 

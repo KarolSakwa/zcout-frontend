@@ -1,0 +1,107 @@
+.lockedRoot,
+.errorPanel {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.lockedTitle,
+.errorTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-accent-primary);
+}
+
+.lockedBody {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 28px 20px 32px;
+  border-radius: var(--ui-radius-lg);
+  border: 1px solid var(--ui-border-subtle);
+  background: color-mix(in srgb, var(--ui-surface-elevated) 72%, transparent);
+  max-width: 420px;
+  margin: 24px auto 0;
+}
+
+.lockedIconWrap {
+  color: var(--ui-accent-primary);
+  opacity: 0.9;
+}
+
+.lockedCounter {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--ui-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.lockedTrack {
+  width: min(100%, 260px);
+  height: 6px;
+  border-radius: var(--ui-radius-meter-tight);
+  background-color: var(--ui-metric-track-bg, rgba(255, 255, 255, 0.06));
+  background-image: none;
+  border: 1px solid var(--ui-metric-track-border, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+}
+
+.lockedFill {
+  height: 100%;
+  border-radius: var(--ui-radius-meter-tight);
+  background-color: var(--ui-accent-primary);
+  background-image: none;
+  transition: width 180ms ease;
+}
+
+.lockedHint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ui-text-dim);
+  text-align: center;
+}
+
+.errorPanel {
+  max-width: 520px;
+  padding: 24px 0;
+}
+
+.errorMessage {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ui-text-dim);
+}
+
+.retryButton {
+  justify-self: start;
+  padding: 8px 14px;
+  border-radius: var(--ui-radius-md);
+  border: 1px solid var(--ui-border-accent);
+  background: color-mix(in srgb, var(--ui-surface-elevated) 80%, transparent);
+  color: var(--ui-accent-primary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.retryButton:hover {
+  border-color: var(--ui-accent-primary);
+}
+
+.retryButton:focus-visible {
+  outline: 2px solid var(--ui-accent-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lockedFill {
+    transition: none;
+  }
+}

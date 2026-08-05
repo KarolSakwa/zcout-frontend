@@ -51,13 +51,36 @@
 
 .item {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  font-family: inherit;
   font-weight: 900;
   font-size: 12px;
   letter-spacing: 0.1em;
+  line-height: 1;
   color: var(--ui-nav-link);
   text-decoration: none;
   padding: 6px 4px;
   -webkit-tap-highlight-color: transparent;
+}
+
+.itemButton {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: none;
+  margin: 0;
+  padding: 6px 4px;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  color: inherit;
+  text-align: inherit;
+  cursor: default;
 }
 
 .item:hover {
@@ -172,6 +195,55 @@
   pointer-events: none;
 }
 
+.myScoutingWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.myScoutingNeutral {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.myScoutingNeutral:hover {
+  color: var(--ui-nav-link);
+}
+
+.myScoutingNeutral::after {
+  display: none;
+}
+
+.myScoutingLocked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.myScoutingLocked:hover {
+  color: var(--ui-nav-link);
+}
+
+.myScoutingLocked::after {
+  display: none;
+}
+
+.myScoutingLocked:focus-visible {
+  outline: 2px solid var(--ui-accent-primary);
+  outline-offset: 2px;
+}
+
+.myScoutingLabel {
+  display: inline-block;
+}
+
+.myScoutingLockIcon {
+  flex-shrink: 0;
+  opacity: 0.85;
+  width: 1em;
+  height: 1em;
+  transform: translateY(0.5px);
+}
+
 @media (min-width: 701px) and (max-width: 1200px) {
   .inner {
     grid-template-columns: auto minmax(0, 1fr);
@@ -256,7 +328,13 @@
   }
 
   .item {
-    font-size: 11px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 6px 2px;
+  }
+
+  .itemButton {
+    font-size: 10px;
     letter-spacing: 0.08em;
     padding: 6px 2px;
   }
@@ -272,14 +350,10 @@
   }
 }
 
-/* Narrow phones: hide DATABASE, tighten nav so DUELS never overlaps logo */
+/* Narrow phones: tighten nav so DUELS never overlaps logo */
 @media (max-width: 430px) {
   .inner {
     gap: 12px 10px;
-  }
-
-  .itemDatabase {
-    display: none;
   }
 
   .menu {
@@ -293,7 +367,7 @@
   }
 
   .item {
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 0.06em;
     padding: 6px 1px;
     white-space: nowrap;
@@ -315,7 +389,7 @@
 
 @media (max-width: 320px) {
   .item {
-    font-size: 8px;
+    font-size: 9px;
     letter-spacing: 0.02em;
   }
 }

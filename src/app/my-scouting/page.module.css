@@ -1,0 +1,10 @@
+.pageShell {
+  padding: 12px 16px 28px;
+  min-height: calc(100vh - 56px);
+}
+
+.pageInner {
+  max-width: 1160px;
+  margin: 0 auto;
+  min-width: 0;
+}

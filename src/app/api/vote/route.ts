@@ -1,26 +1,22 @@
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
+import {
+  applyAnonCookiesToResponse,
+  resolveServerAnonId,
+} from '@/lib/anonId/server';
+import { buildUpstreamAnonHeaders } from '@/lib/anonId/proxy';
 
 const ORIGIN = process.env.APP_ORIGIN || 'http://localhost:3000';
-const API_BASE = process.env.API_BASE ?? process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8080';
-
-function readCookieFromReq(req: Request, name: string): string | null {
-  const cookie = req.headers.get('cookie') ?? '';
-  const parts = cookie.split(';').map((s) => s.trim());
-  const hit = parts.find((p) => p.startsWith(`${name}=`));
-  if (!hit) return null;
-  return decodeURIComponent(hit.substring(name.length + 1));
-}
+const API_BASE =
+  process.env.API_BASE ??
+  process.env.NEXT_PUBLIC_API_BASE ??
+  'http://localhost:8080';
 
 export async function POST(req: Request) {
   try {
     const body = await req.text();
-
-    let anonId = readCookieFromReq(req, 'zcout_anon');
-    const needSetCookie = !anonId;
-    if (!anonId) anonId = crypto.randomUUID();
-
+    const resolved = resolveServerAnonId(req);
     const cookieHeader = req.headers.get('cookie');
     const xsrfHeader = req.headers.get('x-xsrf-token');
 
@@ -30,10 +26,10 @@ export async function POST(req: Request) {
       Origin: ORIGIN,
       Referer: `${ORIGIN}/`,
       'X-Requested-With': 'XMLHttpRequest',
-      'X-Zcout-Anon': anonId,
+      ...buildUpstreamAnonHeaders(resolved),
     };
 
-    if (cookieHeader) headers['Cookie'] = cookieHeader;
+    if (cookieHeader) headers.Cookie = cookieHeader;
     if (xsrfHeader) headers['X-XSRF-TOKEN'] = xsrfHeader;
 
     const upstream = await fetch(`${API_BASE}/api/votes`, {
@@ -52,8 +48,8 @@ export async function POST(req: Request) {
       },
     });
 
-    if (needSetCookie) {
-      res.cookies.set('zcout_anon', anonId, { path: '/', maxAge: 60 * 60 * 24 * 365 * 2, sameSite: 'lax' });
+    if (resolved.canonical) {
+      applyAnonCookiesToResponse(res, resolved.canonical);
     }
 
     return res;

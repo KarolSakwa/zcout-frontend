@@ -175,14 +175,14 @@ export default function DuelImpact({
           borderRadius: "999px",
           textAlign: "center",
           border: isPositive
-            ? "1px solid color-mix(in srgb, var(--ui-accent-success) 32%, transparent)"
-            : "1px solid color-mix(in srgb, var(--ui-danger) 34%, transparent)",
+            ? "1px solid color-mix(in srgb, var(--ui-positive) 32%, transparent)"
+            : "1px solid color-mix(in srgb, var(--ui-negative) 34%, transparent)",
           background: isPositive
-            ? "color-mix(in srgb, var(--ui-accent-success) 9%, transparent)"
-            : "color-mix(in srgb, var(--ui-danger) 9%, transparent)",
+            ? "color-mix(in srgb, var(--ui-positive) 9%, transparent)"
+            : "color-mix(in srgb, var(--ui-negative) 9%, transparent)",
           color: isPositive
-            ? "color-mix(in srgb, var(--ui-accent-success) 82%, white)"
-            : "color-mix(in srgb, var(--ui-danger) 82%, white)",
+            ? "color-mix(in srgb, var(--ui-positive) 82%, white)"
+            : "color-mix(in srgb, var(--ui-negative) 82%, white)",
           fontSize: homepageMode ? 10 : 11,
           fontWeight: 900,
           letterSpacing: "0.03em",

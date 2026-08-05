@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
+import { applyClaimAnonToScoutingProgress } from '@/lib/claimAnon';
+import { useScoutingProgress } from '@/components/scouting/ScoutingProgressProvider';
 
 type LaravelErrorPayload = {
   message?: string;
@@ -20,6 +22,7 @@ function getXsrfToken() {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { updateFromResponse, refresh } = useScoutingProgress();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -140,10 +143,9 @@ export default function LoginPage() {
 
     await fetchMeAndBroadcast().catch(() => {});
 
-    await fetch('/api/auth/claim-anon', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      cache: 'no-store',
+    await applyClaimAnonToScoutingProgress({
+      updateFromResponse,
+      refresh,
     }).catch(() => null);
 
     router.push(nextPath);
@@ -315,7 +317,7 @@ export default function LoginPage() {
           <div style={footerStyle}>
             No account?{' '}
             <Link href="/register" style={footerLinkStyle}>
-              Create one
+              Register
             </Link>
           </div>
         </div>

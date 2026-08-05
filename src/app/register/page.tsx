@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '@/components/ui/Button';
+import { applyClaimAnonToScoutingProgress } from '@/lib/claimAnon';
+import { useScoutingProgress } from '@/components/scouting/ScoutingProgressProvider';
 
 type LaravelErrorPayload = {
   message?: string;
@@ -20,6 +22,7 @@ function getXsrfToken() {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { updateFromResponse, refresh } = useScoutingProgress();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -136,10 +139,9 @@ export default function RegisterPage() {
 
     await fetchMeAndBroadcast().catch(() => {});
 
-    await fetch('/api/auth/claim-anon', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      cache: 'no-store',
+    await applyClaimAnonToScoutingProgress({
+      updateFromResponse,
+      refresh,
     }).catch(() => null);
 
     router.push(nextPath);
@@ -239,7 +241,7 @@ export default function RegisterPage() {
     <div style={pageStyle}>
       <div style={shellStyle}>
         <div style={cardStyle}>
-          <h1 style={titleStyle}>Create account</h1>
+          <h1 style={titleStyle}>Register</h1>
 
           <form onSubmit={onSubmit} style={formStyle}>
             <div style={fieldWrapStyle}>
@@ -309,7 +311,7 @@ export default function RegisterPage() {
             </div>
 
             <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
-              Create account
+              Register
             </Button>
 
             {formError && <div style={formErrorStyle}>{formError}</div>}

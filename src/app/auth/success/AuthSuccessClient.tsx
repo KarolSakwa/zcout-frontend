@@ -2,11 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import LoadingScreen from '@/components/LoadingScreen';
+import { applyClaimAnonToScoutingProgress } from '@/lib/claimAnon';
+import { useScoutingProgress } from '@/components/scouting/ScoutingProgressProvider';
 
 type User = { id: number; name: string; email: string };
 
 export default function AuthSuccessClient({ next }: { next: string }) {
   const [failed, setFailed] = useState(false);
+  const { updateFromResponse, refresh } = useScoutingProgress();
 
   useEffect(() => {
     let cancelled = false;
@@ -44,10 +47,9 @@ export default function AuthSuccessClient({ next }: { next: string }) {
           localStorage.setItem('zcout_user', JSON.stringify(u));
           window.dispatchEvent(new Event('zcout-auth'));
 
-          await fetch('/api/auth/claim-anon', {
-            method: 'POST',
-            headers: { Accept: 'application/json' },
-            cache: 'no-store',
+          await applyClaimAnonToScoutingProgress({
+            updateFromResponse,
+            refresh,
           }).catch(() => null);
 
           window.location.replace(next);
@@ -65,7 +67,7 @@ export default function AuthSuccessClient({ next }: { next: string }) {
     return () => {
       cancelled = true;
     };
-  }, [next]);
+  }, [next, refresh, updateFromResponse]);
 
   if (failed) {
     return (

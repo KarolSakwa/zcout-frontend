@@ -992,6 +992,24 @@ export default function PlayerCard({
           }
         }
 
+        @media (min-width: 1721px) {
+          .card[data-duels-page="true"] .topDesktop .posBadge {
+            box-sizing: border-box;
+            width: 25px;
+            height: 25px;
+            min-width: 25px;
+            min-height: 25px;
+            padding: 0;
+            display: grid;
+            place-items: center;
+          }
+
+          .card[data-duels-page="true"] .topDesktop .posText {
+            font-size: 9px;
+            line-height: 1;
+          }
+        }
+
         @media (min-width: 1201px) and (max-width: 1360px) {
           .card[data-duels-page="true"] .flag {
             left: 8px;

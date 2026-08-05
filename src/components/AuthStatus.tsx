@@ -3,44 +3,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Tooltip from '@/components/Tooltip';
+import { ensureBrowserAnonId } from '@/lib/anonId/browser';
+import {
+  getScoutingProgressTooltip,
+  MY_SCOUTING_LOCKED_TOOLTIP,
+} from '@/lib/scoutingUiCopy';
+import ScoutingLockIcon from '@/components/scouting/ScoutingLockIcon';
+import ScoutingProgressBar from '@/components/scouting/ScoutingProgressBar';
+import { useScoutingProgress } from '@/components/scouting/ScoutingProgressProvider';
 import { useAuth } from './AuthProvider';
+import styles from './AuthStatus.module.css';
 
-const ANON_KEY = 'zcout_anon_id';
-
-function readCookie(name: string): string | null {
-  const parts = document.cookie.split(';').map((s) => s.trim());
-  const hit = parts.find((p) => p.startsWith(`${name}=`));
-  if (!hit) return null;
-  return decodeURIComponent(hit.substring(name.length + 1));
-}
-
-function writeCookie(name: string, value: string, maxAgeSeconds: number) {
-  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
-}
-
-function ensureAnonId(): string | null {
-  if (typeof window === 'undefined') return null;
-
-  const fromLs = window.localStorage.getItem(ANON_KEY);
-  if (fromLs) {
-    writeCookie(ANON_KEY, fromLs, 31536000);
-    return fromLs;
-  }
-
-  const fromCookie = readCookie(ANON_KEY);
-  if (fromCookie) {
-    window.localStorage.setItem(ANON_KEY, fromCookie);
-    return fromCookie;
-  }
-
-  const id =
-  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    
-  window.localStorage.setItem(ANON_KEY, id);
-  writeCookie(ANON_KEY, id, 31536000);
-  return id;
+function getDisplayName(user: { name?: string; email: string }): string {
+  const trimmed = user.name?.trim();
+  return trimmed || user.email;
 }
 
 export default function AuthStatus() {
@@ -51,6 +28,7 @@ export default function AuthStatus() {
     (pathname?.startsWith('/auth/') ?? false);
 
   const { user } = useAuth();
+  const { status, progress } = useScoutingProgress();
 
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -58,7 +36,7 @@ export default function AuthStatus() {
 
   useEffect(() => {
     setMounted(true);
-    ensureAnonId();
+    ensureBrowserAnonId();
   }, []);
 
   useEffect(() => {
@@ -96,28 +74,24 @@ export default function AuthStatus() {
   if (isAuthRoute) return null;
 
   if (!mounted || !user) {
-    return <Link href="/login">Log in</Link>;
+    return (
+      <Link href="/login" className={styles.loginLink}>
+        Log in
+      </Link>
+    );
   }
 
+  const showProgress = status === 'ready' && progress != null;
+  const myScoutingUnlocked = progress?.my_scouting_unlocked === true;
+
   return (
-    <div ref={rootRef} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+    <div ref={rootRef} className={styles.root}>
       <button
         type="button"
         onClick={() => setMenuOpen((v) => !v)}
         title={user.email}
         aria-label="Account"
-        style={{
-          width: 34,
-          height: 34,
-          borderRadius: 999,
-          border: '1px solid var(--ui-border-subtle)',
-          background: 'var(--ui-surface-soft)',
-          color: 'var(--ui-accent-primary)',
-          display: 'grid',
-          placeItems: 'center',
-          cursor: 'pointer',
-          boxShadow: 'var(--ui-shadow-panel-soft)',
-        }}
+        className={styles.accountButton}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -137,53 +111,51 @@ export default function AuthStatus() {
       </button>
 
       {menuOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 8px)',
-            right: 0,
-            minWidth: 220,
-            padding: 10,
-            borderRadius: 12,
-            border: '1px solid var(--ui-border-subtle)',
-            background: 'rgba(7, 14, 28, 0.96)',
-            boxShadow: '0 18px 40px rgba(0,0,0,0.45)',
-            display: 'grid',
-            gap: 10,
-            zIndex: 60,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              letterSpacing: '1px',
-              textTransform: 'uppercase',
-              opacity: 0.8,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            title={user.email}
-          >
-            {user.email}
+        <div className={styles.dropdown}>
+          <div>
+            <div className={styles.userName} title={getDisplayName(user)}>
+              {getDisplayName(user)}
+            </div>
+            {user.name?.trim() ? (
+              <div className={styles.userEmail} title={user.email}>
+                {user.email}
+              </div>
+            ) : null}
           </div>
 
-          <button
-            type="button"
-            onClick={logout}
-            style={{
-              width: '100%',
-              padding: '10px 12px',
-              borderRadius: 10,
-              border: '1px solid var(--ui-border-subtle)',
-              background: 'var(--ui-surface-soft)',
-              color: 'var(--ui-accent-primary)',
-              fontSize: 11,
-              textTransform: 'uppercase',
-              textAlign: 'left',
-              cursor: 'pointer',
-            }}
-          >
+          {showProgress ? (
+            <div className={styles.progressSlot}>
+              <ScoutingProgressBar variant="dropdown" />
+            </div>
+          ) : null}
+
+          {status === 'ready' ? (
+            myScoutingUnlocked ? (
+              <Link href="/my-scouting" className={styles.menuLink}>
+                My Scouting
+              </Link>
+            ) : (
+              <Tooltip
+                content={
+                  progress
+                    ? getScoutingProgressTooltip(progress)
+                    : MY_SCOUTING_LOCKED_TOOLTIP
+                }
+              >
+                <button
+                  type="button"
+                  className={`${styles.menuButton} ${styles.menuButtonLocked}`}
+                  aria-disabled="true"
+                  aria-label="My Scouting locked"
+                >
+                  <span>My Scouting</span>
+                  <ScoutingLockIcon size={11} />
+                </button>
+              </Tooltip>
+            )
+          ) : null}
+
+          <button type="button" onClick={logout} className={styles.menuButton}>
             Log out
           </button>
         </div>

@@ -11,7 +11,14 @@
     "test:watch": "vitest",
     "verify:homepage": "node scripts/verify-homepage-layout.mjs",
     "verify:homepage:featured": "node scripts/verify-featured-player-layout.mjs",
-    "verify:homepage:duel": "node scripts/verify-homepage-duel-canonical.mjs"
+    "verify:homepage:duel": "node scripts/verify-homepage-duel-canonical.mjs",
+    "verify:my-scouting-ui": "node scripts/verify-my-scouting-ui.mjs",
+    "verify:my-scouting-layout": "node scripts/verify-my-scouting-layout.mjs",
+    "verify:scouting-staged-progress": "node scripts/verify-scouting-staged-progress.mjs",
+    "verify:my-scouting-final": "node scripts/verify-my-scouting-final.mjs",
+    "verify:scouting-progress-compact": "node scripts/verify-scouting-progress-compact.mjs",
+    "verify:homepage-duel-panel-bounds": "node scripts/verify-homepage-duel-panel-bounds.mjs",
+    "verify:ui-polish-iteration": "node scripts/verify-ui-polish-iteration.mjs"
   },
   "dependencies": {
     "echarts": "^6.0.0",
