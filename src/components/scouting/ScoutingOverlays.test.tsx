@@ -49,12 +49,14 @@ describe('scouting UI overlays', () => {
     );
 
     expect(screen.queryByText('My Scouting unlocked')).toBeNull();
+    expect(document.querySelector('[data-my-scouting-unlock-bubble]')).toBeNull();
 
     rerender(
       <MyScoutingUnlockBubble open onClose={onClose} onShown={onShown} />,
     );
 
     expect(screen.getByText('My Scouting unlocked')).toBeInTheDocument();
+    expect(document.querySelector('[data-my-scouting-unlock-bubble]')).toBeTruthy();
     expect(onShown).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByLabelText('Dismiss My Scouting unlocked message'));

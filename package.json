@@ -16,6 +16,7 @@
     "verify:my-scouting-layout": "node scripts/verify-my-scouting-layout.mjs",
     "verify:scouting-staged-progress": "node scripts/verify-scouting-staged-progress.mjs",
     "verify:my-scouting-final": "node scripts/verify-my-scouting-final.mjs",
+    "verify:my-scouting-unlock-bubble": "node scripts/verify-my-scouting-unlock-bubble.mjs",
     "verify:mobile-navbar": "node scripts/verify-mobile-navbar.mjs",
     "verify:scouting-progress-compact": "node scripts/verify-scouting-progress-compact.mjs",
     "verify:homepage-duel-panel-bounds": "node scripts/verify-homepage-duel-panel-bounds.mjs",

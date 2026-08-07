@@ -362,7 +362,7 @@
     min-width: 0;
   }
 
-  .myScoutingWrap > * {
+  .myScoutingWrap > *:not([data-my-scouting-unlock-bubble]) {
     display: block;
     width: 100%;
     min-width: 0;

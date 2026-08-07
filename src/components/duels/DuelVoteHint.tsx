@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import accent from '@/components/ui/AccentHintBubble.module.css';
 import styles from './DuelVoteHint.module.css';
 
 const SESSION_KEY = 'zcout_duel_vote_hint_seen_v1';
@@ -97,7 +98,9 @@ export default function DuelVoteHint({
 
   return (
     <div
-      className={`${styles.hint} ${phase === 'exiting' ? styles.hintExit : styles.hintEnter}`}
+      className={`${accent.chrome} ${accent.caretTop} ${styles.hint} ${
+        phase === 'exiting' ? accent.exitCentered : accent.enterCentered
+      }`}
       role="status"
       aria-live="polite"
     >

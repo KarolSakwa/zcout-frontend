@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import accent from '@/components/ui/AccentHintBubble.module.css';
 import styles from './MyScoutingUnlockBubble.module.css';
 
 type BubblePhase = 'idle' | 'visible' | 'exiting';
@@ -40,23 +41,27 @@ export default function MyScoutingUnlockBubble({
   if (phase === 'idle') return null;
 
   return (
-    <div
-      className={`${styles.bubble} ${phase === 'exiting' ? styles.exit : styles.enter}`}
-      role="status"
-      aria-live="polite"
-    >
-      <button
-        type="button"
-        className={styles.close}
-        aria-label="Dismiss My Scouting unlocked message"
-        onClick={startExit}
+    <div className={styles.anchor} data-my-scouting-unlock-bubble>
+      <div
+        className={`${accent.chrome} ${accent.caretTop} ${styles.bubble} ${
+          phase === 'exiting' ? accent.exitAnchored : accent.enterAnchored
+        }`}
+        role="status"
+        aria-live="polite"
       >
-        ×
-      </button>
-      <p className={styles.title}>My Scouting unlocked</p>
-      <p className={styles.body}>
-        Your personal scouting dashboard is now available.
-      </p>
+        <button
+          type="button"
+          className={styles.close}
+          aria-label="Dismiss My Scouting unlocked message"
+          onClick={startExit}
+        >
+          ×
+        </button>
+        <p className={styles.title}>My Scouting unlocked</p>
+        <p className={styles.body}>
+          Your personal scouting dashboard is now available.
+        </p>
+      </div>
     </div>
   );
 }
