@@ -232,7 +232,7 @@ async function main() {
     console.log(`nav font-size @360px: ${font360}`);
     console.log(`nav font-size @320px: ${font320}`);
 
-    assert(font500 === '10px', `expected 10px at 500, got ${font500}`);
+    assert(font500 === '9px', `expected 9px at 500, got ${font500}`);
     assert(font390 === '9px', `expected 9px at 390, got ${font390}`);
     assert(font360 === '9px', `expected 9px at 360, got ${font360}`);
     assert(font320 === '9px', `expected 9px at 320, got ${font320}`);

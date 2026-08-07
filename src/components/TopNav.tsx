@@ -128,7 +128,7 @@ export default function TopNav() {
             <GlobalSearch />
           </div>
 
-          <div className={styles.auth}>
+          <div className={styles.auth} data-nav-auth>
             <AuthStatus />
           </div>
         </div>

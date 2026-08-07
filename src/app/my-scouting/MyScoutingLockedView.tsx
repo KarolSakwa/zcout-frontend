@@ -42,10 +42,8 @@ export default function MyScoutingLockedView({
 
     <section className={styles.lockedRoot} aria-labelledby="my-scouting-locked-title">
 
-      <h1 id="my-scouting-locked-title" className={styles.lockedTitle}>
-
+      <h1 id="my-scouting-locked-title" className="visuallyHidden">
         My Scouting
-
       </h1>
 
 

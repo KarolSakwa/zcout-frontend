@@ -7,7 +7,7 @@ export default function MyScoutingErrorView({
 }) {
   return (
     <section className={styles.errorPanel} aria-live="polite">
-      <h1 className={styles.errorTitle}>My Scouting</h1>
+      <h1 className="visuallyHidden">My Scouting</h1>
       <p className={styles.errorMessage}>We couldn&apos;t load your scouting record.</p>
       <button type="button" className={styles.retryButton} onClick={onRetry}>
         Try again

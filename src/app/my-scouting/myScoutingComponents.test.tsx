@@ -172,6 +172,7 @@ describe('My Scouting dashboard components', () => {
     expect(grid?.children[0]).toBe(summary);
     expect(grid?.children[1]).toBe(recent);
     expect(summary?.querySelector('h1')).toHaveTextContent('My Scouting');
+    expect(summary?.querySelector('h1')).toHaveClass('visuallyHidden');
     expect(summary?.querySelector('[aria-label="Scouting statistics"]')).not.toBeNull();
     expect(summary?.querySelector('[class*="nextUnlockPanel"]')).not.toBeNull();
     expect(recent?.querySelector('[class*="recentPanel"]')).not.toBeNull();

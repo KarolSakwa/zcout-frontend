@@ -10,7 +10,7 @@ export default function MyScoutingHeader({
 }) {
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>My Scouting</h1>
+      <h1 className="visuallyHidden">My Scouting</h1>
 
       {!user ? (
         <div className={styles.anonMeta}>
