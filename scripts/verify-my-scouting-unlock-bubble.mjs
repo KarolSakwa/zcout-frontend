@@ -90,15 +90,21 @@ async function measureUnlockBubble(page) {
   return page.evaluate(() => {
     const bubbleRoot = document.querySelector('[data-my-scouting-unlock-bubble]');
     const chrome = bubbleRoot?.querySelector('[role="status"]') ?? bubbleRoot;
+    const wrap =
+      document.querySelector('[data-my-scouting-nav-entry]') ??
+      document.querySelector('[data-nav-item="my-scouting"]')?.parentElement;
     const anchor = document.querySelector('[data-nav-item="my-scouting"]');
-    if (!bubbleRoot || !chrome || !anchor) {
+    if (!bubbleRoot || !chrome || !anchor || !wrap) {
       return { missing: true };
     }
 
     const bubbleBox = chrome.getBoundingClientRect();
+    const wrapBox = wrap.getBoundingClientRect();
     const anchorBox = anchor.getBoundingClientRect();
     const style = getComputedStyle(chrome);
     const doc = document.documentElement;
+    const shiftRaw = getComputedStyle(bubbleRoot).getPropertyValue('--bubble-shift-x').trim();
+    const shiftX = Number.parseFloat(shiftRaw || '0') || 0;
 
     const overlapsSearch = (() => {
       const search = document.querySelector('[data-nav-search]');
@@ -112,12 +118,16 @@ async function measureUnlockBubble(page) {
       );
     })();
 
+    const wrapCenterX = wrapBox.left + wrapBox.width / 2;
+    const bubbleCenterX = bubbleBox.left + bubbleBox.width / 2;
+    // Caret is aimed at wrap center (bubble center minus shift).
+    const caretAimX = bubbleCenterX - shiftX;
+    const caretDeltaX = Math.abs(caretAimX - wrapCenterX);
+
     const overlapsAnchorX =
       bubbleBox.left <= anchorBox.right + 4 && bubbleBox.right >= anchorBox.left - 4;
 
-    const centerDeltaX = Math.abs(
-      bubbleBox.left + bubbleBox.width / 2 - (anchorBox.left + anchorBox.width / 2),
-    );
+    const centerDeltaX = Math.abs(bubbleCenterX - wrapCenterX);
 
     return {
       missing: false,
@@ -136,6 +146,12 @@ async function measureUnlockBubble(page) {
         bottom: anchorBox.bottom,
         width: anchorBox.width,
       },
+      wrap: {
+        left: wrapBox.left,
+        right: wrapBox.right,
+        width: wrapBox.width,
+        centerX: wrapCenterX,
+      },
       viewport: { width: window.innerWidth, height: window.innerHeight },
       scrollWidth: doc.scrollWidth,
       clientWidth: doc.clientWidth,
@@ -148,6 +164,8 @@ async function measureUnlockBubble(page) {
       belowAnchor: bubbleBox.top >= anchorBox.bottom - 2,
       overlapsAnchorX,
       centerDeltaX,
+      caretDeltaX,
+      shiftX,
       overlapsSearch,
       visual: {
         backgroundColor: style.backgroundColor,
@@ -248,9 +266,24 @@ async function main() {
       assert(!geometry.horizontalOverflow, `${viewport.name}: horizontal overflow`);
       assert(geometry.belowAnchor, `${viewport.name}: bubble not below MY SCOUTING`);
       assert(geometry.overlapsAnchorX, `${viewport.name}: bubble not aligned to MY SCOUTING`);
+      assert(
+        geometry.caretDeltaX < Math.max(geometry.wrap?.width ?? 48, 48) / 2 + 8,
+        `${viewport.name}: caret not aimed at MY SCOUTING (delta=${geometry.caretDeltaX.toFixed(1)})`,
+      );
       if (viewport.width >= 1000) {
         assert(!geometry.overlapsSearch, `${viewport.name}: bubble overlaps search`);
       }
+
+      const menuOrder = await page.evaluate(() =>
+        [...document.querySelectorAll('nav[aria-label="Main"] [data-nav-item]')].map((el) =>
+          el.getAttribute('data-nav-item'),
+        ),
+      );
+      assert(
+        JSON.stringify(menuOrder) ===
+          JSON.stringify(['duels', 'rankings', 'my-scouting', 'how-it-works']),
+        `${viewport.name}: unexpected menu order ${JSON.stringify(menuOrder)}`,
+      );
 
       const widthsWhileOpen = await page.evaluate(() => {
         const anchor = document.querySelector('[data-nav-item="my-scouting"]');
@@ -278,7 +311,7 @@ async function main() {
       };
 
       console.log(
-        `${viewport.name}: OK (deltaX=${geometry.centerDeltaX.toFixed(1)}, bg=${geometry.visual.backgroundColor})`,
+        `${viewport.name}: OK (caretΔ=${geometry.caretDeltaX.toFixed(1)}, shift=${geometry.shiftX}, bg=${geometry.visual.backgroundColor})`,
       );
       await page.close();
     }

@@ -2,7 +2,8 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%);
+  /* Centered on MyScoutingNavEntry wrap; --bubble-shift-x clamps to viewport. */
+  transform: translateX(calc(-50% + var(--bubble-shift-x, 0px)));
   z-index: 70;
   width: max-content;
   max-width: min(calc(100vw - 24px), 18rem);
@@ -11,11 +12,16 @@
 
 .anchor .bubble {
   position: relative;
-  /* Override shared max-width: constrained by .anchor instead. */
   max-width: 100%;
   padding: 6px 28px 6px 12px;
   text-align: left;
   pointer-events: auto;
+}
+
+/* Keep caret aimed at wrap center when the bubble is horizontally clamped. */
+.anchor .bubble::before {
+  left: calc(50% - var(--bubble-shift-x, 0px));
+  transform: translateX(-50%);
 }
 
 .title {
@@ -54,21 +60,4 @@
 .close:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
-}
-
-/* Mobile menu: right-align to MY SCOUTING column so the bubble stays in viewport. */
-@media (max-width: 700px) {
-  .anchor {
-    left: auto;
-    right: 0;
-    transform: none;
-    max-width: min(18rem, calc(100vw - 24px));
-  }
-
-  /* Caret aims at MY SCOUTING column center (≈ half of a 4-col nav cell). */
-  .anchor .bubble::before {
-    left: auto;
-    right: 28px;
-    transform: none;
-  }
 }

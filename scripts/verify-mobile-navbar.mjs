@@ -43,6 +43,8 @@ async function readNavLayout(page) {
       lineHeight: getComputedStyle(el).lineHeight,
     }));
 
+    const order = items.map((item) => item.id);
+
     const menuStyle = getComputedStyle(menu);
     const lockEl = document.querySelector('[data-nav-item="my-scouting"][data-nav-state="locked"] svg');
     const labelEl =
@@ -83,6 +85,7 @@ async function readNavLayout(page) {
       menuGridTemplate: menuStyle.gridTemplateColumns,
       itemCount: items.length,
       items,
+      order,
       columnWidths: items.map((item) => item.box.width),
       overlaps,
       horizontalOverflow: doc.scrollWidth > doc.clientWidth + 1,
@@ -136,6 +139,11 @@ async function main() {
       const layout = await readNavLayout(page);
       assert(!layout.missing, `${name}: navbar landmarks missing`);
       assert(layout.itemCount === 4, `${name}: expected 4 nav items, got ${layout.itemCount}`);
+      assert(
+        JSON.stringify(layout.order) ===
+          JSON.stringify(['duels', 'rankings', 'my-scouting', 'how-it-works']),
+        `${name}: unexpected menu order ${JSON.stringify(layout.order)}`,
+      );
 
       if (width <= 700) {
         assert(layout.menuDisplay === 'grid', `${name}: menu should be grid`);
