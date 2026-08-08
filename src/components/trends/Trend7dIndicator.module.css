@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.22em;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1;
   white-space: nowrap;
@@ -35,8 +35,28 @@
 }
 
 .root[data-variant='iconAndValue'] {
-  font-size: inherit;
+  font-size: 11px;
   gap: 0.28em;
+}
+
+.root[data-intensity='1'] {
+  filter: saturate(0.75);
+}
+
+.root[data-intensity='2'] {
+  filter: saturate(0.85);
+}
+
+.root[data-intensity='3'] {
+  filter: saturate(0.95);
+}
+
+.root[data-intensity='4'] {
+  filter: saturate(1.05);
+}
+
+.root[data-intensity='5'] {
+  filter: saturate(1.15);
 }
 
 .root[data-direction='up'][data-intensity='1'] {

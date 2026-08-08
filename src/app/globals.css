@@ -46,18 +46,30 @@
   --ui-action-primary-text: white;
   --ui-accent-faller: #c98f9a;
 
-  /* Weekly / period trend intensity (direction via ↑↓; not brand blue) */
-  --ui-trend-positive-1: color-mix(in srgb, var(--ui-accent-success) 44%, var(--ui-text-muted));
-  --ui-trend-positive-2: color-mix(in srgb, var(--ui-accent-success) 58%, var(--ui-text-muted));
-  --ui-trend-positive-3: color-mix(in srgb, var(--ui-accent-success) 72%, var(--ui-text-primary));
-  --ui-trend-positive-4: color-mix(in srgb, var(--ui-accent-success) 86%, var(--ui-text-primary));
-  --ui-trend-positive-5: color-mix(in srgb, var(--ui-accent-success) 94%, white);
+  /* Shared blue intensity primitives (text-primary ↔ accent-primary) */
+  --ui-blue-intensity-1: color-mix(in srgb, var(--ui-accent-primary) 10%, var(--ui-text-primary));
+  --ui-blue-intensity-2: color-mix(in srgb, var(--ui-accent-primary) 20%, var(--ui-text-primary));
+  --ui-blue-intensity-3: color-mix(in srgb, var(--ui-accent-primary) 30%, var(--ui-text-primary));
+  --ui-blue-intensity-4: color-mix(in srgb, var(--ui-accent-primary) 40%, var(--ui-text-primary));
+  --ui-blue-intensity-5: color-mix(in srgb, var(--ui-accent-primary) 50%, var(--ui-text-primary));
+  --ui-blue-intensity-6: color-mix(in srgb, var(--ui-accent-primary) 60%, var(--ui-text-primary));
+  --ui-blue-intensity-7: color-mix(in srgb, var(--ui-accent-primary) 70%, var(--ui-text-primary));
+  --ui-blue-intensity-8: color-mix(in srgb, var(--ui-accent-primary) 80%, var(--ui-text-primary));
+  --ui-blue-intensity-9: color-mix(in srgb, var(--ui-accent-primary) 90%, var(--ui-text-primary));
+  --ui-blue-intensity-10: var(--ui-accent-primary);
 
-  --ui-trend-negative-1: color-mix(in srgb, var(--ui-accent-faller) 48%, var(--ui-text-muted));
-  --ui-trend-negative-2: color-mix(in srgb, var(--ui-accent-faller) 62%, var(--ui-text-muted));
-  --ui-trend-negative-3: color-mix(in srgb, var(--ui-accent-faller) 76%, var(--ui-text-primary));
-  --ui-trend-negative-4: color-mix(in srgb, var(--ui-accent-faller) 88%, var(--ui-text-primary));
-  --ui-trend-negative-5: color-mix(in srgb, var(--ui-accent-faller) 96%, white);
+  /* Weekly trend semantic aliases → even samples of the shared 10-step scale */
+  --ui-trend-positive-1: var(--ui-blue-intensity-2);
+  --ui-trend-positive-2: var(--ui-blue-intensity-4);
+  --ui-trend-positive-3: var(--ui-blue-intensity-6);
+  --ui-trend-positive-4: var(--ui-blue-intensity-8);
+  --ui-trend-positive-5: var(--ui-blue-intensity-10);
+
+  --ui-trend-negative-1: var(--ui-blue-intensity-2);
+  --ui-trend-negative-2: var(--ui-blue-intensity-4);
+  --ui-trend-negative-3: var(--ui-blue-intensity-6);
+  --ui-trend-negative-4: var(--ui-blue-intensity-8);
+  --ui-trend-negative-5: var(--ui-blue-intensity-10);
 
   --ui-trend-neutral: var(--ui-text-muted);
 

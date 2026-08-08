@@ -16,6 +16,51 @@ describe('delta color tokens', () => {
     expect(globals).toContain('--ui-negative: var(--theme-danger);');
   });
 
+  it('defines exactly 10 shared blue intensity primitives on text-primary ↔ accent-primary', () => {
+    const globals = readProject('src/app/globals.css');
+
+    for (let level = 1; level <= 10; level += 1) {
+      expect(globals).toContain(`--ui-blue-intensity-${level}:`);
+    }
+
+    expect(globals).toContain(
+      '--ui-blue-intensity-1: color-mix(in srgb, var(--ui-accent-primary) 10%, var(--ui-text-primary));',
+    );
+    expect(globals).toContain(
+      '--ui-blue-intensity-5: color-mix(in srgb, var(--ui-accent-primary) 50%, var(--ui-text-primary));',
+    );
+    expect(globals).toContain('--ui-blue-intensity-10: var(--ui-accent-primary);');
+    expect(globals).not.toMatch(
+      /--ui-blue-intensity-\d:\s*color-mix\([^)]*--ui-text-muted/,
+    );
+    expect(globals).not.toMatch(
+      /--ui-blue-intensity-\d:\s*color-mix\([^)]*--ui-accent-success/,
+    );
+  });
+
+  it('maps weekly trend semantic levels to even blue-intensity samples 2/4/6/8/10', () => {
+    const globals = readProject('src/app/globals.css');
+
+    expect(globals).toContain('--ui-trend-positive-1: var(--ui-blue-intensity-2);');
+    expect(globals).toContain('--ui-trend-positive-2: var(--ui-blue-intensity-4);');
+    expect(globals).toContain('--ui-trend-positive-3: var(--ui-blue-intensity-6);');
+    expect(globals).toContain('--ui-trend-positive-4: var(--ui-blue-intensity-8);');
+    expect(globals).toContain('--ui-trend-positive-5: var(--ui-blue-intensity-10);');
+
+    expect(globals).toContain('--ui-trend-negative-1: var(--ui-blue-intensity-2);');
+    expect(globals).toContain('--ui-trend-negative-2: var(--ui-blue-intensity-4);');
+    expect(globals).toContain('--ui-trend-negative-3: var(--ui-blue-intensity-6);');
+    expect(globals).toContain('--ui-trend-negative-4: var(--ui-blue-intensity-8);');
+    expect(globals).toContain('--ui-trend-negative-5: var(--ui-blue-intensity-10);');
+
+    expect(globals).not.toMatch(
+      /--ui-trend-positive-\d:\s*color-mix\([^)]*--ui-accent-success/,
+    );
+    expect(globals).not.toMatch(
+      /--ui-trend-negative-\d:\s*color-mix\([^)]*--ui-accent-faller/,
+    );
+  });
+
   it('defines weekly trend intensity and vote impact tokens', () => {
     const globals = readProject('src/app/globals.css');
 
@@ -47,5 +92,6 @@ describe('delta color tokens', () => {
     expect(impact).toContain('VoteImpactBadge');
     expect(impact).not.toContain('var(--ui-accent-success)');
     expect(impact).not.toContain('var(--ui-danger)');
+    expect(badgeCss).not.toContain('--ui-blue-intensity-');
   });
 });
