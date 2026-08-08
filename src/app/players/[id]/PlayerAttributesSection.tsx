@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Tooltip from '@/components/Tooltip';
 import AttributeIcon from '@/components/AttributeIcon';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
+import Trend7dIndicator from '@/components/trends/Trend7dIndicator';
 import { getRatingColor } from '@/lib/ratings';
 import { attributeDescriptions } from '@/lib/attributeDescriptions';
 import styles from './page.module.css';
@@ -71,26 +72,6 @@ function getUserAttributeRating(attribute: PlayerProfileAttribute): number | nul
 
 function getAttributeDelta7d(attribute: PlayerProfileAttribute): number | null {
   return attribute.trend_7d;
-}
-
-function getDeltaToneClass(delta: number) {
-  const absDelta = Math.abs(delta);
-
-  if (absDelta >= 0.9) {
-    return styles.attributeDeltaStrong;
-  }
-
-  if (absDelta >= 0.45) {
-    return styles.attributeDeltaMedium;
-  }
-
-  return styles.attributeDeltaSoft;
-}
-
-function formatSignedTwoDecimals(value: number) {
-  const sign = value > 0 ? '+' : value < 0 ? '−' : '';
-
-  return `${sign}${Math.abs(value).toFixed(2)}`;
 }
 
 function formatTwoDecimals(value: number) {
@@ -214,9 +195,6 @@ function AttributeColumn({
 
         const delta7d = getAttributeDelta7d(attr);
 
-        const hasDelta =
-          delta7d != null && Math.abs(delta7d) > 0.001;
-
         return (
           <div
             key={item.id}
@@ -325,36 +303,12 @@ function AttributeColumn({
 
               <div className={styles.attributeMetricCluster}>
                 <div className={styles.attributeDeltaSlot}>
-                  {hasDelta ? (
-                    <Tooltip
-                      content={
-                        <>
-                          Last 7 days:{' '}
-                          <span className="ratingValue">
-                            {formatSignedTwoDecimals(delta7d)}
-                          </span>
-                        </>
-                      }
-                      side="top"
-                      align="end"
-                    >
-                      <span
-                        className={[
-                          styles.attributeDelta,
-                          styles.infoHover,
-                          delta7d > 0
-                            ? styles.attributeDeltaUp
-                            : styles.attributeDeltaDown,
-                          getDeltaToneClass(delta7d),
-                        ].join(' ')}
-                        aria-label={`Last 7 days ${formatSignedTwoDecimals(
-                          delta7d
-                        )}`}
-                      >
-                        {delta7d > 0 ? '↑' : '↓'}
-                      </span>
-                    </Tooltip>
-                  ) : null}
+                  <Trend7dIndicator
+                    delta={delta7d}
+                    domain="attribute"
+                    variant="iconOnly"
+                    className={styles.attributeDelta}
+                  />
                 </div>
 
                 <AnimatedCrowdRating

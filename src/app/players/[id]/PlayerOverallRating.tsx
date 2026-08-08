@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Tooltip from '@/components/Tooltip';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
+import Trend7dIndicator from '@/components/trends/Trend7dIndicator';
 import { getRatingColor } from '@/lib/ratings';
 import styles from './page.module.css';
 
@@ -13,25 +13,6 @@ type PlayerOverallRatingProps = {
   overallDelta7d: number | null;
   shouldAnimate?: boolean;
 };
-
-function formatSignedTwoDecimals(value: number) {
-  const sign = value > 0 ? '+' : value < 0 ? '−' : '';
-  return `${sign}${Math.abs(value).toFixed(2)}`;
-}
-
-function getDeltaToneClass(delta: number) {
-  const absDelta = Math.abs(delta);
-
-  if (absDelta >= 0.9) {
-    return styles.attributeDeltaStrong;
-  }
-
-  if (absDelta >= 0.45) {
-    return styles.attributeDeltaMedium;
-  }
-
-  return styles.attributeDeltaSoft;
-}
 
 function toNumericOverall(value: number | string) {
   const parsed = Number(value);
@@ -123,37 +104,15 @@ export default function PlayerOverallRating({
   overallDelta7d,
   shouldAnimate = false,
 }: PlayerOverallRatingProps) {
-  const hasOverallDelta = overallDelta7d != null && Math.abs(overallDelta7d) > 0.001;
-
   return (
     <div className={styles.overallMetricCluster}>
       <div className={styles.overallDeltaSlot}>
-        {hasOverallDelta ? (
-          <Tooltip
-            content={
-              <>
-                Last 7 days:{' '}
-                <span className="ratingValue">
-                  {formatSignedTwoDecimals(overallDelta7d)}
-                </span>
-              </>
-            }
-            side="top"
-            align="end"
-          >
-            <span
-              className={[
-                styles.attributeDelta,
-                styles.infoHover,
-                overallDelta7d > 0 ? styles.attributeDeltaUp : styles.attributeDeltaDown,
-                getDeltaToneClass(overallDelta7d),
-              ].join(' ')}
-              aria-label={`Last 7 days ${formatSignedTwoDecimals(overallDelta7d)}`}
-            >
-              {overallDelta7d > 0 ? '↑' : '↓'}
-            </span>
-          </Tooltip>
-        ) : null}
+        <Trend7dIndicator
+          delta={overallDelta7d}
+          domain="overall"
+          variant="iconOnly"
+          className={styles.attributeDelta}
+        />
       </div>
 
       <AnimatedOverallMetric

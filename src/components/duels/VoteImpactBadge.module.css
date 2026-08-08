@@ -1,0 +1,29 @@
+.root {
+  flex-shrink: 0;
+  min-width: 58px;
+  padding: 4px 9px;
+  border-radius: var(--ui-radius-pill);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  box-sizing: border-box;
+  border: 1px solid var(--ui-impact-neutral-border);
+  background: var(--ui-impact-neutral-bg);
+  color: var(--ui-impact-neutral-fg);
+}
+
+.root[data-tone='positive'] {
+  border-color: var(--ui-impact-positive-border);
+  background: var(--ui-impact-positive-bg);
+  color: var(--ui-impact-positive-fg);
+}
+
+.root[data-tone='negative'] {
+  border-color: var(--ui-impact-negative-border);
+  background: var(--ui-impact-negative-bg);
+  color: var(--ui-impact-negative-fg);
+}

@@ -46,6 +46,34 @@
   --ui-action-primary-text: white;
   --ui-accent-faller: #c98f9a;
 
+  /* Weekly / period trend intensity (direction via ↑↓; not brand blue) */
+  --ui-trend-positive-1: color-mix(in srgb, var(--ui-accent-success) 44%, var(--ui-text-muted));
+  --ui-trend-positive-2: color-mix(in srgb, var(--ui-accent-success) 58%, var(--ui-text-muted));
+  --ui-trend-positive-3: color-mix(in srgb, var(--ui-accent-success) 72%, var(--ui-text-primary));
+  --ui-trend-positive-4: color-mix(in srgb, var(--ui-accent-success) 86%, var(--ui-text-primary));
+  --ui-trend-positive-5: color-mix(in srgb, var(--ui-accent-success) 94%, white);
+
+  --ui-trend-negative-1: color-mix(in srgb, var(--ui-accent-faller) 48%, var(--ui-text-muted));
+  --ui-trend-negative-2: color-mix(in srgb, var(--ui-accent-faller) 62%, var(--ui-text-muted));
+  --ui-trend-negative-3: color-mix(in srgb, var(--ui-accent-faller) 76%, var(--ui-text-primary));
+  --ui-trend-negative-4: color-mix(in srgb, var(--ui-accent-faller) 88%, var(--ui-text-primary));
+  --ui-trend-negative-5: color-mix(in srgb, var(--ui-accent-faller) 96%, white);
+
+  --ui-trend-neutral: var(--ui-text-muted);
+
+  /* Vote impact pills (stronger than weekly trend; separate from --ui-danger) */
+  --ui-impact-positive-fg: color-mix(in srgb, var(--ui-positive) 84%, white);
+  --ui-impact-positive-bg: color-mix(in srgb, var(--ui-positive) 12%, transparent);
+  --ui-impact-positive-border: color-mix(in srgb, var(--ui-positive) 36%, transparent);
+
+  --ui-impact-negative-fg: color-mix(in srgb, var(--ui-accent-faller) 72%, white);
+  --ui-impact-negative-bg: color-mix(in srgb, var(--ui-accent-faller) 14%, transparent);
+  --ui-impact-negative-border: color-mix(in srgb, var(--ui-accent-faller) 38%, transparent);
+
+  --ui-impact-neutral-fg: var(--ui-text-muted);
+  --ui-impact-neutral-bg: color-mix(in srgb, var(--ui-text-muted) 10%, transparent);
+  --ui-impact-neutral-border: color-mix(in srgb, var(--ui-border-subtle) 90%, transparent);
+
   --ui-action-secondary-bg-1: rgba(78, 86, 101, 0.92);
   --ui-action-secondary-bg-2: rgba(56, 63, 76, 0.94);
   --ui-action-secondary-border: rgba(105, 114, 131, 0.6);

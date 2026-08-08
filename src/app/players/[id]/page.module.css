@@ -483,34 +483,6 @@
   user-select: none;
 }
 
-.attributeDeltaUp {
-  transform: translateY(-0.5px);
-}
-
-.attributeDeltaDown {
-  transform: translateY(0.5px);
-}
-
-.attributeDeltaSoft {
-  color: color-mix(
-    in srgb,
-    var(--ui-accent-primary) 42%,
-    var(--ui-text-primary)
-  );
-}
-
-.attributeDeltaMedium {
-  color: color-mix(
-    in srgb,
-    var(--ui-accent-primary) 66%,
-    var(--ui-text-primary)
-  );
-}
-
-.attributeDeltaStrong {
-  color: color-mix(in srgb, var(--ui-accent-primary) 92%, white);
-}
-
 .metricHover {
   cursor: default;
 }

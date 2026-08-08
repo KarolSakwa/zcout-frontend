@@ -6,6 +6,7 @@ import RankingsControls from '../RankingsControls';
 import RankingsSortLink from '../RankingsSortLink';
 import RankingsTelemetry from './RankingsTelemetry';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
+import Trend7dIndicator from '@/components/trends/Trend7dIndicator';
 import ZLoader from '@/components/ZLoader';
 import { getRatingColor } from '@/lib/ratings';
 
@@ -385,7 +386,12 @@ export default async function RankingsPage({
                     </td>
 
                     <td className={`${styles.trendCell} ${styles.trendColumn}`} data-rankings-col="trend">
-                      {trend === null ? '—' : trend > 0 ? `+${trend.toFixed(2)}` : trend.toFixed(2)}
+                      <Trend7dIndicator
+                        delta={trend}
+                        domain="attribute"
+                        variant="iconAndValue"
+                        emptyFallback="—"
+                      />
                     </td>
                   </tr>
                 );

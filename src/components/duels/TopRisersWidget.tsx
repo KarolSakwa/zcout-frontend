@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import LiveWidgetAttributeMeta from '@/components/duels/LiveWidgetAttributeMeta';
+import Trend7dIndicator from '@/components/trends/Trend7dIndicator';
 import WidgetPanel from '@/components/ui/WidgetPanel';
 
 export type TopRiserItem = {
@@ -10,7 +11,7 @@ export type TopRiserItem = {
   player: string;
   attributeKey: string;
   attributeLabel: string;
-  delta: string;
+  delta: number | null;
 };
 
 type WidgetMode = 'risers' | 'fallers';
@@ -18,7 +19,7 @@ type WidgetMode = 'risers' | 'fallers';
 const sevenDayMetaStyle = {
   fontSize: 9,
   fontWeight: 600,
-  color: 'var(--ui-accent-primary)',
+  color: 'var(--ui-text-muted)',
   whiteSpace: 'nowrap' as const,
 };
 
@@ -40,7 +41,6 @@ export default function TopRisersWidget({
   docked?: boolean;
 }) {
   const title = mode === 'risers' ? 'Top risers' : 'Top fallers';
-  const deltaColor = mode === 'risers' ? 'var(--ui-accent-primary)' : 'var(--ui-accent-faller)';
   const useFloatingAbsolute = !embedded && !docked;
 
   return (
@@ -125,7 +125,6 @@ export default function TopRisersWidget({
                 <div
                   style={{
                     justifySelf: 'end',
-                    color: deltaColor,
                     fontSize: embedded ? 11 : 13,
                     fontWeight: 800,
                     letterSpacing: '0.02em',
@@ -133,7 +132,12 @@ export default function TopRisersWidget({
                     textAlign: 'right',
                   }}
                 >
-                  {item.delta}
+                  <Trend7dIndicator
+                    delta={item.delta}
+                    domain="attribute"
+                    variant="iconAndValue"
+                    emptyFallback="—"
+                  />
                 </div>
               </div>
             ) : (
@@ -187,13 +191,17 @@ export default function TopRisersWidget({
                 <div
                   style={{
                     flexShrink: 0,
-                    color: deltaColor,
                     fontSize: embedded ? 11 : 13,
                     fontWeight: 800,
                     letterSpacing: '0.02em',
                   }}
                 >
-                  {item.delta}
+                  <Trend7dIndicator
+                    delta={item.delta}
+                    domain="attribute"
+                    variant="iconAndValue"
+                    emptyFallback="—"
+                  />
                 </div>
               </div>
             )}

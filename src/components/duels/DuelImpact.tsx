@@ -1,5 +1,6 @@
 import React from "react";
 import RatingWithConfidence from "../RatingWithConfidence";
+import VoteImpactBadge from "./VoteImpactBadge";
 import { getRatingColor } from "@/lib/ratings";
 
 type Impact = {
@@ -13,11 +14,6 @@ type Impact = {
 };
 
 const roundToDisplay = (value: number) => Number(value.toFixed(2));
-
-const formatDelta = (value: number) => {
-  if (!Number.isFinite(value) || value === 0) return "0.00";
-  return `${value > 0 ? "+" : "-"}${Math.abs(value).toFixed(2)}`;
-};
 
 export default function DuelImpact({
   show,
@@ -44,8 +40,8 @@ export default function DuelImpact({
   const after = Number(impact.rating_after);
   const displayBefore = roundToDisplay(before);
   const displayAfter = roundToDisplay(after);
+  // Keep rounded before/after difference so the badge matches visible ratings.
   const displayDelta = roundToDisplay(displayAfter - displayBefore);
-  const isPositive = displayDelta >= 0;
   const showBadge = impact.is_top_ten && impact.attribute_rank !== null;
 
   void playerId;
@@ -167,30 +163,10 @@ export default function DuelImpact({
         )}
       </div>
 
-      <span
-        style={{
-          flexShrink: 0,
-          minWidth: 58,
-          padding: "4px 9px",
-          borderRadius: "999px",
-          textAlign: "center",
-          border: isPositive
-            ? "1px solid color-mix(in srgb, var(--ui-positive) 32%, transparent)"
-            : "1px solid color-mix(in srgb, var(--ui-negative) 34%, transparent)",
-          background: isPositive
-            ? "color-mix(in srgb, var(--ui-positive) 9%, transparent)"
-            : "color-mix(in srgb, var(--ui-negative) 9%, transparent)",
-          color: isPositive
-            ? "color-mix(in srgb, var(--ui-positive) 82%, white)"
-            : "color-mix(in srgb, var(--ui-negative) 82%, white)",
-          fontSize: homepageMode ? 10 : 11,
-          fontWeight: 900,
-          letterSpacing: "0.03em",
-          lineHeight: 1,
-        }}
-      >
-        {formatDelta(displayDelta)}
-      </span>
+      <VoteImpactBadge
+        delta={displayDelta}
+        className={homepageMode ? "impactBadgeHomepage" : undefined}
+      />
 
       <style jsx>{`
         .impact {
@@ -203,6 +179,10 @@ export default function DuelImpact({
           gap: 12px;
           padding: 0 14px;
           box-sizing: border-box;
+        }
+
+        .impact :global(.impactBadgeHomepage) {
+          font-size: 10px;
         }
 
         @media (max-width: 700px) {

@@ -2,8 +2,7 @@
 
 import AttributeIcon from '@/components/AttributeIcon';
 import RatingWithConfidence from '@/components/RatingWithConfidence';
-import Tooltip from '@/components/Tooltip';
-import { formatTrend7d, getTrend7dColor } from '@/lib/trends';
+import Trend7dIndicator from '@/components/trends/Trend7dIndicator';
 import WidgetPanel from '@/components/ui/WidgetPanel';
 import Link from 'next/link';
 
@@ -42,6 +41,11 @@ const metricsClusterStyle = {
   justifyContent: 'flex-end',
   gap: 15,
   minWidth: 0,
+};
+
+/** Secondary to the rating; keep Featured Ranking deltas visually quieter. */
+const featuredTrendStyle = {
+  fontSize: 10,
 };
 
 const stateTextStyle = {
@@ -173,25 +177,14 @@ export default function FeaturedAttributeRankingWidget({
                 </span>
 
                 <div style={metricsClusterStyle}>
-                  {item.trend_7d != null ? (
-                    <Tooltip content="Last 7 days" side="top" align="end">
-                      <span
-                        style={{
-                          color: getTrend7dColor(item.trend_7d),
-                          fontSize: 11,
-                          fontWeight: 800,
-                          letterSpacing: '0.02em',
-                          whiteSpace: 'nowrap',
-                          textAlign: 'right',
-                          lineHeight: 1,
-                          fontVariantNumeric: 'tabular-nums',
-                          cursor: 'help',
-                        }}
-                      >
-                        {formatTrend7d(item.trend_7d)}
-                      </span>
-                    </Tooltip>
-                  ) : null}
+                  <div style={featuredTrendStyle}>
+                    <Trend7dIndicator
+                      delta={item.trend_7d}
+                      domain="attribute"
+                      variant="iconAndValue"
+                      emptyFallback="—"
+                    />
+                  </div>
 
                   <RatingWithConfidence
                     rating={item.rating}

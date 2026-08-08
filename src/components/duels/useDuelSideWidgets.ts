@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { initEcho } from '@/lib/echo';
+import { parseSignedDeltaInput } from '@/lib/trends';
 import Echo from 'laravel-echo'
 
 type RecentVoteItem = {
@@ -21,19 +22,33 @@ declare global {
   }
 }
 
+type TopMoverApiItem = {
+  id: string;
+  playerId: number;
+  player: string;
+  attributeKey: string;
+  attributeLabel: string;
+  delta: string | number | null;
+};
+
 export type TopRiserItem = {
   id: string;
   playerId: number;
   player: string;
   attributeKey: string;
   attributeLabel: string;
-  delta: string;
+  delta: number | null;
 };
 
 type TopMoversMode = 'risers' | 'fallers';
 
 type RecentVotesResponse = {
   items: RecentVoteItem[];
+};
+
+type TopMoversSummaryApiResponse = {
+  risers?: TopMoverApiItem[];
+  fallers?: TopMoverApiItem[];
 };
 
 type TopMoversSummaryResponse = {
@@ -90,13 +105,39 @@ async function fetchJson<T>(input: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+function mapTopMoverItem(item: TopMoverApiItem): TopRiserItem {
+  return {
+    id: item.id,
+    playerId: item.playerId,
+    player: item.player,
+    attributeKey: item.attributeKey,
+    attributeLabel: item.attributeLabel,
+    delta: parseSignedDeltaInput(item.delta),
+  };
+}
+
+function mapTopMoversSummary(
+  summary: TopMoversSummaryApiResponse | null | undefined,
+): TopMoversSummaryResponse {
+  return {
+    risers: Array.isArray(summary?.risers)
+      ? summary.risers.map(mapTopMoverItem)
+      : [],
+    fallers: Array.isArray(summary?.fallers)
+      ? summary.fallers.map(mapTopMoverItem)
+      : [],
+  };
+}
+
 export async function fetchTopMoversSummary(
   signal?: AbortSignal
 ): Promise<TopMoversSummaryResponse> {
-  return fetchJson<TopMoversSummaryResponse>(
+  const summary = await fetchJson<TopMoversSummaryApiResponse>(
     `/api/live/top-movers-summary?period=7d&limit=${LIVE_ITEMS_LIMIT}`,
     signal
   );
+
+  return mapTopMoversSummary(summary);
 }
 
 export async function fetchRecentVotes(
@@ -185,8 +226,8 @@ export function useDuelSideWidgets() {
     try {
       const summary = await fetchTopMoversSummary();
 
-      setRiserItems(Array.isArray(summary.risers) ? summary.risers : []);
-      setFallerItems(Array.isArray(summary.fallers) ? summary.fallers : []);
+      setRiserItems(summary.risers);
+      setFallerItems(summary.fallers);
     } catch (error) {
       console.error('Failed to refetch top movers summary', error);
     }
@@ -205,8 +246,8 @@ export function useDuelSideWidgets() {
 
         const summary = await fetchTopMoversSummary(controller.signal);
 
-        setRiserItems(Array.isArray(summary.risers) ? summary.risers : []);
-        setFallerItems(Array.isArray(summary.fallers) ? summary.fallers : []);
+        setRiserItems(summary.risers);
+        setFallerItems(summary.fallers);
       } catch {
         setRiserItems([]);
         setFallerItems([]);
