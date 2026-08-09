@@ -11,7 +11,7 @@ const TOL = 1.01;
 /** e9cd773 CSS-derived expectations */
 const EXPECT = {
   1920: {
-    cardW: 282,
+    cardW: 246,
     nameFs: 18,
     flagW: 22,
     flagH: 14,
@@ -22,7 +22,7 @@ const EXPECT = {
     topM: 'none',
   },
   1440: {
-    cardW: 274,
+    cardW: 238,
     nameFs: 18,
     flagW: 22,
     flagH: 14,

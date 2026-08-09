@@ -13,14 +13,15 @@ const VIEWPORTS = [
 const LOADER_TRIAGE_VIEWPORTS = [1240, 1201];
 const LOADER_SCREENSHOT_DIR = join(process.cwd(), 'tmp', 'verify-duels-loader-triage');
 const DESKTOP_BASELINE = {
-  1920: { cardW: 282, rowW: 720, stageMax: 996 },
-  1440: { cardW: 274, rowW: 660, stageMax: 840 },
+  1920: { cardW: 246, rowW: 628, stageMax: 1320 },
+  1440: { cardW: 238, rowW: 576, stageMax: 1240 },
 };
 
 /** Mocked only when live backend is unreachable — real React tree still renders. */
 const MOCKED_ENDPOINTS = [
   '/api/duels/next',
   '/api/live/top-movers-summary',
+  '/api/live/attribute-top',
   '/api/live/recent-votes',
   '/api/auth/user',
 ];
@@ -63,7 +64,11 @@ async function gotoDuels(page) {
   });
   await page.waitForSelector('[data-duels-row]', { timeout: 120000 });
   await page.waitForSelector('[data-duels-page="true"]', { timeout: 30000 });
-  await page.waitForTimeout(600);
+  await page.waitForSelector('[data-duels-slot="left"] article.card', {
+    timeout: 120000,
+    state: 'attached',
+  });
+  await page.waitForTimeout(800);
 }
 
 async function measureDuels(page) {
@@ -98,7 +103,9 @@ async function measureDuels(page) {
     const docEl = document.documentElement;
     const body = document.body;
     const row = document.querySelector('[data-duels-row]');
-    const stage = document.querySelector('[class*="duelStageCenter"]');
+    const scene = document.querySelector('[class*="duelStageScene"]');
+    const stage = document.querySelector('[class*="duelCenterColumn"]') || scene;
+    const centerColumn = document.querySelector('[class*="duelCenterColumn"]');
     const leftSlot = document.querySelector('[data-duels-slot="left"]');
     const rightSlot = document.querySelector('[data-duels-slot="right"]');
     const center = document.querySelector('[data-duels-slot="center"]');
@@ -110,7 +117,7 @@ async function measureDuels(page) {
       rightSlot?.querySelector('article.card') ||
       rightSlot?.querySelector('[data-duels-page="true"]') ||
       rightSlot?.firstElementChild;
-    const idleSpacer = center?.querySelector('[data-duels-center-spacer]');
+    const idleSpacer = center?.querySelector('[data-duels-vs]');
     const centerLoaderRoot =
       center && !idleSpacer && isVisible(center.firstElementChild)
         ? center.firstElementChild
@@ -128,6 +135,24 @@ async function measureDuels(page) {
     const skip = document.querySelector('[data-duels-skip]');
     const risers = document.querySelector('[data-duels-widget="risers"]');
     const votes = document.querySelector('[data-duels-widget="votes"]');
+    const progressWrap = document.querySelector('[class*="duelPageActionsProgress"]');
+
+    let vsCenterOffset = null;
+    if (leftCard && rightCard && idleSpacer) {
+      const gapMid = (leftCard.getBoundingClientRect().right + rightCard.getBoundingClientRect().left) / 2;
+      const vsRect = idleSpacer.getBoundingClientRect();
+      const vsMid = (vsRect.left + vsRect.right) / 2;
+      vsCenterOffset = +(vsMid - gapMid).toFixed(2);
+    }
+
+    let cardsToProgressGap = null;
+    if (leftCard && rightCard && progressWrap) {
+      const cardsBottom = Math.max(
+        leftCard.getBoundingClientRect().bottom,
+        rightCard.getBoundingClientRect().bottom,
+      );
+      cardsToProgressGap = +(progressWrap.getBoundingClientRect().top - cardsBottom).toFixed(2);
+    }
 
     const contentOverflows = (card) => {
       if (!card) return false;
@@ -159,6 +184,7 @@ async function measureDuels(page) {
         body.scrollWidth - window.innerWidth,
       ),
       stage: box(stage),
+      scene: box(scene),
       row: box(row),
       leftCard: box(leftCard),
       rightCard: box(rightCard),
@@ -170,6 +196,27 @@ async function measureDuels(page) {
       votes: box(votes),
       leftOverflow: contentOverflows(leftCard),
       rightOverflow: contentOverflows(rightCard),
+      vsCenterOffset,
+      cardsToProgressGap,
+      railHeight: risers ? +risers.getBoundingClientRect().height.toFixed(2) : null,
+      centerColumn: box(centerColumn),
+      railCenterY:
+        risers && votes
+          ? +(
+              (risers.getBoundingClientRect().top +
+                risers.getBoundingClientRect().bottom +
+                votes.getBoundingClientRect().top +
+                votes.getBoundingClientRect().bottom) /
+              4
+            ).toFixed(2)
+          : null,
+      stackCenterY: centerColumn
+        ? +(
+            (centerColumn.getBoundingClientRect().top +
+              centerColumn.getBoundingClientRect().bottom) /
+            2
+          ).toFixed(2)
+        : null,
       cols: row ? getComputedStyle(row).gridTemplateColumns : null,
     };
   });
@@ -266,7 +313,7 @@ async function measureLoadingOverlap(page, width) {
       rightSlot?.querySelector('article.card') ||
       rightSlot?.querySelector('[class*="Placeholder"]') ||
       rightSlot?.firstElementChild;
-    const idleSpacer = center?.querySelector('[data-duels-center-spacer]');
+    const idleSpacer = center?.querySelector('[data-duels-vs]');
     const centerLoaderRoot =
       center && !idleSpacer && isVisible(center.firstElementChild)
         ? center.firstElementChild
@@ -400,12 +447,12 @@ function fail(msg) {
       if (w > 1200) {
         if (!(m.risers.right <= m.stage.left + 2)) {
           ok = fail(
-            `viewport ${w}: risers not to the left of stage (r=${m.risers.right}, stageL=${m.stage.left})`,
+            `viewport ${w}: left rail not to the left of stage (r=${m.risers.right}, stageL=${m.stage.left})`,
           );
         }
         if (!(m.votes.left >= m.stage.right - 2)) {
           ok = fail(
-            `viewport ${w}: votes not to the right of stage (l=${m.votes.left}, stageR=${m.stage.right})`,
+            `viewport ${w}: right rail not to the right of stage (l=${m.votes.left}, stageR=${m.stage.right})`,
           );
         }
         const baseline = DESKTOP_BASELINE[w];
@@ -421,6 +468,27 @@ function fail(msg) {
             );
           }
         }
+
+        if (m.vsCenterOffset != null && Math.abs(m.vsCenterOffset) > 2) {
+          ok = fail(
+            `viewport ${w}: VS off card-gap center by ${m.vsCenterOffset}px`,
+          );
+        }
+
+        if (m.railHeight != null && m.railHeight > 560) {
+          ok = fail(`viewport ${w}: rail height ${m.railHeight}px exceeds natural max`);
+        }
+
+        if (w === 1920 && m.cardsToProgressGap != null) {
+          console.log(
+            `  geometry: vsΔ=${m.vsCenterOffset}px cards→progress=${m.cardsToProgressGap}px railH=${m.railHeight}px stackΔY=${m.stackCenterY != null && m.railCenterY != null ? (m.stackCenterY - m.railCenterY).toFixed(2) : 'n/a'}px`,
+          );
+          if (m.cardsToProgressGap < 4 || m.cardsToProgressGap > 48) {
+            ok = fail(
+              `viewport ${w}: cards→progress gap ${m.cardsToProgressGap}px outside 4–48px`,
+            );
+          }
+        }
       } else {
         if (!(m.skip.bottom <= m.risers.top + 2)) {
           ok = fail(
@@ -432,9 +500,9 @@ function fail(msg) {
             `viewport ${w}: risers not above votes (risersB=${m.risers.bottom}, votesT=${m.votes.top})`,
           );
         }
-        if (!(m.stage.bottom <= m.skip.top + 4)) {
+        if (!(m.stage.bottom <= m.risers.top + 4)) {
           ok = fail(
-            `viewport ${w}: stage not above skip (stageB=${m.stage.bottom}, skipT=${m.skip.top})`,
+            `viewport ${w}: center not above stacked left rail (centerB=${m.stage.bottom}, risersT=${m.risers.top})`,
           );
         }
         if (!approxEqual(m.risers.width, m.votes.width, 4)) {
@@ -470,6 +538,7 @@ function fail(msg) {
     const cur = results[i];
     if (!prev.leftCard || !cur.leftCard) continue;
     if (cur.w >= prev.w) continue;
+    if (prev.w === 1201 && cur.w === 1200) continue;
     if (cur.leftCard.width > prev.leftCard.width + 2) {
       ok = fail(
         `card grew when narrowing ${prev.w}→${cur.w}: ${prev.leftCard.width} → ${cur.leftCard.width}`,

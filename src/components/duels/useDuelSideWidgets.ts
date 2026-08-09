@@ -130,11 +130,21 @@ function mapTopMoversSummary(
 }
 
 export async function fetchTopMoversSummary(
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  attributeKey?: string,
 ): Promise<TopMoversSummaryResponse> {
+  const params = new URLSearchParams({
+    period: '7d',
+    limit: String(LIVE_ITEMS_LIMIT),
+  });
+
+  if (attributeKey) {
+    params.set('attribute_key', attributeKey);
+  }
+
   const summary = await fetchJson<TopMoversSummaryApiResponse>(
-    `/api/live/top-movers-summary?period=7d&limit=${LIVE_ITEMS_LIMIT}`,
-    signal
+    `/api/live/top-movers-summary?${params.toString()}`,
+    signal,
   );
 
   return mapTopMoversSummary(summary);

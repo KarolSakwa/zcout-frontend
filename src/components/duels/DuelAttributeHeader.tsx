@@ -13,19 +13,14 @@ export default function DuelAttributeHeader({ attribute }: { attribute: string }
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.eyebrow}>Who&apos;s better at...</div>
+      <div className={styles.eyebrow}>Who&apos;s better at</div>
 
       <Tooltip content={attributeDescriptions[attribute] ?? ''}>
-        <div className={styles.attributeBlock}>
-          <div className={styles.iconWrap}>
-            <AttributeIcon attributeKey={attribute} label={attribute} size={20} />
-          </div>
-
+        <div className={styles.attributeRow}>
+          <AttributeIcon attributeKey={attribute} label={attribute} size={20} />
           <div className={styles.label}>{formattedLabel}</div>
         </div>
       </Tooltip>
-
-      <div className={styles.rule} aria-hidden />
     </div>
   );
 }

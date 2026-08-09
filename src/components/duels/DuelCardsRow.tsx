@@ -170,7 +170,9 @@ export default function DuelCardsRow({
         {showPendingUi ? (
           <ZLoader />
         ) : (
-          <div style={{ width: 30, height: 30 }} data-duels-center-spacer />
+          <span className={duelStyles.duelVsMark} data-duels-vs aria-hidden>
+            VS
+          </span>
         )}
       </div>
 

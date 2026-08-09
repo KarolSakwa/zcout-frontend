@@ -6,6 +6,7 @@ import type {
   VoteApiResponse,
 } from "./duels/duelTypes";
 import { ATTR_MAP, SLIDE_MS, toPct } from "./duels/duelUtils";
+import { formatAttributeLabel } from "@/lib/attributeDescriptions";
 import { useDuelPairNavigation } from "./duels/useDuelPairNavigation";
 import DuelCountdownBar from "./duels/DuelCountdownBar";
 import DuelAttributeHeader from "./duels/DuelAttributeHeader";
@@ -14,9 +15,9 @@ import DuelRevealPanel from "./duels/DuelRevealPanel";
 import DuelHomepageAttributeLink from "./duels/DuelHomepageAttributeLink";
 import DuelLoadingOverlays from "./duels/DuelLoadingOverlays";
 import DuelVoteHint from "./duels/DuelVoteHint";
-import RecentVotesWidget from "./duels/RecentVotesWidget";
-import TopRisersWidget from "./duels/TopRisersWidget";
-import { useDuelSideWidgets } from "./duels/useDuelSideWidgets";
+import DuelLeftRail from "./duels/DuelLeftRail";
+import DuelRightRail from "./duels/DuelRightRail";
+import { useDuelContextualWidgets } from "./duels/useDuelContextualWidgets";
 import { useDuelAutoNext } from "./duels/useDuelAutoNext";
 import { logEvent } from "@/lib/telemetry";
 import { ensureCsrfToken } from "@/lib/ensureCsrfToken";
@@ -132,6 +133,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   } | null>(null);
   const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
   const [widgetsStacked, setWidgetsStacked] = useState(false);
+  const [narrowDuelsRailLayout, setNarrowDuelsRailLayout] = useState(false);
   const [homepageRowWidth, setHomepageRowWidth] = useState(
     HOMEPAGE_CANONICAL_ROW_PX,
   );
@@ -145,9 +147,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const goNextRef = useRef<() => void>(() => {});
 
   const glow = "var(--ui-accent-primary)";
-
-  const { recentVotes, latestRecentVoteId, topMoversMode, topMoverItems } =
-    useDuelSideWidgets();
 
   const resetRevealState = useCallback(() => {
     setPostVoteRatings(null);
@@ -255,17 +254,24 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
     const mqCompact = window.matchMedia("(max-width: 700px)");
     const mqStacked = window.matchMedia("(max-width: 1200px)");
+    const mqNarrowRails = window.matchMedia(
+      "(min-width: 1201px) and (max-width: 1360px)",
+    );
     const updateCompact = () => setIsCompactDuelLayout(mqCompact.matches);
     const updateStacked = () => setWidgetsStacked(mqStacked.matches);
+    const updateNarrowRails = () => setNarrowDuelsRailLayout(mqNarrowRails.matches);
 
     updateCompact();
     updateStacked();
+    updateNarrowRails();
     mqCompact.addEventListener("change", updateCompact);
     mqStacked.addEventListener("change", updateStacked);
+    mqNarrowRails.addEventListener("change", updateNarrowRails);
 
     return () => {
       mqCompact.removeEventListener("change", updateCompact);
       mqStacked.removeEventListener("change", updateStacked);
+      mqNarrowRails.removeEventListener("change", updateNarrowRails);
     };
   }, [homepageMode]);
 
@@ -324,6 +330,31 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   const showReveal = lastWinner !== null;
 
+  const attributeKey =
+    ATTR_MAP[String(pair?.attribute ?? "").toUpperCase()] ??
+    String(pair?.attribute ?? "").toLowerCase();
+
+  const duelistIds = pair ? [pair.left.id, pair.right.id] : [];
+
+  const contextualWidgets = useDuelContextualWidgets({
+    attributeKey: homepageMode ? "" : attributeKey,
+    duelistIds,
+  });
+
+  const railAttributeLabel =
+    pair?.attributeLabel
+      ? String(pair.attributeLabel)
+      : contextualWidgets.topAttribute?.key === attributeKey
+        ? contextualWidgets.topAttribute.label
+        : formatAttributeLabel(attributeKey);
+
+  const isNextDuelLoading = !homepageMode && loadingPair && pair !== null;
+
+  const showMoversSkeleton =
+    isNextDuelLoading || contextualWidgets.isTopMoversLoading;
+  const showTopSkeleton = isNextDuelLoading || contextualWidgets.isTopLoading;
+  const showRecentVotesSkeleton = contextualWidgets.isRecentVotesLoading;
+
   const cardStyle = useCallback(
     (side: "left" | "right"): React.CSSProperties => {
       const isLeft = side === "left";
@@ -352,7 +383,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             Math.round((homepageTrack - homepageCardGap) / 2),
           )
         : isDuelsDesktopWide
-          ? HOMEPAGE_CANONICAL_INSET_PX
+          ? narrowDuelsRailLayout
+            ? 16
+            : HOMEPAGE_CANONICAL_INSET_PX
           : isDuelsMobile
             ? 10
             : isCompactDuelLayout || widgetsStacked
@@ -421,6 +454,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       showReveal,
       isCompactDuelLayout,
       widgetsStacked,
+      narrowDuelsRailLayout,
       homepageMode,
       homepageRowWidth,
     ],
@@ -700,20 +734,31 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   });
 
   const sideWidgets = !homepageMode ? (
-    <>
-      <TopRisersWidget
-        items={topMoverItems}
-        mode={topMoversMode}
-        docked={widgetsStacked}
-        embedded={widgetsStacked}
-      />
-      <RecentVotesWidget
-        items={recentVotes}
-        latestItemId={latestRecentVoteId}
-        docked={widgetsStacked}
-        embedded={widgetsStacked}
-      />
-    </>
+    widgetsStacked ? (
+      <>
+        <DuelLeftRail
+          attributeKey={attributeKey}
+          attributeLabel={railAttributeLabel}
+          riserItems={contextualWidgets.riserItems}
+          fallerItems={contextualWidgets.fallerItems}
+          showMoversSkeleton={showMoversSkeleton}
+          embedded
+        />
+        <DuelRightRail
+          attributeKey={attributeKey}
+          attributeLabel={railAttributeLabel}
+          preRevealPlayers={contextualWidgets.preRevealTop}
+          revealedPlayers={contextualWidgets.revealedTop}
+          revealed={showReveal}
+          showTopSkeleton={showTopSkeleton}
+          topHasError={contextualWidgets.topHasError}
+          recentVotes={contextualWidgets.recentVotes}
+          latestRecentVoteId={contextualWidgets.latestRecentVoteId}
+          showRecentVotesSkeleton={showRecentVotesSkeleton}
+          embedded
+        />
+      </>
+    ) : null
   ) : null;
 
   const duelMain = (
@@ -727,16 +772,34 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         }}
       >
         <div className={styles.duelStageOuter}>
-          <div className={styles.duelStageCenter}>
-            {!homepageMode && !widgetsStacked ? sideWidgets : null}
+          <div
+            className={
+              homepageMode
+                ? styles.duelStageCenter
+                : `${styles.duelStageCenter} ${styles.duelStageScene}`
+            }
+          >
+            {!homepageMode && !widgetsStacked ? (
+              <DuelLeftRail
+                attributeKey={attributeKey}
+                attributeLabel={railAttributeLabel}
+                riserItems={contextualWidgets.riserItems}
+                fallerItems={contextualWidgets.fallerItems}
+                showMoversSkeleton={showMoversSkeleton}
+              />
+            ) : null}
 
-            <div
-              style={{
-                filter: showDelayedNextPending ? "blur(2px)" : "none",
-                opacity: showDelayedNextPending ? 0.5 : 1,
-                transition: "filter 180ms ease, opacity 180ms ease",
-              }}
-            >
+            <div className={styles.duelCenterColumn}>
+              {!homepageMode ? <div className={styles.duelCenterGlow} aria-hidden /> : null}
+
+              <div
+                className={styles.duelCenterStack}
+                style={{
+                  filter: showDelayedNextPending ? "blur(2px)" : "none",
+                  opacity: showDelayedNextPending ? 0.5 : 1,
+                  transition: "filter 180ms ease, opacity 180ms ease",
+                }}
+              >
               {homepageMode ? (
                 <DuelHomepageAttributeLink
                   attribute={String(pair?.attribute ?? attribute)}
@@ -790,7 +853,95 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                   />
                 </div>
               )}
+              </div>
+
+              {!homepageMode ? (
+                <div
+                  className={styles.duelCenterUtility}
+                  data-duels-skip
+                  style={{
+                    pointerEvents: showOverlayLoader ? "none" : "auto",
+                  }}
+                >
+                  <ScoutingProgressStartedHint
+                    canShow={canShowScoutingStartedHint}
+                    onDismiss={() => setPendingScoutingHint(false)}
+                  />
+                  {showDuelActions ? (
+                    <div className={styles.duelPageActionsProgress}>
+                      <ScoutingProgressBar
+                        variant="default"
+                        progressOverride={progressBarOverride}
+                      />
+                    </div>
+                  ) : null}
+                  {showImpact && postVoteRatings ? (
+                    <div style={{ width: "100%" }}>
+                      <DuelRevealPanel
+                        pair={pair!}
+                        onMouseEnter={pauseAutoNext}
+                        onMouseLeave={resumeAutoNext}
+                        duelVotePct={duelVotePct}
+                        lastWinner={lastWinner}
+                        nextDisabled={nextDisabled}
+                        nextIsHover={nextIsHover}
+                        setNextHover={setNextHover}
+                        goNext={goNext}
+                        showImpact={showImpact}
+                        postVoteRatings={postVoteRatings}
+                        glow={glow}
+                        barPct={barPct}
+                        homepageMode={homepageMode}
+                      />
+                    </div>
+                  ) : (
+                    showDuelActions && (
+                      <button
+                        type="button"
+                        onClick={handleSkip}
+                        disabled={skipDisabled}
+                        style={{
+                          minWidth: 190,
+                          padding: "10px 22px",
+                          borderRadius: "var(--ui-radius-md)",
+                          border: "1px solid var(--ui-border-accent)",
+                          color: "var(--ui-accent-primary)",
+                          background:
+                            "linear-gradient(180deg, rgba(26,26,26,0.72), rgba(12,12,12,0.38))",
+                          boxShadow:
+                            "0 14px 38px rgba(0,0,0,0.60), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px rgba(0,0,0,0.40)",
+                          backdropFilter: "blur(7px)",
+                          WebkitBackdropFilter: "blur(7px)",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: "0.28em",
+                          textTransform: "uppercase",
+                          cursor: skipDisabled ? "default" : "pointer",
+                          opacity: skipDisabled ? 0.45 : 1,
+                        }}
+                      >
+                        Skip
+                      </button>
+                    )
+                  )}
+                </div>
+              ) : null}
             </div>
+
+            {!homepageMode && !widgetsStacked ? (
+              <DuelRightRail
+                attributeKey={attributeKey}
+                attributeLabel={railAttributeLabel}
+                preRevealPlayers={contextualWidgets.preRevealTop}
+                revealedPlayers={contextualWidgets.revealedTop}
+                revealed={showReveal}
+                showTopSkeleton={showTopSkeleton}
+                topHasError={contextualWidgets.topHasError}
+                recentVotes={contextualWidgets.recentVotes}
+                latestRecentVoteId={contextualWidgets.latestRecentVoteId}
+                showRecentVotesSkeleton={showRecentVotesSkeleton}
+              />
+            ) : null}
 
             <DuelLoadingOverlays
               placement="stage"
@@ -801,46 +952,27 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         </div>
       </div>
 
+      {homepageMode ? (
       <div
-        className={
-          homepageMode
-            ? `${styles.duelSkipArea} ${styles.duelSkipAreaHomepage}`
-            : undefined
-        }
-        style={
-          homepageMode
-            ? {
-                display: "flex",
-                flexDirection: "column",
-                alignItems:
-                  !(showImpact && postVoteRatings) ? "center" : undefined,
-                justifyContent:
-                  !(showImpact && postVoteRatings) ? "center" : "center",
-                pointerEvents: showOverlayLoader ? "none" : "auto",
-              }
-            : {
-                height: 160,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                pointerEvents: showOverlayLoader ? "none" : "auto",
-              }
-        }
-        data-duels-skip={!homepageMode ? true : undefined}
-        data-hp-reveal={homepageMode && showImpact && postVoteRatings ? "true" : undefined}
+        className={`${styles.duelSkipArea} ${styles.duelSkipAreaHomepage}`}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: !(showImpact && postVoteRatings) ? "center" : undefined,
+          justifyContent: !(showImpact && postVoteRatings) ? "center" : "center",
+          pointerEvents: showOverlayLoader ? "none" : "auto",
+        }}
+        data-hp-reveal={showImpact && postVoteRatings ? "true" : undefined}
       >
-        {homepageMode && (
-          <DuelVoteHint
-            canShow={canShowVoteHint}
-            onHintVisible={handleVoteHintVisible}
-          />
-        )}
+        <DuelVoteHint
+          canShow={canShowVoteHint}
+          onHintVisible={handleVoteHintVisible}
+        />
         <ScoutingProgressStartedHint
           canShow={canShowScoutingStartedHint}
           onDismiss={() => setPendingScoutingHint(false)}
         />
-        {homepageMode && showDuelActions ? (
+        {showDuelActions ? (
           <div
             className={styles.homepageProgressOverlay}
             style={{ width: homepageProgressWidth }}
@@ -848,14 +980,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             <ScoutingProgressBar
               variant="compact"
               compactLayout="fluid"
-              progressOverride={progressBarOverride}
-            />
-          </div>
-        ) : null}
-        {showDuelActions && !homepageMode ? (
-          <div className={styles.duelPageActionsProgress}>
-            <ScoutingProgressBar
-              variant="default"
               progressOverride={progressBarOverride}
             />
           </div>
@@ -910,6 +1034,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           )
         )}
       </div>
+      ) : null}
 
       {!homepageMode && widgetsStacked ? (
         <div className={styles.duelPageStackedWidgets}>{sideWidgets}</div>

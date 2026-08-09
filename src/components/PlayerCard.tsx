@@ -1020,6 +1020,49 @@ export default function PlayerCard({
             width: 20px !important;
             height: 13px !important;
           }
+
+          .card[data-duels-page="true"] .topDesktop .name {
+            font-size: 11px;
+          }
+
+          .card[data-duels-page="true"] .topDesktop .name.nameLong {
+            font-size: 13px;
+          }
+
+          .card[data-duels-page="true"] .topDesktop .name.nameVeryLong {
+            font-size: 11px;
+          }
+
+          .card[data-duels-page="true"] .number {
+            font-size: clamp(48px, 5vw, 76px);
+          }
+
+          .card[data-duels-page="true"] .club {
+            font-size: 9px;
+          }
+        }
+
+        /* /duels desktop typography — scoped, -2px name/number, -1px club vs baseline */
+        @media (min-width: 1361px) {
+          .card[data-duels-page="true"] .topDesktop .name {
+            font-size: 16px;
+          }
+
+          .card[data-duels-page="true"] .topDesktop .name.nameLong {
+            font-size: 13px;
+          }
+
+          .card[data-duels-page="true"] .topDesktop .name.nameVeryLong {
+            font-size: 11px;
+          }
+
+          .card[data-duels-page="true"] .number {
+            font-size: clamp(56px, 6vw, 92px);
+          }
+
+          .card[data-duels-page="true"] .club {
+            font-size: 11px;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {

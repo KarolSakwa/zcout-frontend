@@ -41,7 +41,25 @@ export const VERIFY_MOCK_RISERS = {
     attributeLabel: 'Pace',
     delta: `+${(1.2 - i * 0.15).toFixed(2)}`,
   })),
-  fallers: [],
+  fallers: Array.from({ length: 5 }, (_, i) => ({
+    id: `f${i}`,
+    playerId: 300 + i,
+    player: `Faller Player ${i + 1}`,
+    attributeKey: 'pace',
+    attributeLabel: 'Pace',
+    delta: `-${(1.1 - i * 0.12).toFixed(2)}`,
+  })),
+};
+
+export const VERIFY_MOCK_ATTRIBUTE_TOP = {
+  attribute: { key: 'pace', label: 'Pace' },
+  players: Array.from({ length: 5 }, (_, i) => ({
+    id: String(600 + i),
+    playerId: 600 + i,
+    player: `Top Player ${i + 1}`,
+    rating: 95 - i,
+    rank: i + 1,
+  })),
 };
 
 export const VERIFY_MOCK_RECENT_VOTES = {
@@ -210,6 +228,13 @@ export async function installVerifyDataMocks(page, {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(VERIFY_MOCK_RISERS),
+    }),
+  );
+  await page.route('**/api/live/attribute-top**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(VERIFY_MOCK_ATTRIBUTE_TOP),
     }),
   );
   await page.route('**/api/live/recent-votes**', (route) =>
