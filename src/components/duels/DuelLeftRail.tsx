@@ -50,6 +50,7 @@ export default function DuelLeftRail({
   riserItems,
   fallerItems,
   showMoversSkeleton = false,
+  contentFading = false,
   embedded = false,
 }: {
   attributeKey: string;
@@ -57,6 +58,7 @@ export default function DuelLeftRail({
   riserItems: TopRiserItem[];
   fallerItems: TopRiserItem[];
   showMoversSkeleton?: boolean;
+  contentFading?: boolean;
   embedded?: boolean;
 }) {
   return (
@@ -66,7 +68,11 @@ export default function DuelLeftRail({
       data-duels-rail={embedded ? 'stacked' : 'left'}
     >
       <div className={styles.railBody}>
-        <div className={styles.railContentStack}>
+        <div
+          className={`${styles.railContentStack} ${
+            contentFading ? styles.railContentFading : ''
+          }`}
+        >
           <div className={styles.railAttributeHeader}>
             <span className={styles.railAttributeIcon} aria-hidden>
               <AttributeIcon

@@ -152,6 +152,7 @@ export default function DuelRightRail({
   recentVotes,
   latestRecentVoteId,
   showRecentVotesSkeleton = false,
+  contentFading = false,
   embedded = false,
 }: {
   attributeKey: string;
@@ -164,6 +165,7 @@ export default function DuelRightRail({
   recentVotes: RecentVoteItem[];
   latestRecentVoteId: string | null;
   showRecentVotesSkeleton?: boolean;
+  contentFading?: boolean;
   embedded?: boolean;
 }) {
   return (
@@ -174,48 +176,54 @@ export default function DuelRightRail({
     >
       <div className={styles.railBody}>
         <div className={styles.railContentStack}>
-          <div className={styles.railTopHeader}>
-            <div className={styles.railAttributeGroup}>
-              <span className={styles.railAttributeIcon} aria-hidden>
-                <AttributeIcon
-                  attributeKey={attributeKey}
-                  label={attributeLabel}
-                  size={10}
-                />
-              </span>
-              <span className={styles.railAttributeName}>{attributeLabel}</span>
-            </div>
-            <span className={styles.railSectionLabel}>Top 5</span>
-          </div>
-
-          <div className={styles.section}>
-            {!revealed ? (
-              <p className={styles.hiddenHint}>Current duelists hidden until reveal</p>
-            ) : null}
-            {showTopSkeleton ? (
-              <TopFiveSkeletonRows />
-            ) : topHasError ? (
-              <div className={styles.stateText}>Unable to load ranking.</div>
-            ) : (
-              <div className={styles.topCrossfade}>
-                <div
-                  className={`${styles.topLayer} ${
-                    revealed ? styles.topLayerHidden : styles.topLayerVisible
-                  }`}
-                  aria-hidden={revealed}
-                >
-                  <TopFiveRows players={preRevealPlayers} />
-                </div>
-                <div
-                  className={`${styles.topLayer} ${
-                    revealed ? styles.topLayerVisible : styles.topLayerHidden
-                  }`}
-                  aria-hidden={!revealed}
-                >
-                  <TopFiveRows players={revealedPlayers} />
-                </div>
+          <div
+            className={`${styles.railContentStack} ${
+              contentFading ? styles.railContentFading : ''
+            }`}
+          >
+            <div className={styles.railTopHeader}>
+              <div className={styles.railAttributeGroup}>
+                <span className={styles.railAttributeIcon} aria-hidden>
+                  <AttributeIcon
+                    attributeKey={attributeKey}
+                    label={attributeLabel}
+                    size={10}
+                  />
+                </span>
+                <span className={styles.railAttributeName}>{attributeLabel}</span>
               </div>
-            )}
+              <span className={styles.railSectionLabel}>Top 5</span>
+            </div>
+
+            <div className={styles.section}>
+              {!revealed ? (
+                <p className={styles.hiddenHint}>Current duelists hidden until reveal</p>
+              ) : null}
+              {showTopSkeleton ? (
+                <TopFiveSkeletonRows />
+              ) : topHasError ? (
+                <div className={styles.stateText}>Unable to load ranking.</div>
+              ) : (
+                <div className={styles.topCrossfade}>
+                  <div
+                    className={`${styles.topLayer} ${
+                      revealed ? styles.topLayerHidden : styles.topLayerVisible
+                    }`}
+                    aria-hidden={revealed}
+                  >
+                    <TopFiveRows players={preRevealPlayers} />
+                  </div>
+                  <div
+                    className={`${styles.topLayer} ${
+                      revealed ? styles.topLayerVisible : styles.topLayerHidden
+                    }`}
+                    aria-hidden={!revealed}
+                  >
+                    <TopFiveRows players={revealedPlayers} />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className={styles.separator} aria-hidden />

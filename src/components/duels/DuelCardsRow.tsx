@@ -6,6 +6,16 @@ import ZLoader from '../ZLoader';
 import type { PairResponse, RatingsMap } from './duelTypes';
 import duelStyles from '../Duel.module.css';
 
+const CENTER_LOADING_DIM: React.CSSProperties = {
+  opacity: 0.5,
+  filter: 'blur(2px)',
+};
+
+const CENTER_LOADING_CLEAR: React.CSSProperties = {
+  opacity: 1,
+  filter: 'none',
+};
+
 export default function DuelCardsRow({
   pair,
   cardStyle,
@@ -20,9 +30,11 @@ export default function DuelCardsRow({
   homepageMode = false,
   loading = false,
   hintLiftActive = false,
+  contentDimmed = false,
 }: {
   pair?: PairResponse | null;
   cardStyle: (side: 'left' | 'right') => React.CSSProperties;
+  /** Vote pending OR next-pair loading — shows ZLoader in the VS center slot. */
   showPendingUi: boolean;
   showReveal: boolean;
   lastWinner: number | null;
@@ -34,6 +46,8 @@ export default function DuelCardsRow({
   homepageMode?: boolean;
   loading?: boolean;
   hintLiftActive?: boolean;
+  /** Dim left/right cards only — center loader stays full contrast. */
+  contentDimmed?: boolean;
 }) {
   void showImpact;
   void postVoteRatings;
@@ -41,6 +55,7 @@ export default function DuelCardsRow({
 
   const isHomepageLoading = homepageMode && loading && !pair;
   const isDuelsLoading = !homepageMode && loading && !pair;
+  const cardDimStyle = contentDimmed ? CENTER_LOADING_DIM : CENTER_LOADING_CLEAR;
 
   if (!pair && !isHomepageLoading && !isDuelsLoading) {
     return null;
@@ -51,7 +66,7 @@ export default function DuelCardsRow({
       <div className={duelStyles.homepageCardsRow} data-hp-duel-row>
         <div
           className={duelStyles.homepageCardSlot}
-          style={cardStyle('left')}
+          style={{ ...cardStyle('left'), ...cardDimStyle }}
           data-hp-duel-slot="left"
         >
           {isHomepageLoading ? (
@@ -89,7 +104,7 @@ export default function DuelCardsRow({
 
         <div
           className={duelStyles.homepageCardSlot}
-          style={cardStyle('right')}
+          style={{ ...cardStyle('right'), ...cardDimStyle }}
           data-hp-duel-slot="right"
         >
           {isHomepageLoading ? (
@@ -160,7 +175,7 @@ export default function DuelCardsRow({
     <div className={duelStyles.duelPageCardsRow} data-duels-row>
       <div
         className={duelStyles.duelPageCardSlot}
-        style={cardStyle('left')}
+        style={{ ...cardStyle('left'), ...cardDimStyle }}
         data-duels-slot="left"
       >
         {renderDuelsCard('left')}
@@ -178,7 +193,7 @@ export default function DuelCardsRow({
 
       <div
         className={duelStyles.duelPageCardSlot}
-        style={cardStyle('right')}
+        style={{ ...cardStyle('right'), ...cardDimStyle }}
         data-duels-slot="right"
       >
         {renderDuelsCard('right')}
@@ -186,3 +201,5 @@ export default function DuelCardsRow({
     </div>
   );
 }
+
+export { CENTER_LOADING_DIM, CENTER_LOADING_CLEAR };

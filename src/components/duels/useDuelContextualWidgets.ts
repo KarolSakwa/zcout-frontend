@@ -16,6 +16,7 @@ declare global {
 }
 
 const TOP_MOVERS_REFETCH_DEBOUNCE_MS = 5000;
+const RAIL_CROSSFADE_MS = 150;
 
 export type AttributeTopPlayer = {
   id: string;
@@ -30,7 +31,25 @@ export type AttributeTopResponse = {
   players: AttributeTopPlayer[];
 };
 
-async function fetchAttributeTop(
+export type NextDuelPrefetchTarget = {
+  attributeKey: string;
+  duelistIds: number[];
+};
+
+type PrefetchedNextContext = {
+  target: NextDuelPrefetchTarget;
+  riserItems: TopRiserItem[];
+  fallerItems: TopRiserItem[];
+  preRevealTop: AttributeTopPlayer[];
+  revealedTop: AttributeTopPlayer[];
+  topAttribute: { key: string; label: string } | null;
+  moversReady: boolean;
+  topReady: boolean;
+  topHasError: boolean;
+  moversHasError: boolean;
+};
+
+export async function fetchAttributeTop(
   attributeKey: string,
   excludePlayerIds: number[],
   signal?: AbortSignal,
@@ -56,12 +75,22 @@ async function fetchAttributeTop(
   return response.json() as Promise<AttributeTopResponse>;
 }
 
+function targetsMatch(
+  a: NextDuelPrefetchTarget,
+  b: NextDuelPrefetchTarget,
+): boolean {
+  return (
+    a.attributeKey === b.attributeKey &&
+    a.duelistIds.join(',') === b.duelistIds.join(',')
+  );
+}
+
 export function useDuelContextualWidgets({
   attributeKey,
   duelistIds,
 }: {
   attributeKey: string;
-  /** Current pair player ids — used only when attribute context changes, not on reveal. */
+  /** Committed pair player ids — updated only on duel transition, not during reveal. */
   duelistIds: number[];
 }) {
   const { recentVotes, latestRecentVoteId, isRecentVotesLoading } =
@@ -70,6 +99,7 @@ export function useDuelContextualWidgets({
   const [riserItems, setRiserItems] = useState<TopRiserItem[]>([]);
   const [fallerItems, setFallerItems] = useState<TopRiserItem[]>([]);
   const [isTopMoversLoading, setIsTopMoversLoading] = useState(true);
+  const [moversEverLoaded, setMoversEverLoaded] = useState(false);
 
   const [preRevealTop, setPreRevealTop] = useState<AttributeTopPlayer[]>([]);
   const [revealedTop, setRevealedTop] = useState<AttributeTopPlayer[]>([]);
@@ -79,9 +109,28 @@ export function useDuelContextualWidgets({
   } | null>(null);
   const [isTopLoading, setIsTopLoading] = useState(true);
   const [topHasError, setTopHasError] = useState(false);
+  const [topEverLoaded, setTopEverLoaded] = useState(false);
+
+  const [railContentFading, setRailContentFading] = useState(false);
 
   const topMoversDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const duelistKey = duelistIds.join(',');
+
+  const prefetchRef = useRef<PrefetchedNextContext | null>(null);
+  const prefetchAbortRef = useRef<AbortController | null>(null);
+  const prefetchSeqRef = useRef(0);
+  const [prefetchingContext, setPrefetchingContext] = useState(false);
+  const prefetchPromiseRef = useRef<Promise<void> | null>(null);
+  const skipTopRefetchRef = useRef(false);
+
+  const clearContextPrefetch = useCallback(() => {
+    if (prefetchAbortRef.current) prefetchAbortRef.current.abort();
+    prefetchAbortRef.current = null;
+    prefetchSeqRef.current += 1;
+    prefetchRef.current = null;
+    prefetchPromiseRef.current = null;
+    setPrefetchingContext(false);
+  }, []);
 
   const refetchTopMoversSummary = useCallback(async () => {
     if (!attributeKey) return;
@@ -100,14 +149,17 @@ export function useDuelContextualWidgets({
       return;
     }
 
-    setIsTopMoversLoading(true);
-  }, [attributeKey]);
+    if (!moversEverLoaded) {
+      setIsTopMoversLoading(true);
+    }
+  }, [attributeKey, moversEverLoaded]);
 
   useEffect(() => {
     if (!attributeKey) {
       setRiserItems([]);
       setFallerItems([]);
       setIsTopMoversLoading(false);
+      setMoversEverLoaded(false);
       return;
     }
 
@@ -115,13 +167,16 @@ export function useDuelContextualWidgets({
 
     (async () => {
       try {
-        setIsTopMoversLoading(true);
+        if (!moversEverLoaded) {
+          setIsTopMoversLoading(true);
+        }
         const summary = await fetchTopMoversSummary(
           controller.signal,
           attributeKey,
         );
         setRiserItems(summary.risers);
         setFallerItems(summary.fallers);
+        setMoversEverLoaded(true);
       } catch {
         if (!controller.signal.aborted) {
           setRiserItems([]);
@@ -142,9 +197,11 @@ export function useDuelContextualWidgets({
       return;
     }
 
-    setIsTopLoading(true);
-    setTopHasError(false);
-  }, [attributeKey, duelistKey]);
+    if (!topEverLoaded) {
+      setIsTopLoading(true);
+      setTopHasError(false);
+    }
+  }, [attributeKey, duelistKey, topEverLoaded]);
 
   useEffect(() => {
     if (!attributeKey) {
@@ -152,6 +209,12 @@ export function useDuelContextualWidgets({
       setRevealedTop([]);
       setTopAttribute(null);
       setIsTopLoading(false);
+      setTopEverLoaded(false);
+      return;
+    }
+
+    if (skipTopRefetchRef.current) {
+      skipTopRefetchRef.current = false;
       return;
     }
 
@@ -159,8 +222,10 @@ export function useDuelContextualWidgets({
 
     (async () => {
       try {
-        setIsTopLoading(true);
-        setTopHasError(false);
+        if (!topEverLoaded) {
+          setIsTopLoading(true);
+          setTopHasError(false);
+        }
 
         const [preData, postData] = await Promise.all([
           fetchAttributeTop(attributeKey, duelistIds, controller.signal),
@@ -170,6 +235,7 @@ export function useDuelContextualWidgets({
         setTopAttribute(preData.attribute ?? postData.attribute ?? null);
         setPreRevealTop(Array.isArray(preData.players) ? preData.players : []);
         setRevealedTop(Array.isArray(postData.players) ? postData.players : []);
+        setTopEverLoaded(true);
       } catch {
         if (!controller.signal.aborted) {
           setPreRevealTop([]);
@@ -185,7 +251,185 @@ export function useDuelContextualWidgets({
     })();
 
     return () => controller.abort();
-  }, [attributeKey, duelistKey]);
+  }, [attributeKey, duelistKey, topEverLoaded]);
+
+  const startPrefetchForNext = useCallback(
+    (target: NextDuelPrefetchTarget, currentAttributeKey: string) => {
+      if (!target.attributeKey) return;
+
+      clearContextPrefetch();
+
+      const controller = new AbortController();
+      prefetchAbortRef.current = controller;
+      const seq = ++prefetchSeqRef.current;
+      setPrefetchingContext(true);
+
+      const sameAttribute = target.attributeKey === currentAttributeKey;
+      const draft: PrefetchedNextContext = {
+        target,
+        riserItems: [],
+        fallerItems: [],
+        preRevealTop: [],
+        revealedTop: [],
+        topAttribute: null,
+        moversReady: sameAttribute,
+        topReady: false,
+        topHasError: false,
+        moversHasError: false,
+      };
+      prefetchRef.current = draft;
+
+      const promise = (async () => {
+        try {
+          const topPromise = Promise.all([
+            fetchAttributeTop(
+              target.attributeKey,
+              target.duelistIds,
+              controller.signal,
+            ),
+            fetchAttributeTop(target.attributeKey, [], controller.signal),
+          ]);
+
+          if (sameAttribute) {
+            const [preData, postData] = await topPromise;
+            if (prefetchSeqRef.current !== seq) return;
+
+            draft.preRevealTop = Array.isArray(preData.players)
+              ? preData.players
+              : [];
+            draft.revealedTop = Array.isArray(postData.players)
+              ? postData.players
+              : [];
+            draft.topAttribute =
+              preData.attribute ?? postData.attribute ?? null;
+            draft.topReady = true;
+          } else {
+            const [moversResult, topResult] = await Promise.allSettled([
+              fetchTopMoversSummary(controller.signal, target.attributeKey),
+              topPromise,
+            ]);
+
+            if (prefetchSeqRef.current !== seq) return;
+
+            if (moversResult.status === 'fulfilled') {
+              draft.riserItems = moversResult.value.risers;
+              draft.fallerItems = moversResult.value.fallers;
+              draft.moversReady = true;
+            } else if (!controller.signal.aborted) {
+              draft.moversHasError = true;
+              draft.moversReady = true;
+            }
+
+            if (topResult.status === 'fulfilled') {
+              const [preData, postData] = topResult.value;
+              draft.preRevealTop = Array.isArray(preData.players)
+                ? preData.players
+                : [];
+              draft.revealedTop = Array.isArray(postData.players)
+                ? postData.players
+                : [];
+              draft.topAttribute =
+                preData.attribute ?? postData.attribute ?? null;
+              draft.topReady = true;
+            } else if (!controller.signal.aborted) {
+              draft.topHasError = true;
+              draft.topReady = true;
+            }
+          }
+
+          prefetchRef.current = draft;
+        } catch {
+          if (controller.signal.aborted) return;
+          if (prefetchSeqRef.current !== seq) return;
+          prefetchRef.current = null;
+        } finally {
+          if (prefetchSeqRef.current === seq) {
+            setPrefetchingContext(false);
+            prefetchPromiseRef.current = null;
+          }
+        }
+      })();
+
+      prefetchPromiseRef.current = promise;
+      return promise;
+    },
+    [clearContextPrefetch],
+  );
+
+  const isReadyForNext = useCallback(
+    (target: NextDuelPrefetchTarget) => {
+      const prefetched = prefetchRef.current;
+      if (!prefetched || !targetsMatch(prefetched.target, target)) {
+        return false;
+      }
+
+      const sameAttribute = target.attributeKey === attributeKey;
+      if (sameAttribute) {
+        return prefetched.topReady;
+      }
+
+      return prefetched.moversReady && prefetched.topReady;
+    },
+    [attributeKey],
+  );
+
+  const waitForPrefetchReady = useCallback(
+    async (target: NextDuelPrefetchTarget) => {
+      if (isReadyForNext(target)) return true;
+
+      if (prefetchPromiseRef.current) {
+        await prefetchPromiseRef.current;
+      }
+
+      return isReadyForNext(target);
+    },
+    [isReadyForNext],
+  );
+
+  const promoteForNext = useCallback(
+    (target: NextDuelPrefetchTarget) => {
+      const prefetched = prefetchRef.current;
+      if (!prefetched || !targetsMatch(prefetched.target, target)) {
+        return false;
+      }
+
+      const sameAttribute = target.attributeKey === attributeKey;
+      const applyContent = () => {
+        skipTopRefetchRef.current = true;
+
+        if (!sameAttribute) {
+          setRiserItems(prefetched.riserItems);
+          setFallerItems(prefetched.fallerItems);
+          setMoversEverLoaded(true);
+          setIsTopMoversLoading(false);
+        }
+
+        setPreRevealTop(prefetched.preRevealTop);
+        setRevealedTop(prefetched.revealedTop);
+        setTopAttribute(prefetched.topAttribute);
+        setTopHasError(prefetched.topHasError);
+        setTopEverLoaded(true);
+        setIsTopLoading(false);
+
+        prefetchRef.current = null;
+        prefetchSeqRef.current += 1;
+      };
+
+      if (sameAttribute) {
+        applyContent();
+        return true;
+      }
+
+      setRailContentFading(true);
+      window.setTimeout(() => {
+        applyContent();
+        requestAnimationFrame(() => setRailContentFading(false));
+      }, RAIL_CROSSFADE_MS);
+
+      return true;
+    },
+    [attributeKey],
+  );
 
   useEffect(() => {
     initEcho();
@@ -220,6 +464,15 @@ export function useDuelContextualWidgets({
     };
   }, [refetchTopMoversSummary]);
 
+  useEffect(() => {
+    return () => {
+      if (prefetchAbortRef.current) prefetchAbortRef.current.abort();
+    };
+  }, []);
+
+  const showMoversSkeleton = isTopMoversLoading && !moversEverLoaded;
+  const showTopSkeleton = isTopLoading && !topEverLoaded;
+
   return {
     recentVotes,
     latestRecentVoteId,
@@ -232,5 +485,14 @@ export function useDuelContextualWidgets({
     topAttribute,
     isTopLoading,
     topHasError,
+    showMoversSkeleton,
+    showTopSkeleton,
+    railContentFading,
+    startPrefetchForNext,
+    clearContextPrefetch,
+    isReadyForNext,
+    waitForPrefetchReady,
+    promoteForNext,
+    prefetchingContext,
   };
 }

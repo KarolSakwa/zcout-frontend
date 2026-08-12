@@ -38,7 +38,7 @@
   max-width: 100%;
 }
 
-.host :global(> span) {
+.host > :global(span) {
   display: flex;
   width: 100%;
   min-width: 0;

@@ -124,3 +124,19 @@ export function normalizePair(raw: unknown): PairResponse {
 
   return buildNormalizedPair(payload, firstPlayerRaw, secondPlayerRaw);
 }
+
+export function pairToAttributeKey(pairAttribute: string): string {
+  return (
+    ATTR_MAP[String(pairAttribute).toUpperCase()] ??
+    String(pairAttribute).toLowerCase()
+  );
+}
+
+export function pairToPrefetchTarget(
+  pair: Pick<PairResponse, 'attribute' | 'left' | 'right'>,
+) {
+  return {
+    attributeKey: pairToAttributeKey(pair.attribute),
+    duelistIds: [pair.left.id, pair.right.id],
+  };
+}

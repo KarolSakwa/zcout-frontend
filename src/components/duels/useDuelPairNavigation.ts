@@ -15,6 +15,10 @@ export type UseDuelPairNavigationOptions = {
   clearPendingUi: () => void;
   voting: boolean;
   lastWinner: number | null;
+  /** After next pair is fetched, prepare contextual rails before swap. */
+  prepareNextPair?: (next: PairResponse) => Promise<boolean>;
+  /** Called synchronously when the displayed pair is swapped (after exit). */
+  onPairSwapped?: (next: PairResponse) => void;
 };
 
 export function useDuelPairNavigation({
@@ -24,6 +28,8 @@ export function useDuelPairNavigation({
   clearPendingUi,
   voting,
   lastWinner,
+  prepareNextPair,
+  onPairSwapped,
 }: UseDuelPairNavigationOptions) {
   const [pair, setPair] = useState<PairResponse | null>(() => {
     try {
@@ -41,6 +47,12 @@ export function useDuelPairNavigation({
 
   const fetchAbortRef = useRef<AbortController | null>(null);
   const fetchSeqRef = useRef(0);
+  const loadingPairRef = useRef(false);
+  const prepareNextPairRef = useRef(prepareNextPair);
+  const onPairSwappedRef = useRef(onPairSwapped);
+
+  prepareNextPairRef.current = prepareNextPair;
+  onPairSwappedRef.current = onPairSwapped;
 
   const fetchInitialPair = useCallback(async () => {
     clearAutoNext(true);
@@ -51,6 +63,7 @@ export function useDuelPairNavigation({
     const seq = ++fetchSeqRef.current;
 
     setError(null);
+    loadingPairRef.current = true;
     setLoadingPair(true);
 
     setPair(null);
@@ -73,12 +86,13 @@ export function useDuelPairNavigation({
       setTransition("idle");
     } finally {
       if (fetchSeqRef.current !== seq) return;
+      loadingPairRef.current = false;
       setLoadingPair(false);
     }
   }, [clearAutoNext, resetRevealState]);
 
   const fetchNextPair = useCallback(async () => {
-    if (loadingPair) return;
+    if (loadingPairRef.current) return;
 
     clearAutoNext(true);
 
@@ -88,6 +102,7 @@ export function useDuelPairNavigation({
     const seq = ++fetchSeqRef.current;
 
     setError(null);
+    loadingPairRef.current = true;
     setLoadingPair(true);
 
     try {
@@ -95,16 +110,33 @@ export function useDuelPairNavigation({
 
       if (fetchSeqRef.current !== seq) return;
 
+      const prepare = prepareNextPairRef.current;
+      if (prepare) {
+        const ready = await prepare(next);
+        if (fetchSeqRef.current !== seq) return;
+        if (!ready) {
+          setError("Błąd przygotowania kolejnego pojedynku");
+          setTransition("idle");
+          loadingPairRef.current = false;
+          setLoadingPair(false);
+          return;
+        }
+      }
+
+      if (fetchSeqRef.current !== seq) return;
+
       setTransition("exit");
       window.setTimeout(() => {
         if (fetchSeqRef.current !== seq) return;
 
+        onPairSwappedRef.current?.(next);
         setPair(next);
         resetRevealState();
 
         setTransition("enter");
         requestAnimationFrame(() => setTransition("idle"));
 
+        loadingPairRef.current = false;
         setLoadingPair(false);
       }, SLIDE_MS);
     } catch (e: unknown) {
@@ -113,9 +145,10 @@ export function useDuelPairNavigation({
       const msg = e instanceof Error ? e.message : "Błąd pobierania pary";
       setError(msg);
       setTransition("idle");
+      loadingPairRef.current = false;
       setLoadingPair(false);
     }
-  }, [loadingPair, clearAutoNext, resetRevealState]);
+  }, [clearAutoNext, resetRevealState]);
 
   const goNext = useCallback(() => {
     clearPendingUi();

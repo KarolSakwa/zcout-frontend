@@ -439,12 +439,12 @@ export default function PlayerCard({
 
         .card[data-homepage="true"] .flag {
           left: clamp(4px, 4.8cqw, 7px);
-          top: clamp(5px, 6.2cqw, 9px);
+          top: clamp(2px, calc(6.2cqw - 3px), 6px);
         }
 
         .card[data-homepage="true"] .flagImg {
-          width: clamp(11px, 12.3cqw, 18px);
-          height: clamp(7px, 8.2cqw, 12px);
+          width: clamp(9px, calc(12.3cqw - 2px), 16px);
+          height: clamp(5px, calc(8.2cqw - 2px), 10px);
         }
 
         .card[data-homepage="true"] .posBadge {
@@ -906,8 +906,6 @@ export default function PlayerCard({
             top: auto !important;
           }
 
-          .card[data-homepage="true"] .mobileCardTopRow img,
-          .card[data-homepage="true"] .mobileCardTopRow :global(.flagImg),
           .card[data-duels-page="true"] .mobileCardTopRow img,
           .card[data-duels-page="true"] .mobileCardTopRow :global(.flagImg) {
             height: var(--mobile-card-meta-height) !important;
@@ -916,10 +914,26 @@ export default function PlayerCard({
             display: block !important;
           }
 
-          .card[data-homepage="true"] .mobileCardTopRow .flagPlaceholder,
+          .card[data-homepage="true"] .mobileCardTopRow img,
+          .card[data-homepage="true"] .mobileCardTopRow :global(.flagImg) {
+            height: calc(var(--mobile-card-meta-height) - 2px) !important;
+            width: auto !important;
+            max-width: none !important;
+            display: block !important;
+          }
+
+          .card[data-homepage="true"] .mobileFlagSlot {
+            transform: translateY(-3px);
+          }
+
           .card[data-duels-page="true"] .mobileCardTopRow .flagPlaceholder {
             width: calc(var(--mobile-card-meta-height) * 1.57) !important;
             height: var(--mobile-card-meta-height) !important;
+          }
+
+          .card[data-homepage="true"] .mobileCardTopRow .flagPlaceholder {
+            width: calc((var(--mobile-card-meta-height) - 2px) * 1.57) !important;
+            height: calc(var(--mobile-card-meta-height) - 2px) !important;
           }
 
           .card[data-homepage="true"] .mobilePositionSlot .posText,

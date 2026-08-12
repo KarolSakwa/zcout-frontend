@@ -124,40 +124,48 @@ export default function AuthStatus() {
           </div>
 
           {showProgress ? (
-            <div className={styles.progressSlot}>
-              <ScoutingProgressBar variant="dropdown" />
+            <div className={styles.progressTooltipHost}>
+              <Tooltip content="My Scouting progress">
+                <div className={styles.progressSlot} tabIndex={0}>
+                  <ScoutingProgressBar variant="dropdown" />
+                </div>
+              </Tooltip>
             </div>
           ) : null}
 
-          {status === 'ready' ? (
-            myScoutingUnlocked ? (
-              <Link href="/my-scouting" className={styles.menuLink}>
-                My Scouting
-              </Link>
-            ) : (
-              <Tooltip
-                content={
-                  progress
-                    ? getScoutingProgressTooltip(progress)
-                    : MY_SCOUTING_LOCKED_TOOLTIP
-                }
-              >
-                <button
-                  type="button"
-                  className={`${styles.menuButton} ${styles.menuButtonLocked}`}
-                  aria-disabled="true"
-                  aria-label="My Scouting locked"
-                >
-                  <span>My Scouting</span>
-                  <ScoutingLockIcon size={11} />
-                </button>
-              </Tooltip>
-            )
-          ) : null}
+          <div className={styles.menuDivider} role="separator" />
 
-          <button type="button" onClick={logout} className={styles.menuButton}>
-            Log out
-          </button>
+          <div className={styles.menuList}>
+            {status === 'ready' ? (
+              myScoutingUnlocked ? (
+                <Link href="/my-scouting" className={styles.menuItem}>
+                  My Scouting
+                </Link>
+              ) : (
+                <Tooltip
+                  content={
+                    progress
+                      ? getScoutingProgressTooltip(progress)
+                      : MY_SCOUTING_LOCKED_TOOLTIP
+                  }
+                >
+                  <button
+                    type="button"
+                    className={`${styles.menuItem} ${styles.menuItemLocked}`}
+                    aria-disabled="true"
+                    aria-label="My Scouting locked"
+                  >
+                    <span>My Scouting</span>
+                    <ScoutingLockIcon size={11} />
+                  </button>
+                </Tooltip>
+              )
+            ) : null}
+
+            <button type="button" onClick={logout} className={styles.menuItem}>
+              Log out
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -2,15 +2,19 @@
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type {
+  PairResponse,
   RatingsMap,
   VoteApiResponse,
 } from "./duels/duelTypes";
-import { ATTR_MAP, SLIDE_MS, toPct } from "./duels/duelUtils";
+import { ATTR_MAP, SLIDE_MS, pairToPrefetchTarget, toPct } from "./duels/duelUtils";
 import { formatAttributeLabel } from "@/lib/attributeDescriptions";
 import { useDuelPairNavigation } from "./duels/useDuelPairNavigation";
 import DuelCountdownBar from "./duels/DuelCountdownBar";
 import DuelAttributeHeader from "./duels/DuelAttributeHeader";
-import DuelCardsRow from "./duels/DuelCardsRow";
+import DuelCardsRow, {
+  CENTER_LOADING_CLEAR,
+  CENTER_LOADING_DIM,
+} from "./duels/DuelCardsRow";
 import DuelRevealPanel from "./duels/DuelRevealPanel";
 import DuelHomepageAttributeLink from "./duels/DuelHomepageAttributeLink";
 import DuelLoadingOverlays from "./duels/DuelLoadingOverlays";
@@ -104,6 +108,12 @@ type DuelProps = {
   homepageMode?: boolean;
 };
 
+type CommittedRailContext = {
+  attributeKey: string;
+  duelistIds: number[];
+  attributeLabel: string;
+};
+
 export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const { updateFromResponse, progress: scoutingProgress } = useScoutingProgress();
   const { user } = useAuth();
@@ -144,6 +154,26 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   );
   const shellRef = useRef<HTMLDivElement | null>(null);
 
+  const [committedRail, setCommittedRail] = useState<CommittedRailContext | null>(
+    null,
+  );
+  const committedRailRef = useRef(committedRail);
+  committedRailRef.current = committedRail;
+
+  const contextualApiRef = useRef<{
+    startPrefetchForNext: (
+      target: ReturnType<typeof pairToPrefetchTarget>,
+      currentAttributeKey: string,
+    ) => void;
+    waitForPrefetchReady: (
+      target: ReturnType<typeof pairToPrefetchTarget>,
+    ) => Promise<boolean>;
+    promoteForNext: (
+      target: ReturnType<typeof pairToPrefetchTarget>,
+    ) => boolean;
+    clearContextPrefetch: () => void;
+  } | null>(null);
+
   const goNextRef = useRef<() => void>(() => {});
 
   const glow = "var(--ui-accent-primary)";
@@ -168,6 +198,40 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       window.clearTimeout(pendingUiTimerRef.current);
     pendingUiTimerRef.current = null;
   }, []);
+
+  const prepareNextPair = useCallback(
+    async (next: PairResponse) => {
+      if (homepageMode) return true;
+      const api = contextualApiRef.current;
+      if (!api) return true;
+
+      const target = pairToPrefetchTarget(next);
+      api.startPrefetchForNext(
+        target,
+        committedRailRef.current?.attributeKey ?? target.attributeKey,
+      );
+      return api.waitForPrefetchReady(target);
+    },
+    [homepageMode],
+  );
+
+  const onPairSwapped = useCallback(
+    (next: PairResponse) => {
+      if (homepageMode) return;
+      const api = contextualApiRef.current;
+      const target = pairToPrefetchTarget(next);
+      api?.promoteForNext(target);
+      setCommittedRail({
+        attributeKey: target.attributeKey,
+        duelistIds: target.duelistIds,
+        attributeLabel: next.attributeLabel
+          ? String(next.attributeLabel)
+          : formatAttributeLabel(target.attributeKey),
+      });
+      api?.clearContextPrefetch();
+    },
+    [homepageMode],
+  );
 
   const {
     progress: autoNextProgress,
@@ -196,6 +260,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     clearPendingUi,
     voting,
     lastWinner,
+    prepareNextPair,
+    onPairSwapped,
   });
 
   goNextRef.current = goNext;
@@ -336,24 +402,50 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   const duelistIds = pair ? [pair.left.id, pair.right.id] : [];
 
+  const railAttributeKey = homepageMode
+    ? ""
+    : (committedRail?.attributeKey ?? attributeKey);
+  const railDuelistIds = committedRail?.duelistIds ?? duelistIds;
+
   const contextualWidgets = useDuelContextualWidgets({
-    attributeKey: homepageMode ? "" : attributeKey,
-    duelistIds,
+    attributeKey: railAttributeKey,
+    duelistIds: railDuelistIds,
   });
 
+  contextualApiRef.current = {
+    startPrefetchForNext: contextualWidgets.startPrefetchForNext,
+    waitForPrefetchReady: contextualWidgets.waitForPrefetchReady,
+    promoteForNext: contextualWidgets.promoteForNext,
+    clearContextPrefetch: contextualWidgets.clearContextPrefetch,
+  };
+
+  useEffect(() => {
+    if (!pair || homepageMode) return;
+    if (committedRail) return;
+
+    setCommittedRail({
+      attributeKey,
+      duelistIds,
+      attributeLabel: pair.attributeLabel
+        ? String(pair.attributeLabel)
+        : formatAttributeLabel(attributeKey),
+    });
+  }, [pair, attributeKey, duelistIds, committedRail, homepageMode]);
+
   const railAttributeLabel =
-    pair?.attributeLabel
+    committedRail?.attributeLabel ??
+    (pair?.attributeLabel
       ? String(pair.attributeLabel)
-      : contextualWidgets.topAttribute?.key === attributeKey
+      : contextualWidgets.topAttribute?.key === railAttributeKey
         ? contextualWidgets.topAttribute.label
-        : formatAttributeLabel(attributeKey);
+        : formatAttributeLabel(railAttributeKey));
 
-  const isNextDuelLoading = !homepageMode && loadingPair && pair !== null;
-
-  const showMoversSkeleton =
-    isNextDuelLoading || contextualWidgets.isTopMoversLoading;
-  const showTopSkeleton = isNextDuelLoading || contextualWidgets.isTopLoading;
+  const showMoversSkeleton = contextualWidgets.showMoversSkeleton;
+  const showTopSkeleton = contextualWidgets.showTopSkeleton;
   const showRecentVotesSkeleton = contextualWidgets.isRecentVotesLoading;
+
+  const showCenterLoader = showPendingUi || showDelayedNextPending;
+  const centerContentDimmed = showDelayedNextPending;
 
   const cardStyle = useCallback(
     (side: "left" | "right"): React.CSSProperties => {
@@ -564,6 +656,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           pendingUiTimerRef.current = null;
           setLastWinner(null);
           clearAutoNext(true);
+          contextualWidgets.clearContextPrefetch();
           goNext();
           return;
         }
@@ -668,6 +761,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       setError,
       updateFromResponse,
       user,
+      contextualWidgets.clearContextPrefetch,
     ],
   );
 
@@ -681,6 +775,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
   const showOverlayLoader = !pair && (loadingPair || skipping);
   const overlayBlur = showOverlayLoader && !!pair;
+
   const skipDisabled =
     !pair ||
     skipping ||
@@ -737,15 +832,16 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     widgetsStacked ? (
       <>
         <DuelLeftRail
-          attributeKey={attributeKey}
+          attributeKey={railAttributeKey}
           attributeLabel={railAttributeLabel}
           riserItems={contextualWidgets.riserItems}
           fallerItems={contextualWidgets.fallerItems}
           showMoversSkeleton={showMoversSkeleton}
+          contentFading={contextualWidgets.railContentFading}
           embedded
         />
         <DuelRightRail
-          attributeKey={attributeKey}
+          attributeKey={railAttributeKey}
           attributeLabel={railAttributeLabel}
           preRevealPlayers={contextualWidgets.preRevealTop}
           revealedPlayers={contextualWidgets.revealedTop}
@@ -755,6 +851,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           recentVotes={contextualWidgets.recentVotes}
           latestRecentVoteId={contextualWidgets.latestRecentVoteId}
           showRecentVotesSkeleton={showRecentVotesSkeleton}
+          contentFading={contextualWidgets.railContentFading}
           embedded
         />
       </>
@@ -781,31 +878,31 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
           >
             {!homepageMode && !widgetsStacked ? (
               <DuelLeftRail
-                attributeKey={attributeKey}
+                attributeKey={railAttributeKey}
                 attributeLabel={railAttributeLabel}
                 riserItems={contextualWidgets.riserItems}
                 fallerItems={contextualWidgets.fallerItems}
                 showMoversSkeleton={showMoversSkeleton}
+                contentFading={contextualWidgets.railContentFading}
               />
             ) : null}
 
             <div className={styles.duelCenterColumn}>
               {!homepageMode ? <div className={styles.duelCenterGlow} aria-hidden /> : null}
 
-              <div
-                className={styles.duelCenterStack}
-                style={{
-                  filter: showDelayedNextPending ? "blur(2px)" : "none",
-                  opacity: showDelayedNextPending ? 0.5 : 1,
-                  transition: "filter 180ms ease, opacity 180ms ease",
-                }}
-              >
+              <div className={styles.duelCenterStack}>
               {homepageMode ? (
                 <DuelHomepageAttributeLink
                   attribute={String(pair?.attribute ?? attribute)}
                 />
               ) : (
-                <div>
+                <div
+                  style={
+                    centerContentDimmed
+                      ? CENTER_LOADING_DIM
+                      : CENTER_LOADING_CLEAR
+                  }
+                >
                   <DuelAttributeHeader
                     attribute={String(pair?.attribute ?? attribute)}
                   />
@@ -837,10 +934,13 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                   <DuelCardsRow
                     pair={pair}
                     loading={
-                      homepageMode ? showHomepagePairLoading : loadingPair
+                      homepageMode
+                        ? showHomepagePairLoading
+                        : loadingPair && !pair
                     }
                     cardStyle={cardStyle}
-                    showPendingUi={showPendingUi}
+                    showPendingUi={showCenterLoader}
+                    contentDimmed={centerContentDimmed}
                     showReveal={showReveal}
                     lastWinner={lastWinner}
                     glow={glow}
@@ -876,7 +976,14 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                     </div>
                   ) : null}
                   {showImpact && postVoteRatings ? (
-                    <div style={{ width: "100%" }}>
+                    <div
+                      style={{
+                        width: "100%",
+                        ...(centerContentDimmed
+                          ? CENTER_LOADING_DIM
+                          : CENTER_LOADING_CLEAR),
+                      }}
+                    >
                       <DuelRevealPanel
                         pair={pair!}
                         onMouseEnter={pauseAutoNext}
@@ -930,7 +1037,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
             {!homepageMode && !widgetsStacked ? (
               <DuelRightRail
-                attributeKey={attributeKey}
+                attributeKey={railAttributeKey}
                 attributeLabel={railAttributeLabel}
                 preRevealPlayers={contextualWidgets.preRevealTop}
                 revealedPlayers={contextualWidgets.revealedTop}
@@ -940,13 +1047,14 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
                 recentVotes={contextualWidgets.recentVotes}
                 latestRecentVoteId={contextualWidgets.latestRecentVoteId}
                 showRecentVotesSkeleton={showRecentVotesSkeleton}
+                contentFading={contextualWidgets.railContentFading}
               />
             ) : null}
 
             <DuelLoadingOverlays
               placement="stage"
               homepageMode={homepageMode}
-              showDelayedNextPending={showDelayedNextPending}
+              showDelayedNextPending={homepageMode && showDelayedNextPending}
             />
           </div>
         </div>

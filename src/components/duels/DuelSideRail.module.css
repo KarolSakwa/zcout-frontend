@@ -46,6 +46,11 @@
   flex-direction: column;
   width: 100%;
   gap: 2px;
+  transition: opacity 150ms ease;
+}
+
+.railContentFading {
+  opacity: 0;
 }
 
 .railAttributeHeader {
@@ -418,6 +423,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .topLayer {
+    transition: none;
+  }
+
+  .railContentStack,
+  .railTopHeader,
+  .topCrossfade {
     transition: none;
   }
 
