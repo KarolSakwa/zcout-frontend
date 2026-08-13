@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getDuelLoaderFlags,
   shouldShowDuelActions,
   shouldShowScoutingStartedHint,
 } from '@/lib/duelScoutingUi';
@@ -58,6 +59,32 @@ describe('duel scouting UI lifecycle', () => {
         showReveal: true,
       }),
     ).toBe(false);
+  });
+
+  it('shows a single center ZLoader after vote, without a homepage stage overlay', () => {
+    expect(
+      getDuelLoaderFlags({
+        homepageMode: true,
+        showPendingUi: true,
+        showDelayedNextPending: false,
+      }),
+    ).toEqual({
+      showCenterLoader: true,
+      showHomepageStageOverlay: false,
+    });
+  });
+
+  it('shows a single center ZLoader while the next duel loads, without a second homepage overlay', () => {
+    expect(
+      getDuelLoaderFlags({
+        homepageMode: true,
+        showPendingUi: false,
+        showDelayedNextPending: true,
+      }),
+    ).toEqual({
+      showCenterLoader: true,
+      showHomepageStageOverlay: false,
+    });
   });
 
   it('does not show scouting started hint for logged-in users', () => {

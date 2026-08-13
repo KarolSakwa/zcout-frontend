@@ -47,3 +47,23 @@ export function shouldShowScoutingStartedHint(
     !input.showOverlayLoader
   );
 }
+
+export type DuelLoaderFlagsInput = {
+  homepageMode: boolean;
+  showPendingUi: boolean;
+  showDelayedNextPending: boolean;
+};
+
+/**
+ * Next-pair loading must reuse the VS-slot ZLoader.
+ * A homepage stage overlay on top of it is the double-Z regression.
+ */
+export function getDuelLoaderFlags(input: DuelLoaderFlagsInput): {
+  showCenterLoader: boolean;
+  showHomepageStageOverlay: boolean;
+} {
+  return {
+    showCenterLoader: input.showPendingUi || input.showDelayedNextPending,
+    showHomepageStageOverlay: false,
+  };
+}

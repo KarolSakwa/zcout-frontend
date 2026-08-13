@@ -48,3 +48,5 @@ ai_context.md
 /scripts/fp-layout-artifacts/
 scripts/output/
 tmp/
+
+/docs

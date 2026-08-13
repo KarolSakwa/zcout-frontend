@@ -52,8 +52,10 @@
   border-radius: 6px;
   background: transparent;
   color: color-mix(in srgb, var(--ui-text-primary) 88%, transparent);
+  font-family: inherit;
   font-size: 12px;
   font-weight: 500;
+  line-height: 1.2;
   letter-spacing: 0.01em;
   text-transform: none;
   text-align: left;
@@ -63,18 +65,62 @@
   align-items: center;
   gap: 8px;
   box-sizing: border-box;
+  opacity: 1;
 }
 
-.menuItem:hover {
+/* Beat TopNav `.auth button` / `.auth a` inheritance (uppercase, accent, padding:0). */
+.menuList .menuItem,
+.menuList button.menuItem,
+.menuList a.menuItem {
+  width: 100%;
+  min-height: 34px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: color-mix(in srgb, var(--ui-text-primary) 88%, transparent);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  opacity: 1;
+}
+
+.menuItem:hover,
+.menuList .menuItem:hover,
+.menuList button.menuItem:hover,
+.menuList a.menuItem:hover {
   background: color-mix(in srgb, var(--ui-surface-soft) 72%, transparent);
+  color: color-mix(in srgb, var(--ui-text-primary) 88%, transparent);
+  text-decoration: none;
+  opacity: 1;
 }
 
-.menuItem:focus-visible {
+.menuItem:focus-visible,
+.menuList .menuItem:focus-visible,
+.menuList button.menuItem:focus-visible,
+.menuList a.menuItem:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--ui-accent-primary) 55%, transparent);
   outline-offset: -2px;
 }
 
 .menuItemLocked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.menuList .menuItemLocked,
+.menuList button.menuItemLocked {
   opacity: 0.55;
   cursor: default;
 }

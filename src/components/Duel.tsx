@@ -35,6 +35,7 @@ import {
 } from "@/lib/scoutingUiPersistence";
 import { ensureBrowserAnonId } from "@/lib/anonId/browser";
 import {
+  getDuelLoaderFlags,
   shouldShowDuelActions,
   shouldShowScoutingStartedHint,
 } from "@/lib/duelScoutingUi";
@@ -444,7 +445,11 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const showTopSkeleton = contextualWidgets.showTopSkeleton;
   const showRecentVotesSkeleton = contextualWidgets.isRecentVotesLoading;
 
-  const showCenterLoader = showPendingUi || showDelayedNextPending;
+  const { showCenterLoader, showHomepageStageOverlay } = getDuelLoaderFlags({
+    homepageMode,
+    showPendingUi,
+    showDelayedNextPending,
+  });
   const centerContentDimmed = showDelayedNextPending;
 
   const cardStyle = useCallback(
@@ -1054,7 +1059,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             <DuelLoadingOverlays
               placement="stage"
               homepageMode={homepageMode}
-              showDelayedNextPending={homepageMode && showDelayedNextPending}
+              showDelayedNextPending={showHomepageStageOverlay}
             />
           </div>
         </div>

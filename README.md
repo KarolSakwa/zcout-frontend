@@ -32,16 +32,16 @@ Inspired by Football Manager-style scouting and designed around ultra-fast inter
 
 # Core Features
 
-- Instant duel flow
-- Crowd verdict reveal animations
+- Homepage product screen (hero, featured player, embedded duel, live widgets)
+- Instant duel flow + crowd reveal
 - Live rankings
-- Player profiles with radar charts
-- Scout reports
-- Homepage instant search
-- Anonymous voting flow
-- Responsive layouts
-- FM-inspired visual design
-- Real-time live widgets
+- Player profiles with radar charts + archetypes
+- Scout reports (profile modal)
+- My Scouting progression dashboard
+- Homepage / nav search (SQL-backed; players shown in UI)
+- Anonymous voting + claim after auth
+- Responsive layouts, FM-inspired visual design
+- Real-time live widgets (Soketi / Echo)
 
 ---
 
@@ -203,26 +203,24 @@ See `.env.example` for full configuration.
 
 # Current MVP Scope
 
-Implemented / in progress:
+Implemented (high level):
 
-- Duel flow
-- Crowd reveal system
-- Rankings
-- Player profiles
-- Radar charts
-- Scout reports
-- Homepage search
-- Realtime widgets
-- Anonymous voting flow
+- Homepage, duel flow, reveal, rankings, profiles, scout-report modal
+- Search (players), realtime widgets, anonymous voting + claim
+- My Scouting unlock / dashboard
+
+Partial / shelved:
+
+- Your Impact content (locked stub)
+- `/database` entry redirects away; club pages not in nav
+- Club hits from search API not shown in dropdown
 
 Planned expansions:
 
 - Player comparison
-- Advanced live widgets
-- Enhanced profile depth
 - Historical attribute timelines
-- More advanced realtime experiences
-- Additional polish & animations
+- Your Impact / insight drops content
+- Further polish & discovery features
 
 ---
 

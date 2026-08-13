@@ -237,6 +237,26 @@ export default function DuelRevealPanel({
             opacity 140ms ease;
         }
 
+        .revealPanelHomepage .verdictLabel {
+          transform: translateY(3px);
+        }
+
+        .revealPanelHomepage .nextBtn {
+          height: 32px;
+          padding: 0 14px;
+        }
+
+        @media (min-width: 1025px) {
+          .revealPanelHomepage .verdictLabel {
+            transform: translateY(4px);
+          }
+
+          .revealPanelHomepage .nextBtn {
+            height: 30px;
+            padding: 0 14px;
+          }
+        }
+
         @media (max-width: 700px) {
           .revealPanel {
             max-width: none;
@@ -261,6 +281,7 @@ export default function DuelRevealPanel({
           .revealPanelHomepage .verdictLabel {
             margin-bottom: -2px;
             font-size: 9px;
+            transform: translateY(3px);
           }
 
           .revealPanelHomepage .impactGrid {

@@ -439,12 +439,12 @@ export default function PlayerCard({
 
         .card[data-homepage="true"] .flag {
           left: clamp(4px, 4.8cqw, 7px);
-          top: clamp(2px, calc(6.2cqw - 3px), 6px);
+          top: clamp(-1px, calc(6.2cqw - 6px), 3px);
         }
 
         .card[data-homepage="true"] .flagImg {
-          width: clamp(9px, calc(12.3cqw - 2px), 16px);
-          height: clamp(5px, calc(8.2cqw - 2px), 10px);
+          width: clamp(7px, calc(12.3cqw - 4px), 14px);
+          height: clamp(3px, calc(8.2cqw - 4px), 8px);
         }
 
         .card[data-homepage="true"] .posBadge {
