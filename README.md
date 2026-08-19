@@ -191,10 +191,11 @@ npm run start
 Example variables:
 
 ```env
-NEXT_PUBLIC_API_BASE=http://localhost:8000/api
+NEXT_PUBLIC_API_BASE=http://localhost:8080
+NEXT_PUBLIC_APP_ORIGIN=http://localhost:3000
 NEXT_PUBLIC_PUSHER_APP_KEY=local
 NEXT_PUBLIC_PUSHER_HOST=localhost
-NEXT_PUBLIC_PUSHER_PORT=6001
+NEXT_PUBLIC_PUSHER_APP_CLUSTER=mt1
 ```
 
 See `.env.example` for full configuration.
