@@ -182,7 +182,6 @@ export default function FeaturedAttributeRankingWidget({
                       delta={item.trend_7d}
                       domain="attribute"
                       variant="iconAndValue"
-                      emptyFallback="—"
                     />
                   </div>
 

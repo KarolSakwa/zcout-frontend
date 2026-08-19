@@ -92,12 +92,16 @@ describe('useDuelPairNavigation', () => {
 
     expect(result.current.loadingPair).toBe(true);
     expect(result.current.pair?.pair_id).toBe('1');
+    expect(result.current.transition).toBe('idle');
     expect(fetchDuelPair).toHaveBeenCalledTimes(1);
 
     await act(async () => {
       resolveNext?.(normalizePair(mockNextPairRaw));
       await Promise.resolve();
     });
+
+    expect(result.current.transition).toBe('exit');
+    expect(result.current.pair?.pair_id).toBe('1');
   });
 
   it('waits for prepareNextPair before swapping', async () => {

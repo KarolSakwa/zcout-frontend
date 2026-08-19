@@ -35,6 +35,7 @@ import {
 } from "@/lib/scoutingUiPersistence";
 import { ensureBrowserAnonId } from "@/lib/anonId/browser";
 import {
+  getDuelCardMotionPhase,
   getDuelLoaderFlags,
   shouldShowDuelActions,
   shouldShowScoutingStartedHint,
@@ -449,8 +450,15 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
     homepageMode,
     showPendingUi,
     showDelayedNextPending,
+    transition,
   });
   const centerContentDimmed = showDelayedNextPending;
+  const cardMotion = getDuelCardMotionPhase({
+    transition,
+    showPendingUi,
+    loadingPair,
+    homepageMode,
+  });
 
   const cardStyle = useCallback(
     (side: "left" | "right"): React.CSSProperties => {
@@ -512,7 +520,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             ? 24
             : 50;
 
-      if (transition === "exit") {
+      if (cardMotion === "exit") {
         return {
           ...base,
           transform: `translateX(${isLeft ? -EXIT_X : EXIT_X}px)`,
@@ -521,7 +529,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         };
       }
 
-      if (transition === "enter") {
+      if (cardMotion === "enter") {
         return {
           ...base,
           transform: `translateX(${isLeft ? -ENTER_X : ENTER_X}px)`,
@@ -530,7 +538,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         };
       }
 
-      const x = showPendingUi
+      const x = cardMotion === "pending"
         ? isLeft
           ? -PENDING_X
           : PENDING_X
@@ -546,8 +554,8 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       };
     },
     [
+      cardMotion,
       transition,
-      showPendingUi,
       showReveal,
       isCompactDuelLayout,
       widgetsStacked,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getDuelCardMotionPhase,
   getDuelLoaderFlags,
   shouldShowDuelActions,
   shouldShowScoutingStartedHint,
@@ -80,6 +81,119 @@ describe('duel scouting UI lifecycle', () => {
         homepageMode: true,
         showPendingUi: false,
         showDelayedNextPending: true,
+      }),
+    ).toEqual({
+      showCenterLoader: true,
+      showHomepageStageOverlay: false,
+    });
+  });
+
+  it('uses pending card motion while the /duels next-pair request is in flight', () => {
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'idle',
+        showPendingUi: false,
+        loadingPair: true,
+        homepageMode: false,
+      }),
+    ).toBe('pending');
+  });
+
+  it('keeps exit card motion after the next pair is ready, even if loading flags are still on', () => {
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'exit',
+        showPendingUi: false,
+        loadingPair: true,
+        homepageMode: false,
+      }),
+    ).toBe('exit');
+  });
+
+  it('uses pending card motion during vote loading', () => {
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'idle',
+        showPendingUi: true,
+        loadingPair: false,
+        homepageMode: false,
+      }),
+    ).toBe('pending');
+  });
+
+  it('keeps homepage next-fetch on idle geometry even when the center loader is shown', () => {
+    const flags = getDuelLoaderFlags({
+      homepageMode: true,
+      showPendingUi: false,
+      showDelayedNextPending: true,
+      transition: 'idle',
+    });
+
+    expect(flags.showCenterLoader).toBe(true);
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'idle',
+        showPendingUi: false,
+        loadingPair: true,
+        homepageMode: true,
+      }),
+    ).toBe('idle');
+  });
+
+  it('keeps homepage vote-loading on pending geometry via the real loader→motion chain', () => {
+    const flags = getDuelLoaderFlags({
+      homepageMode: true,
+      showPendingUi: true,
+      showDelayedNextPending: false,
+      transition: 'idle',
+    });
+
+    expect(flags.showCenterLoader).toBe(true);
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'idle',
+        showPendingUi: true,
+        loadingPair: false,
+        homepageMode: true,
+      }),
+    ).toBe('pending');
+  });
+
+  it('keeps the /duels center loader during next-pair fetch while idle', () => {
+    expect(
+      getDuelLoaderFlags({
+        homepageMode: false,
+        showPendingUi: false,
+        showDelayedNextPending: true,
+        transition: 'idle',
+      }),
+    ).toEqual({
+      showCenterLoader: true,
+      showHomepageStageOverlay: false,
+    });
+  });
+
+  it('hides the /duels center loader once exit starts', () => {
+    expect(
+      getDuelLoaderFlags({
+        homepageMode: false,
+        showPendingUi: false,
+        showDelayedNextPending: true,
+        transition: 'exit',
+      }),
+    ).toEqual({
+      showCenterLoader: false,
+      showHomepageStageOverlay: false,
+    });
+  });
+
+  it('does not hide the homepage center loader during exit', () => {
+    expect(
+      getDuelLoaderFlags({
+        homepageMode: true,
+        showPendingUi: false,
+        showDelayedNextPending: true,
+        transition: 'exit',
       }),
     ).toEqual({
       showCenterLoader: true,
