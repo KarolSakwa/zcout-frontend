@@ -17,11 +17,14 @@ export default function AttributeIcon({
   className,
 }: AttributeIconProps) {
   const [failed, setFailed] = useState(false);
-  useEffect(() => {
-  setFailed(false);
-}, [attributeKey]);
+  const trimmedKey = attributeKey.trim();
+  const showFallback = !trimmedKey || failed;
 
-  if (failed) {
+  useEffect(() => {
+    setFailed(false);
+  }, [attributeKey]);
+
+  if (showFallback) {
     return (
       <span
         className={className}
@@ -40,20 +43,21 @@ export default function AttributeIcon({
 
   return (
     <Image
-        src={`/icons/attribute-icons/${attributeKey}.svg`}
-        alt={label ? `${label} icon` : ''}
-        width={size}
-        height={size}
-        className={className}
-        aria-hidden={label ? undefined : true}
-        onError={() => setFailed(true)}
-        style={{
-            width: size,
-            height: size,
-            flex: `0 0 ${size}px`,
-            objectFit: 'contain',
-            filter: 'brightness(0) saturate(100%) invert(72%) sepia(55%) saturate(5111%) hue-rotate(193deg) brightness(101%) contrast(103%)',
-        }}
-        />
+      src={`/icons/attribute-icons/${trimmedKey}.svg`}
+      alt={label ? `${label} icon` : ''}
+      width={size}
+      height={size}
+      className={className}
+      aria-hidden={label ? undefined : true}
+      onError={() => setFailed(true)}
+      style={{
+        width: size,
+        height: size,
+        flex: `0 0 ${size}px`,
+        objectFit: 'contain',
+        filter:
+          'brightness(0) saturate(100%) invert(72%) sepia(55%) saturate(5111%) hue-rotate(193deg) brightness(101%) contrast(103%)',
+      }}
+    />
   );
 }
