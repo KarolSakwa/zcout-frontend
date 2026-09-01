@@ -456,6 +456,7 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const cardMotion = getDuelCardMotionPhase({
     transition,
     showPendingUi,
+    showDelayedNextPending,
     loadingPair,
     homepageMode,
   });

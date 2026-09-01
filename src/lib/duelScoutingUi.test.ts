@@ -173,6 +173,38 @@ describe('duel scouting UI lifecycle', () => {
     });
   });
 
+  it('keeps /duels pending geometry while the delayed loader outlives loadingPair', () => {
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'idle',
+        showPendingUi: false,
+        showDelayedNextPending: true,
+        loadingPair: false,
+        homepageMode: false,
+      }),
+    ).toBe('pending');
+  });
+
+  it('aligns /duels center loader visibility with pending card geometry', () => {
+    const flags = getDuelLoaderFlags({
+      homepageMode: false,
+      showPendingUi: false,
+      showDelayedNextPending: true,
+      transition: 'idle',
+    });
+
+    expect(flags.showCenterLoader).toBe(true);
+    expect(
+      getDuelCardMotionPhase({
+        transition: 'idle',
+        showPendingUi: false,
+        showDelayedNextPending: true,
+        loadingPair: false,
+        homepageMode: false,
+      }),
+    ).toBe('pending');
+  });
+
   it('hides the /duels center loader once exit starts', () => {
     expect(
       getDuelLoaderFlags({

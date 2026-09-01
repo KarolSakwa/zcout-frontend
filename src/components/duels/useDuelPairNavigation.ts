@@ -54,6 +54,12 @@ export function useDuelPairNavigation({
   prepareNextPairRef.current = prepareNextPair;
   onPairSwappedRef.current = onPairSwapped;
 
+  const finishLoadingPair = useCallback(() => {
+    loadingPairRef.current = false;
+    setLoadingPair(false);
+    setShowDelayedNextPending(false);
+  }, []);
+
   const fetchInitialPair = useCallback(async () => {
     clearAutoNext(true);
 
@@ -86,10 +92,9 @@ export function useDuelPairNavigation({
       setTransition("idle");
     } finally {
       if (fetchSeqRef.current !== seq) return;
-      loadingPairRef.current = false;
-      setLoadingPair(false);
+      finishLoadingPair();
     }
-  }, [clearAutoNext, resetRevealState]);
+  }, [clearAutoNext, resetRevealState, finishLoadingPair]);
 
   const fetchNextPair = useCallback(async () => {
     if (loadingPairRef.current) return;
@@ -117,8 +122,7 @@ export function useDuelPairNavigation({
         if (!ready) {
           setError("Błąd przygotowania kolejnego pojedynku");
           setTransition("idle");
-          loadingPairRef.current = false;
-          setLoadingPair(false);
+          finishLoadingPair();
           return;
         }
       }
@@ -136,8 +140,7 @@ export function useDuelPairNavigation({
         setTransition("enter");
         requestAnimationFrame(() => setTransition("idle"));
 
-        loadingPairRef.current = false;
-        setLoadingPair(false);
+        finishLoadingPair();
       }, SLIDE_MS);
     } catch (e: unknown) {
       if (controller.signal.aborted) return;
@@ -145,10 +148,9 @@ export function useDuelPairNavigation({
       const msg = e instanceof Error ? e.message : "Błąd pobierania pary";
       setError(msg);
       setTransition("idle");
-      loadingPairRef.current = false;
-      setLoadingPair(false);
+      finishLoadingPair();
     }
-  }, [clearAutoNext, resetRevealState]);
+  }, [clearAutoNext, resetRevealState, finishLoadingPair]);
 
   const goNext = useCallback(() => {
     clearPendingUi();
