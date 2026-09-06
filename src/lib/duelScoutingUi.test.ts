@@ -88,15 +88,13 @@ describe('duel scouting UI lifecycle', () => {
     });
   });
 
-  it('uses pending card motion while the /duels next-pair request is in flight', () => {
+  it('keeps /duels cards on idle geometry while the next-pair request is in flight', () => {
     expect(
       getDuelCardMotionPhase({
         transition: 'idle',
         showPendingUi: false,
-        loadingPair: true,
-        homepageMode: false,
       }),
-    ).toBe('pending');
+    ).toBe('idle');
   });
 
   it('keeps exit card motion after the next pair is ready, even if loading flags are still on', () => {
@@ -104,8 +102,6 @@ describe('duel scouting UI lifecycle', () => {
       getDuelCardMotionPhase({
         transition: 'exit',
         showPendingUi: false,
-        loadingPair: true,
-        homepageMode: false,
       }),
     ).toBe('exit');
   });
@@ -115,8 +111,6 @@ describe('duel scouting UI lifecycle', () => {
       getDuelCardMotionPhase({
         transition: 'idle',
         showPendingUi: true,
-        loadingPair: false,
-        homepageMode: false,
       }),
     ).toBe('pending');
   });
@@ -134,8 +128,6 @@ describe('duel scouting UI lifecycle', () => {
       getDuelCardMotionPhase({
         transition: 'idle',
         showPendingUi: false,
-        loadingPair: true,
-        homepageMode: true,
       }),
     ).toBe('idle');
   });
@@ -153,8 +145,6 @@ describe('duel scouting UI lifecycle', () => {
       getDuelCardMotionPhase({
         transition: 'idle',
         showPendingUi: true,
-        loadingPair: false,
-        homepageMode: true,
       }),
     ).toBe('pending');
   });
@@ -173,19 +163,16 @@ describe('duel scouting UI lifecycle', () => {
     });
   });
 
-  it('keeps /duels pending geometry while the delayed loader outlives loadingPair', () => {
+  it('keeps /duels idle geometry while the delayed loader outlives loadingPair', () => {
     expect(
       getDuelCardMotionPhase({
         transition: 'idle',
         showPendingUi: false,
-        showDelayedNextPending: true,
-        loadingPair: false,
-        homepageMode: false,
       }),
-    ).toBe('pending');
+    ).toBe('idle');
   });
 
-  it('aligns /duels center loader visibility with pending card geometry', () => {
+  it('shows the /duels center loader without moving the cards off idle geometry', () => {
     const flags = getDuelLoaderFlags({
       homepageMode: false,
       showPendingUi: false,
@@ -198,11 +185,8 @@ describe('duel scouting UI lifecycle', () => {
       getDuelCardMotionPhase({
         transition: 'idle',
         showPendingUi: false,
-        showDelayedNextPending: true,
-        loadingPair: false,
-        homepageMode: false,
       }),
-    ).toBe('pending');
+    ).toBe('idle');
   });
 
   it('hides the /duels center loader once exit starts', () => {

@@ -145,7 +145,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   } | null>(null);
   const [isCompactDuelLayout, setIsCompactDuelLayout] = useState(false);
   const [widgetsStacked, setWidgetsStacked] = useState(false);
-  const [narrowDuelsRailLayout, setNarrowDuelsRailLayout] = useState(false);
   const [homepageRowWidth, setHomepageRowWidth] = useState(
     HOMEPAGE_CANONICAL_ROW_PX,
   );
@@ -322,24 +321,17 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
 
     const mqCompact = window.matchMedia("(max-width: 700px)");
     const mqStacked = window.matchMedia("(max-width: 1200px)");
-    const mqNarrowRails = window.matchMedia(
-      "(min-width: 1201px) and (max-width: 1360px)",
-    );
     const updateCompact = () => setIsCompactDuelLayout(mqCompact.matches);
     const updateStacked = () => setWidgetsStacked(mqStacked.matches);
-    const updateNarrowRails = () => setNarrowDuelsRailLayout(mqNarrowRails.matches);
 
     updateCompact();
     updateStacked();
-    updateNarrowRails();
     mqCompact.addEventListener("change", updateCompact);
     mqStacked.addEventListener("change", updateStacked);
-    mqNarrowRails.addEventListener("change", updateNarrowRails);
 
     return () => {
       mqCompact.removeEventListener("change", updateCompact);
       mqStacked.removeEventListener("change", updateStacked);
-      mqNarrowRails.removeEventListener("change", updateNarrowRails);
     };
   }, [homepageMode]);
 
@@ -456,9 +448,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
   const cardMotion = getDuelCardMotionPhase({
     transition,
     showPendingUi,
-    showDelayedNextPending,
-    loadingPair,
-    homepageMode,
   });
 
   const cardStyle = useCallback(
@@ -483,20 +472,20 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       const isDuelsMobile = !homepageMode && isCompactDuelLayout;
       const isDuelsDesktopWide =
         !homepageMode && !isCompactDuelLayout && !widgetsStacked;
-      const INSET_X = homepageMode
-        ? Math.max(
-            0,
-            Math.round((homepageTrack - homepageCardGap) / 2),
-          )
-        : isDuelsDesktopWide
-          ? narrowDuelsRailLayout
-            ? 16
-            : HOMEPAGE_CANONICAL_INSET_PX
-          : isDuelsMobile
-            ? 10
-            : isCompactDuelLayout || widgetsStacked
-              ? 0
-              : HOMEPAGE_CANONICAL_INSET_PX;
+      /*
+       * Homepage measures its own inset from the observed row width. On /duels
+       * the inset lives in --duel-idle-inset next to --duel-center/--duel-gap,
+       * so it can never fall out of sync with the center track it pulls into.
+       */
+      const homepageInsetX = Math.max(
+        0,
+        Math.round((homepageTrack - homepageCardGap) / 2),
+      );
+      const idleTransform = homepageMode
+        ? `translateX(${isLeft ? homepageInsetX : -homepageInsetX}px)`
+        : `translateX(calc(var(--duel-idle-inset, ${HOMEPAGE_CANONICAL_INSET_PX}px) * ${
+            isLeft ? 1 : -1
+          }))`;
       const PENDING_X = homepageMode
         ? Math.round(2 * homepageScale)
         : isDuelsDesktopWide
@@ -539,17 +528,12 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
         };
       }
 
-      const x = cardMotion === "pending"
-        ? isLeft
-          ? -PENDING_X
-          : PENDING_X
-        : isLeft
-          ? INSET_X
-          : -INSET_X;
-
       return {
         ...base,
-        transform: `translateX(${x}px)`,
+        transform:
+          cardMotion === "pending"
+            ? `translateX(${isLeft ? -PENDING_X : PENDING_X}px)`
+            : idleTransform,
         opacity: 1,
         filter: "none",
       };
@@ -560,7 +544,6 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       showReveal,
       isCompactDuelLayout,
       widgetsStacked,
-      narrowDuelsRailLayout,
       homepageMode,
       homepageRowWidth,
     ],

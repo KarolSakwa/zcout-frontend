@@ -60,17 +60,13 @@ export type DuelCardMotionPhase = 'idle' | 'pending' | 'exit' | 'enter';
 export type DuelCardMotionPhaseInput = {
   transition: string;
   showPendingUi: boolean;
-  /** /duels next-pair delayed loader — must match center-loader visibility. */
-  showDelayedNextPending?: boolean;
-  loadingPair: boolean;
-  homepageMode: boolean;
 };
 
 /**
  * Vote-loading uses pending on homepage and /duels.
- * /duels next-pair fetch uses pending via loadingPair and showDelayedNextPending.
- * Homepage next-pair must stay on idle geometry even when the center loader shows.
- * Exit/enter always win so the pair-swap slide is not used as a loading spread.
+ * Next-pair fetch stays on idle geometry on both surfaces: the center loader
+ * fits the idle gap, so the pair swap reads as one slide instead of a spread
+ * followed by the exit. Exit/enter always win over pending.
  */
 export function getDuelCardMotionPhase(
   input: DuelCardMotionPhaseInput,
@@ -78,12 +74,6 @@ export function getDuelCardMotionPhase(
   if (input.transition === 'exit') return 'exit';
   if (input.transition === 'enter') return 'enter';
   if (input.showPendingUi) return 'pending';
-  if (
-    !input.homepageMode &&
-    (input.loadingPair || input.showDelayedNextPending)
-  ) {
-    return 'pending';
-  }
   return 'idle';
 }
 
