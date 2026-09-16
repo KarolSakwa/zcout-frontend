@@ -376,8 +376,12 @@
    * changes --duel-center/--duel-gap: the visible gap is
    * 2 * --duel-gap + --duel-center - 2 * --duel-idle-inset and must stay >= 40px
    * so the VS mark and the 34px center loader clear the cards.
+   *
+   * Exit offset must stay within the center column side margins so cards do not
+   * slide under the docked side rails (stage grid: widget | center | widget).
    */
   --duel-idle-inset: 48px;
+  --duel-exit-offset: 32px;
 
   --duel-card: min(
     var(--duel-card-max),
@@ -459,6 +463,7 @@
     --duel-gap: 22px;
     --duel-card-max: 238px;
     --duel-idle-inset: 30px;
+    --duel-exit-offset: 36px;
   }
 }
 
@@ -469,6 +474,7 @@
     --duel-gap: 18px;
     --duel-card-max: 228px;
     --duel-idle-inset: 16px;
+    --duel-exit-offset: 8px;
   }
 }
 
@@ -497,6 +503,7 @@
     --duel-center: 36px;
     --duel-gap: 8px;
     --duel-idle-inset: 0px;
+    --duel-exit-offset: 36px;
     --duel-row-max: min(720px, calc(100vw - 80px));
     --duel-card-max: min(
       262px,
@@ -535,6 +542,7 @@
   .duelShell:not(.duelHomepageShell) .duelPageCardsRow {
     --duel-row-max: min(425px, calc(100vw - 80px));
     --duel-idle-inset: 6px;
+    --duel-exit-offset: 32px;
     --duel-card-max: min(
       262px,
       calc((var(--duel-row-max) - var(--duel-center) - 2 * var(--duel-gap)) / 2)

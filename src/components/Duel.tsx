@@ -495,13 +495,10 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
             : isCompactDuelLayout || widgetsStacked
               ? 0
               : 2;
-      const EXIT_X = homepageMode
-        ? Math.round(90 * homepageScale)
-        : isDuelsDesktopWide
-          ? 90
-          : isCompactDuelLayout || widgetsStacked
-            ? 40
-            : 90;
+      const EXIT_X = homepageMode ? Math.round(90 * homepageScale) : 0;
+      const duelsExitTransform = `translateX(calc(var(--duel-exit-offset, 32px) * ${
+        isLeft ? -1 : 1
+      }))`;
       const ENTER_X = homepageMode
         ? Math.round(50 * homepageScale)
         : isDuelsDesktopWide
@@ -513,7 +510,9 @@ export default function Duel({ initialPair, homepageMode = false }: DuelProps) {
       if (cardMotion === "exit") {
         return {
           ...base,
-          transform: `translateX(${isLeft ? -EXIT_X : EXIT_X}px)`,
+          transform: homepageMode
+            ? `translateX(${isLeft ? -EXIT_X : EXIT_X}px)`
+            : duelsExitTransform,
           opacity: 0,
           filter: "blur(6px)",
         };
