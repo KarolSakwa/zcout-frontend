@@ -270,12 +270,6 @@ export default function PlayerProfileCard({
             <div className={styles.topCardLeft}>
               <div className={styles.topCardIdentity}>
                 <h1 className={styles.playerName}>
-                  {data.number != null ? (
-                    <span className={styles.playerNumberInline}>
-                      #{data.number}
-                    </span>
-                  ) : null}
-
                   <span>{data.name}</span>
                 </h1>
                 {data.archetype ? (
